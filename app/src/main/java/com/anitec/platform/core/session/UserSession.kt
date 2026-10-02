@@ -16,6 +16,7 @@ data class UserSession(
     val fullName: String,
     val role: UserRole,
     val token: String,
+    val email: String? = null,
 )
 
 sealed interface SessionState {

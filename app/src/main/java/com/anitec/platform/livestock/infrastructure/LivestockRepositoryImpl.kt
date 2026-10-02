@@ -4,6 +4,8 @@ import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
+import com.anitec.platform.core.outbox.OutboxKinds
+import com.anitec.platform.core.outbox.OutboxQueue
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
@@ -19,6 +21,7 @@ import com.anitec.platform.livestock.domain.LivestockScope
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.livestock.infrastructure.remote.AnimalIdsDto
 import com.anitec.platform.livestock.infrastructure.remote.AnimalsStatusDto
+import com.anitec.platform.livestock.infrastructure.remote.AnimalDto
 import com.anitec.platform.livestock.infrastructure.remote.LivestockApi
 import com.anitec.platform.veterinary.infrastructure.remote.VeterinaryApi
 import kotlinx.coroutines.async
@@ -34,6 +37,7 @@ class LivestockRepositoryImpl @Inject constructor(
     private val veterinaryApi: VeterinaryApi,
     private val dao: LivestockDao,
     private val sessionStore: SessionStore,
+    private val outbox: OutboxQueue,
 ) : LivestockRepository {
 
     override fun observeHerds(): Flow<List<Herd>> = dao.observeHerds().map { list -> list.map { it.toDomain() } }
@@ -97,8 +101,18 @@ class LivestockRepositoryImpl @Inject constructor(
 
     // --- animals ---
 
-    override suspend fun createAnimal(draft: AnimalDraft): AppResult<Animal> =
-        safeApiCall { api.createAnimal(draft.toDto()).toDomain() }.onSuccess { dao.upsertAnimal(it.toEntity()) }
+    override suspend fun createAnimal(draft: AnimalDraft): AppResult<Animal> {
+        val body = draft.toDto()
+        val result = safeApiCall { api.createAnimal(body).toDomain() }
+        if (result is AppResult.Failure && result.error == AppError.Network) {
+            // No connection: keep the animal locally under a temporary id and send it later.
+            val localId = outbox.enqueue(OutboxKinds.CREATE_ANIMAL, AnimalDto.serializer(), body)
+            val pending = body.toDomain().copy(id = localId)
+            dao.upsertAnimal(pending.toEntity())
+            return AppResult.Success(pending)
+        }
+        return result.onSuccess { dao.upsertAnimal(it.toEntity()) }
+    }
 
     override suspend fun updateAnimal(id: Int, draft: AnimalDraft): AppResult<Animal> =
         safeApiCall { api.updateAnimal(id, draft.toDto()).toDomain() }.onSuccess { dao.upsertAnimal(it.toEntity()) }

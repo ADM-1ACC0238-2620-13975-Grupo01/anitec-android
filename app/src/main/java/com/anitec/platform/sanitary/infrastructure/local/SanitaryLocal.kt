@@ -32,7 +32,12 @@ interface SanitaryDao {
     @Upsert suspend fun upsert(event: HealthEventEntity)
     @Upsert suspend fun upsertAll(events: List<HealthEventEntity>)
     @Query("DELETE FROM health_events WHERE id = :id") suspend fun delete(id: Int)
-    @Query("DELETE FROM health_events") suspend fun clear()
+    // Records created offline have negative ids and must survive a refresh until they are sent.
+    @Query("DELETE FROM health_events WHERE id >= 0") suspend fun clear()
+
+    /** Moves the records of an animal created offline to the id the server gave it. */
+    @Query("UPDATE health_events SET animalId = :realId WHERE animalId = :localId")
+    suspend fun reassignAnimal(localId: Int, realId: Int)
 
     @Transaction
     suspend fun replaceAll(events: List<HealthEventEntity>) {

@@ -69,7 +69,11 @@ fun AniTecTextField(
         singleLine = singleLine,
         minLines = minLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
-        keyboardActions = KeyboardActions(onDone = { onImeAction?.invoke() }, onGo = { onImeAction?.invoke() }),
+        keyboardActions = KeyboardActions(
+            onDone = { onImeAction?.invoke() },
+            onGo = { onImeAction?.invoke() },
+            onSearch = { onImeAction?.invoke() },
+        ),
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         shape = MaterialTheme.shapes.medium,

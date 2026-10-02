@@ -8,7 +8,13 @@ interface AuthRepository {
     suspend fun signIn(username: String, password: String): AppResult<UserSession>
 
     /** The API's sign-up returns no token, so a successful registration is followed by a sign-in. */
-    suspend fun signUp(fullName: String, username: String, password: String, role: UserRole): AppResult<UserSession>
+    suspend fun signUp(
+        fullName: String,
+        username: String,
+        password: String,
+        role: UserRole,
+        email: String? = null,
+    ): AppResult<UserSession>
 
     suspend fun signOut()
 }

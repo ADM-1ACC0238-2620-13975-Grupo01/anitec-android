@@ -59,6 +59,10 @@
     <string name="auth_role_veterinarian_badge">Veterinarian account</string>
     <string name="auth_no_account">Don\'t have an account? Create one</string>
     <string name="auth_have_account">Already have an account? Sign in</string>
+    <string name="auth_email">Email (optional)</string>
+    <string name="auth_email_hint">name@example.com</string>
+    <string name="auth_email_invalid">Enter a valid email address.</string>
+    <string name="auth_email_taken">That email is already registered.</string>
     <string name="auth_passwords_mismatch">Passwords do not match</string>
     <string name="auth_invalid_credentials">Invalid username or password.</string>
     <string name="auth_username_taken">That username is already taken.</string>

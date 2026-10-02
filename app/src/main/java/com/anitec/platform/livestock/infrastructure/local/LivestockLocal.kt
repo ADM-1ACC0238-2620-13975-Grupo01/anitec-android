@@ -60,6 +60,10 @@ interface LivestockDao {
     @Query("SELECT id FROM animals")
     suspend fun animalIds(): List<Int>
 
+    /** Ids of the herds the user may see. */
+    @Query("SELECT id FROM herds")
+    suspend fun herdIds(): List<Int>
+
     @Upsert suspend fun upsertHerd(herd: HerdEntity)
     @Upsert suspend fun upsertCorral(corral: CorralEntity)
     @Upsert suspend fun upsertAnimal(animal: AnimalEntity)
@@ -76,7 +80,8 @@ interface LivestockDao {
 
     @Query("DELETE FROM herds") suspend fun clearHerds()
     @Query("DELETE FROM corrals") suspend fun clearCorrals()
-    @Query("DELETE FROM animals") suspend fun clearAnimals()
+    // Animals created offline have negative ids and must survive a refresh until they are sent.
+    @Query("DELETE FROM animals WHERE id >= 0") suspend fun clearAnimals()
 
     @Upsert suspend fun upsertHerds(herds: List<HerdEntity>)
     @Upsert suspend fun upsertCorrals(corrals: List<CorralEntity>)

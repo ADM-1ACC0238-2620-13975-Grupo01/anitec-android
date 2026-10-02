@@ -29,6 +29,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.pluralStringResource
+import com.anitec.platform.core.designsystem.component.ConfirmDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,16 +55,16 @@ private fun moreItems(role: UserRole): List<MoreItem> = when (role) {
     UserRole.Rancher -> listOf(
         MoreItem(R.string.nav_herds, Icons.Filled.Place, HerdsRoute),
         MoreItem(R.string.nav_corrals, Icons.Filled.GridView, CorralsRoute),
-        MoreItem(R.string.nav_finance, Icons.Filled.AccountBalanceWallet, PlaceholderRoute(R.string.nav_finance)),
-        MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, PlaceholderRoute(R.string.nav_analytics)),
-        MoreItem(R.string.nav_iot, Icons.Filled.Sensors, PlaceholderRoute(R.string.nav_iot)),
+        MoreItem(R.string.nav_finance, Icons.Filled.AccountBalanceWallet, FinancialRoute),
+        MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, AnalyticsRoute),
+        MoreItem(R.string.nav_iot, Icons.Filled.Sensors, DevicesRoute),
         MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, PlaceholderRoute(R.string.nav_subscriptions)),
         MoreItem(R.string.nav_terms, Icons.Filled.Description, TermsRoute),
     )
     UserRole.Veterinarian -> listOf(
-        MoreItem(R.string.nav_clients, Icons.Filled.People, PlaceholderRoute(R.string.nav_clients)),
-        MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, PlaceholderRoute(R.string.nav_analytics)),
-        MoreItem(R.string.nav_iot, Icons.Filled.Sensors, PlaceholderRoute(R.string.nav_iot)),
+        MoreItem(R.string.nav_clients, Icons.Filled.People, ClientsRoute),
+        MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, AnalyticsRoute),
+        MoreItem(R.string.nav_iot, Icons.Filled.Sensors, DevicesRoute),
         MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, PlaceholderRoute(R.string.nav_subscriptions)),
         MoreItem(R.string.nav_terms, Icons.Filled.Description, TermsRoute),
     )
@@ -70,8 +76,11 @@ fun MoreScreen(
     onOpen: (Any) -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Changes made offline and not sent yet; signing out would lose them. */
+    unsyncedCount: Int = 0,
 ) {
     val items = moreItems(session.role)
+    var confirmSignOut by remember { mutableStateOf(false) }
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -79,6 +88,9 @@ fun MoreScreen(
         AniTecPanel(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(session.fullName, style = MaterialTheme.typography.titleMedium)
+                session.email?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 Text(
                     stringResource(R.string.shell_signed_in_as, session.username, stringResource(session.role.labelRes())),
                     style = MaterialTheme.typography.bodySmall,
@@ -113,9 +125,23 @@ fun MoreScreen(
 
         DangerTextButton(
             text = stringResource(R.string.nav_sign_out),
-            onClick = onSignOut,
+            onClick = { if (unsyncedCount > 0) confirmSignOut = true else onSignOut() },
             icon = Icons.AutoMirrored.Filled.Logout,
             modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    if (confirmSignOut) {
+        ConfirmDialog(
+            title = stringResource(R.string.sync_sign_out_title),
+            message = pluralStringResource(R.plurals.sync_sign_out_message, unsyncedCount, unsyncedCount),
+            confirmLabel = stringResource(R.string.nav_sign_out),
+            dismissLabel = stringResource(R.string.common_cancel),
+            onConfirm = {
+                confirmSignOut = false
+                onSignOut()
+            },
+            onDismiss = { confirmSignOut = false },
         )
     }
 }

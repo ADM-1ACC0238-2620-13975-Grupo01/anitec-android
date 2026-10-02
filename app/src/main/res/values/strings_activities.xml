@@ -1,0 +1,34 @@
+<resources>
+    <string name="activities_empty">No activities scheduled.</string>
+    <string name="activities_new">New activity</string>
+    <string name="activities_confirm_delete">Delete the activity "%1$s"? This cannot be undone.</string>
+    <string name="activity_form_new">New activity</string>
+    <string name="activity_form_edit">Edit activity</string>
+    <string name="activity_form_subtitle">Schedule a task for the farm or for a client.</string>
+    <string name="activity_title">Title</string>
+    <string name="activity_type">Type</string>
+    <string name="activity_date">Date</string>
+    <string name="activity_priority">Priority</string>
+    <string name="activity_status">Status</string>
+    <string name="activity_for_client">Client</string>
+    <string name="activity_overdue">Overdue</string>
+    <string name="activity_save_error">The activity could not be saved.</string>
+
+    <string name="activity_type_health">Health</string>
+    <string name="activity_type_vet_visit">Veterinary visit</string>
+    <string name="activity_type_production">Production</string>
+    <string name="activity_type_financial">Financial</string>
+    <string name="activity_type_reproductive">Reproductive</string>
+    <string name="activity_type_vaccination">Vaccination</string>
+    <string name="activity_type_treatment_followup">Treatment follow-up</string>
+    <string name="activity_priority_high">High</string>
+    <string name="activity_priority_medium">Medium</string>
+    <string name="activity_priority_low">Low</string>
+    <string name="activity_status_pending">Pending</string>
+    <string name="activity_status_scheduled">Scheduled</string>
+    <string name="activity_status_completed">Completed</string>
+
+    <string name="home_metric_upcoming">Upcoming activities</string>
+    <string name="home_upcoming_title">Upcoming activities</string>
+    <string name="home_upcoming_empty">No upcoming activities.</string>
+</resources>

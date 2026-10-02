@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.R
+import com.anitec.platform.activities.interfaces.ui.ActivityCard
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.DropdownField
@@ -55,6 +57,7 @@ import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
 import com.anitec.platform.sanitary.interfaces.ui.HealthRecordCard
+import com.anitec.platform.veterinary.interfaces.ui.VetHome
 
 @Composable
 fun HomeScreen(
@@ -62,18 +65,22 @@ fun HomeScreen(
     onRegisterAnimal: () -> Unit,
     onRecordHealth: () -> Unit,
     onViewAllHealth: () -> Unit,
+    onViewAllActivities: () -> Unit,
+    onAddClient: () -> Unit,
+    onViewPatients: (Int) -> Unit,
+    onOpenClients: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (session.role) {
-        UserRole.Rancher -> RancherHome(session, onRegisterAnimal, onRecordHealth, onViewAllHealth, modifier)
-        // The veterinarian dashboard is built together with the veterinary module.
-        UserRole.Veterinarian -> Column(
-            modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            GreetingPanel(session)
-            EmptyState(stringResource(R.string.common_coming_soon))
-        }
+        UserRole.Rancher -> RancherHome(session, onRegisterAnimal, onRecordHealth, onViewAllHealth, onViewAllActivities, modifier)
+        UserRole.Veterinarian -> VetHome(
+            session = session,
+            onAddClient = onAddClient,
+            onReviewRecords = onViewAllHealth,
+            onViewPatients = onViewPatients,
+            onOpenClients = onOpenClients,
+            modifier = modifier,
+        )
     }
 }
 
@@ -95,6 +102,7 @@ private fun RancherHome(
     onRegisterAnimal: () -> Unit,
     onRecordHealth: () -> Unit,
     onViewAllHealth: () -> Unit,
+    onViewAllActivities: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -164,6 +172,23 @@ private fun RancherHome(
                         icon = Icons.Filled.EventRepeat,
                         modifier = Modifier.weight(1f),
                     )
+                }
+
+                MetricCard(
+                    label = stringResource(R.string.home_metric_upcoming),
+                    value = state.upcomingCount.toString(),
+                    icon = Icons.Filled.Event,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.home_upcoming_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    TextButton(onClick = onViewAllActivities) { Text(stringResource(R.string.home_view_all), color = MaterialTheme.colorScheme.primary) }
+                }
+                if (state.upcoming.isEmpty()) {
+                    EmptyState(stringResource(R.string.home_upcoming_empty))
+                } else {
+                    state.upcoming.forEach { ActivityCard(it, state.today) }
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

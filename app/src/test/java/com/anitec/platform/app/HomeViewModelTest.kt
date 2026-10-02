@@ -1,5 +1,8 @@
 package com.anitec.platform.app
 
+import com.anitec.platform.activities.application.ObserveActivitiesUseCase
+import com.anitec.platform.activities.application.RefreshActivitiesUseCase
+import com.anitec.platform.activities.domain.ActivitiesRepository
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
 import com.anitec.platform.livestock.application.ObserveHerdsUseCase
@@ -64,9 +67,13 @@ class HomeViewModelTest {
         val sanitary = mockk<SanitaryRepository>()
         every { sanitary.observeEvents() } returns flowOf(events)
         coEvery { sanitary.refresh() } returns AppResult.Success(Unit)
+        val activities = mockk<ActivitiesRepository>()
+        every { activities.observeActivities() } returns flowOf(emptyList())
+        coEvery { activities.refresh() } returns AppResult.Success(Unit)
         return HomeViewModel(
             ObserveHerdsUseCase(livestock), ObserveAnimalsUseCase(livestock), ObserveHealthEventsUseCase(sanitary),
-            RefreshLivestockUseCase(livestock), RefreshSanitaryUseCase(sanitary),
+            ObserveActivitiesUseCase(activities), RefreshLivestockUseCase(livestock), RefreshSanitaryUseCase(sanitary),
+            RefreshActivitiesUseCase(activities),
         )
     }
 

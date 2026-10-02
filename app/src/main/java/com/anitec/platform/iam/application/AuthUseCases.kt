@@ -1,6 +1,7 @@
 package com.anitec.platform.iam.application
 
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.common.EmailValidator
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.domain.AuthRepository
@@ -17,7 +18,8 @@ class SignUpUseCase @Inject constructor(private val repository: AuthRepository) 
         username: String,
         password: String,
         role: UserRole,
-    ): AppResult<UserSession> = repository.signUp(fullName.trim(), username.trim(), password, role)
+        email: String? = null,
+    ): AppResult<UserSession> = repository.signUp(fullName.trim(), username.trim(), password, role, email?.let(EmailValidator::normalize))
 }
 
 class SignOutUseCase @Inject constructor(private val repository: AuthRepository) {

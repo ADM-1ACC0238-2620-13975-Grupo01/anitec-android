@@ -25,7 +25,7 @@ class AuthRepositoryImpl @Inject constructor(
                 val dto = result.value
                 val role = UserRole.fromApi(dto.role)
                     ?: return AppResult.Failure(AppError.Unknown("Unsupported role: ${dto.role}"))
-                val session = UserSession(dto.id, dto.username, dto.fullName.ifBlank { dto.username }, role, dto.token)
+                val session = UserSession(dto.id, dto.username, dto.fullName.ifBlank { dto.username }, role, dto.token, dto.email)
                 sessionStore.save(session)
                 AppResult.Success(session)
             }
@@ -37,8 +37,9 @@ class AuthRepositoryImpl @Inject constructor(
         username: String,
         password: String,
         role: UserRole,
+        email: String?,
     ): AppResult<UserSession> {
-        val created = safeApiCall { api.signUp(SignUpRequestDto(username, password, fullName, role.apiValue)) }
+        val created = safeApiCall { api.signUp(SignUpRequestDto(username, password, fullName, role.apiValue, email)) }
         return when (created) {
             is AppResult.Failure -> created
             is AppResult.Success -> signIn(username, password)

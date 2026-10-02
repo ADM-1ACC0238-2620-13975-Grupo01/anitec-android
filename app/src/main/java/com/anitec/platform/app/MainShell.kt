@@ -2,6 +2,11 @@ package com.anitec.platform.app
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anitec.platform.sync.SyncBanner
+import com.anitec.platform.sync.SyncStatusViewModel
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -16,6 +21,8 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -43,6 +50,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.anitec.platform.R
+import com.anitec.platform.activities.interfaces.ui.ActivityFormScreen
+import com.anitec.platform.activities.interfaces.ui.ActivityListScreen
+import com.anitec.platform.analytics.interfaces.ui.AnalyticsScreen
+import com.anitec.platform.scanner.interfaces.ui.ScannerScreen
+import com.anitec.platform.devices.interfaces.ui.DeviceFormScreen
+import com.anitec.platform.devices.interfaces.ui.DeviceListScreen
+import com.anitec.platform.financial.interfaces.ui.FinancialFormScreen
+import com.anitec.platform.financial.interfaces.ui.FinancialListScreen
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.TermsScreen
@@ -52,6 +67,10 @@ import com.anitec.platform.livestock.interfaces.ui.CorralFormScreen
 import com.anitec.platform.livestock.interfaces.ui.CorralListScreen
 import com.anitec.platform.livestock.interfaces.ui.HerdFormScreen
 import com.anitec.platform.livestock.interfaces.ui.HerdListScreen
+import com.anitec.platform.veterinary.interfaces.ui.AddClientScreen
+import com.anitec.platform.veterinary.interfaces.ui.ClientListScreen
+import com.anitec.platform.veterinary.interfaces.ui.ClinicalHistoryScreen
+import com.anitec.platform.veterinary.interfaces.ui.PatientsScreen
 import com.anitec.platform.sanitary.interfaces.ui.HealthFormScreen
 import com.anitec.platform.sanitary.interfaces.ui.HealthListScreen
 
@@ -64,8 +83,8 @@ private data class BottomDestination(
 private fun bottomDestinations(role: UserRole): List<BottomDestination> = listOf(
     BottomDestination(HomeRoute, R.string.nav_home, Icons.Filled.Home),
     when (role) {
-        UserRole.Rancher -> BottomDestination(AnimalsRoute, R.string.nav_animals, Icons.Filled.Pets)
-        UserRole.Veterinarian -> BottomDestination(PatientsRoute, R.string.nav_patients, Icons.Filled.Badge)
+        UserRole.Rancher -> BottomDestination(AnimalsRoute(), R.string.nav_animals, Icons.Filled.Pets)
+        UserRole.Veterinarian -> BottomDestination(PatientsRoute(), R.string.nav_patients, Icons.Filled.Badge)
     },
     BottomDestination(HealthRoute, R.string.nav_health, Icons.Filled.Favorite),
     BottomDestination(ActivitiesRoute, R.string.nav_activities, Icons.Filled.Event),
@@ -77,6 +96,8 @@ private fun bottomDestinations(role: UserRole): List<BottomDestination> = listOf
 @Composable
 fun MainShell(session: UserSession, onSignOut: () -> Unit) {
     val navController = rememberNavController()
+    val syncViewModel: SyncStatusViewModel = hiltViewModel()
+    val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
     val destinations = remember(session.role) { bottomDestinations(session.role) }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -97,6 +118,11 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(stringResource(current.label), style = MaterialTheme.typography.titleLarge)
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { navController.navigate(ScannerRoute) }) {
+                            Icon(Icons.Filled.QrCodeScanner, contentDescription = stringResource(R.string.scanner_action))
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
@@ -124,10 +150,12 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             }
         },
     ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
+        SyncBanner(status = syncStatus, onRetry = syncViewModel::retry, onDiscard = syncViewModel::discardFailed)
         NavHost(
             navController = navController,
             startDestination = HomeRoute,
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.weight(1f),
         ) {
             composable<HomeRoute> {
                 HomeScreen(
@@ -135,6 +163,10 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                     onRegisterAnimal = { navController.navigate(AnimalFormRoute()) },
                     onRecordHealth = { navController.navigate(HealthFormRoute()) },
                     onViewAllHealth = { navController.navigateToTopLevel(HealthRoute) },
+                    onViewAllActivities = { navController.navigateToTopLevel(ActivitiesRoute) },
+                    onAddClient = { navController.navigate(AddClientRoute) },
+                    onViewPatients = { clientId -> navController.navigate(PatientsRoute(clientId)) },
+                    onOpenClients = { navController.navigate(ClientsRoute) },
                 )
             }
             composable<AnimalsRoute> {
@@ -143,7 +175,23 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                     onEditAnimal = { id -> navController.navigate(AnimalFormRoute(id)) },
                 )
             }
-            composable<PatientsRoute> { ComingSoonScreen() }
+            composable<PatientsRoute> {
+                PatientsScreen(onOpenHistory = { animalId -> navController.navigate(ClinicalHistoryRoute(animalId)) })
+            }
+            composable<ClinicalHistoryRoute> {
+                ClinicalHistoryScreen(
+                    onBack = { navController.popBackStack() },
+                    onNewRecord = { animalId -> navController.navigate(HealthFormRoute(animalId = animalId)) },
+                )
+            }
+            composable<ClientsRoute> {
+                ClientListScreen(
+                    onBack = { navController.popBackStack() },
+                    onAddClient = { navController.navigate(AddClientRoute) },
+                    onViewPatients = { clientId -> navController.navigate(PatientsRoute(clientId)) },
+                )
+            }
+            composable<AddClientRoute> { AddClientScreen(onBack = { navController.popBackStack() }) }
             composable<HealthRoute> {
                 HealthListScreen(
                     onNew = { navController.navigate(HealthFormRoute()) },
@@ -151,12 +199,50 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                 )
             }
             composable<HealthFormRoute> { HealthFormScreen(onBack = { navController.popBackStack() }) }
-            composable<ActivitiesRoute> { ComingSoonScreen() }
+            composable<ActivitiesRoute> {
+                ActivityListScreen(
+                    onNew = { navController.navigate(ActivityFormRoute()) },
+                    onEdit = { id -> navController.navigate(ActivityFormRoute(id)) },
+                )
+            }
+            composable<ActivityFormRoute> { ActivityFormScreen(onBack = { navController.popBackStack() }) }
+            composable<FinancialRoute> {
+                FinancialListScreen(
+                    onBack = { navController.popBackStack() },
+                    onNew = { navController.navigate(FinancialFormRoute()) },
+                    onEdit = { id -> navController.navigate(FinancialFormRoute(id)) },
+                )
+            }
+            composable<FinancialFormRoute> { FinancialFormScreen(onBack = { navController.popBackStack() }) }
+            composable<ScannerRoute> {
+                ScannerScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenAnimal = { id ->
+                        // A rancher sees the animal's record; a veterinarian its clinical history.
+                        navController.popBackStack()
+                        if (session.role == UserRole.Veterinarian) {
+                            navController.navigate(ClinicalHistoryRoute(id))
+                        } else {
+                            navController.navigate(AnimalsRoute(openAnimalId = id)) { launchSingleTop = true }
+                        }
+                    },
+                )
+            }
+            composable<AnalyticsRoute> { AnalyticsScreen(onBack = { navController.popBackStack() }) }
+            composable<DevicesRoute> {
+                DeviceListScreen(
+                    onBack = { navController.popBackStack() },
+                    onNew = { navController.navigate(DeviceFormRoute()) },
+                    onEdit = { id -> navController.navigate(DeviceFormRoute(id)) },
+                )
+            }
+            composable<DeviceFormRoute> { DeviceFormScreen(onBack = { navController.popBackStack() }) }
             composable<MoreRoute> {
                 MoreScreen(
                     session = session,
                     onOpen = { route -> navController.navigate(route) },
                     onSignOut = onSignOut,
+                    unsyncedCount = syncStatus.total,
                 )
             }
             composable<TermsRoute> { TermsScreen(onBack = { navController.popBackStack() }) }
@@ -188,6 +274,7 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                     onBack = { navController.popBackStack() },
                 )
             }
+        }
         }
     }
 }

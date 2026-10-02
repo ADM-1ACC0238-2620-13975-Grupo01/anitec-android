@@ -112,7 +112,7 @@ class AuthViewModelsTest {
         viewModel.submit()
 
         assertTrue(viewModel.state.value.passwordsMismatch)
-        coVerify(exactly = 0) { useCase(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { useCase(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -125,26 +125,26 @@ class AuthViewModelsTest {
         viewModel.submit()
 
         assertTrue(viewModel.state.value.termsMissing)
-        coVerify(exactly = 0) { useCase(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { useCase(any(), any(), any(), any(), any()) }
     }
 
     @Test
     fun `sign up sends the selected role`() {
         val useCase = mockk<SignUpUseCase>()
-        coEvery { useCase(any(), any(), any(), any()) } returns AppResult.Success(session)
+        coEvery { useCase(any(), any(), any(), any(), any()) } returns AppResult.Success(session)
         val viewModel = SignUpViewModel(useCase)
         viewModel.fillValid()
         viewModel.onRoleChange(UserRole.Veterinarian)
 
         viewModel.submit()
 
-        coVerify(exactly = 1) { useCase("Demo User", "demo", "secret", UserRole.Veterinarian) }
+        coVerify(exactly = 1) { useCase("Demo User", "demo", "secret", UserRole.Veterinarian, "") }
     }
 
     @Test
     fun `sign up with a taken username is reported`() {
         val useCase = mockk<SignUpUseCase>()
-        coEvery { useCase(any(), any(), any(), any()) } returns AppResult.Failure(AppError.Conflict())
+        coEvery { useCase(any(), any(), any(), any(), any()) } returns AppResult.Failure(AppError.Conflict())
         val viewModel = SignUpViewModel(useCase)
         viewModel.fillValid()
 

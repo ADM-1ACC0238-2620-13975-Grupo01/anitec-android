@@ -1,0 +1,16 @@
+<resources>
+    <string name="scanner_action">Scan animal tag</string>
+    <string name="scanner_title">Scan animal tag</string>
+    <string name="scanner_hint">Point the camera at the code on the animal tag (QR or barcode).</string>
+    <string name="scanner_permission">The camera is needed to read tag codes. You can also type the code below.</string>
+    <string name="scanner_denied">Camera access was denied. You can allow it, or type the code below.</string>
+    <string name="scanner_unavailable">The camera is not available on this device. Type the tag code below.</string>
+    <string name="scanner_grant">Allow camera</string>
+    <string name="scanner_found">Animal found</string>
+    <string name="scanner_not_found">No animal with the code "%1$s" in your records.</string>
+    <string name="scanner_open">Open record</string>
+    <string name="scanner_again">Scan again</string>
+    <string name="scanner_manual_title">Or type the code</string>
+    <string name="scanner_manual_label">Tag code</string>
+    <string name="scanner_lookup">Look up</string>
+</resources>

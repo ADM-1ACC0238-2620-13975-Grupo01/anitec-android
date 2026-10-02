@@ -1,0 +1,42 @@
+<resources>
+    <string name="iot_title">IoT devices</string>
+    <string name="iot_subtitle">Basic readings from sensors linked to farms or livestock animals.</string>
+    <string name="iot_new">Add device</string>
+    <string name="iot_empty">No devices linked to your farms or animals.</string>
+    <string name="iot_series">Serial number</string>
+    <string name="iot_location">Location</string>
+    <string name="iot_location_farm">Farm: %1$s</string>
+    <string name="iot_location_animal">Animal: %1$s</string>
+    <string name="iot_unassigned">Unassigned</string>
+    <string name="iot_readings">Readings</string>
+    <string name="iot_readings_count">%1$d registered</string>
+    <string name="iot_latest">Latest</string>
+    <string name="iot_no_readings">No readings</string>
+    <string name="iot_confirm_delete">Delete the device "%1$s"? This cannot be undone.</string>
+    <string name="iot_form_new">Add IoT device</string>
+    <string name="iot_form_edit">Edit IoT device</string>
+    <string name="iot_form_subtitle">Register the device and assign it to a farm or livestock animal.</string>
+    <string name="iot_name">Name</string>
+    <string name="iot_name_placeholder">E.g. Sensor collar 01</string>
+    <string name="iot_type">Type</string>
+    <string name="iot_serial">Serial number</string>
+    <string name="iot_serial_placeholder">E.g. IOT-ANI-001</string>
+    <string name="iot_status">Status</string>
+    <string name="iot_assign_to">Assign to</string>
+    <string name="iot_farm">Farm</string>
+    <string name="iot_animal">Animal</string>
+
+    <string name="iot_type_scale">Scale</string>
+    <string name="iot_type_collar">Smart collar</string>
+    <string name="iot_type_ear_tag">Identification ear tag</string>
+    <string name="iot_type_thermal_camera">Thermal camera</string>
+    <string name="iot_type_weather_station">Weather station</string>
+    <string name="iot_type_environmental">Environmental sensor</string>
+    <string name="iot_status_online">Online</string>
+    <string name="iot_status_maintenance">Maintenance</string>
+    <string name="iot_status_offline">Offline</string>
+    <string name="iot_metric_weight">Weight</string>
+    <string name="iot_metric_temperature">Temperature</string>
+    <string name="iot_metric_humidity">Humidity</string>
+    <string name="iot_metric_heart_rate">Heart rate</string>
+</resources>

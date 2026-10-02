@@ -59,6 +59,10 @@
     <string name="auth_role_veterinarian_badge">Cuenta veterinaria</string>
     <string name="auth_no_account">¿No tienes cuenta? Crea una</string>
     <string name="auth_have_account">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="auth_email">Correo electrónico (opcional)</string>
+    <string name="auth_email_hint">nombre@ejemplo.com</string>
+    <string name="auth_email_invalid">Ingresa un correo electrónico válido.</string>
+    <string name="auth_email_taken">Ese correo ya está registrado.</string>
     <string name="auth_passwords_mismatch">Las contraseñas no coinciden</string>
     <string name="auth_invalid_credentials">Usuario o contraseña incorrectos.</string>
     <string name="auth_username_taken">Ese nombre de usuario ya está en uso.</string>
