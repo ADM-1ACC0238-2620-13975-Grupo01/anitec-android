@@ -1,0 +1,46 @@
+<resources>
+    <!-- Health records -->
+    <string name="health_subtitle">Health history of your animals.</string>
+    <string name="health_empty">No health records yet.</string>
+    <string name="health_new">New record</string>
+    <string name="health_form_new">New health record</string>
+    <string name="health_form_edit">Edit health record</string>
+    <string name="health_form_subtitle">Register an incident, vaccine, treatment or check-up.</string>
+    <string name="health_type">Type</string>
+    <string name="health_date">Date</string>
+    <string name="health_next_due">Next due date (optional)</string>
+    <string name="health_veterinarian">Veterinarian</string>
+    <string name="health_description">Description</string>
+    <string name="health_diagnosis">Diagnosis</string>
+    <string name="health_treatment">Treatment</string>
+    <string name="health_prescription">Prescription</string>
+    <string name="health_follow_up">Follow-up notes</string>
+    <string name="health_tag_follow_up">Follow-up</string>
+    <string name="health_tag_closed">Closed</string>
+    <string name="health_confirm_delete">Delete this health record? This cannot be undone.</string>
+    <string name="health_no_animals">Register an animal first to add health records.</string>
+    <string name="health_save_error">The record could not be saved.</string>
+    <string name="health_choose_date">Choose date</string>
+    <string name="health_clear_date">Clear date</string>
+    <string name="health_type_incident">Incident</string>
+    <string name="health_type_vaccine">Vaccine</string>
+    <string name="health_type_treatment">Treatment</string>
+    <string name="health_type_diagnosis">Diagnosis</string>
+    <string name="health_type_checkup">Check-up</string>
+
+    <!-- Rancher home -->
+    <string name="home_subtitle">This is how your livestock is doing.</string>
+    <string name="home_all_farms">All farms</string>
+    <string name="home_farm_filter">Farm</string>
+    <string name="home_metric_animals">Animals</string>
+    <string name="home_metric_attention">Need attention</string>
+    <string name="home_metric_records">Health records</string>
+    <string name="home_metric_followups">Pending follow-ups</string>
+    <string name="home_metric_attention_caption">Under observation or in treatment</string>
+    <string name="home_quick_title">Quick actions</string>
+    <string name="home_action_register_animal">Register animal</string>
+    <string name="home_action_record_health">Record health</string>
+    <string name="home_recent_title">Recent health records</string>
+    <string name="home_recent_empty">No health records yet.</string>
+    <string name="home_view_all">View all</string>
+</resources>

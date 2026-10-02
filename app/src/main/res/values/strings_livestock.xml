@@ -1,0 +1,131 @@
+<resources>
+    <!-- Animal list -->
+    <string name="animals_search_hint">Search by code, name, species, breed, farm or status</string>
+    <string name="animals_filter_corral">Corral</string>
+    <string name="animals_all_corrals">All corrals</string>
+    <string name="animals_count">%1$d of %2$d animals</string>
+    <string name="animals_empty">No animals registered yet.</string>
+    <string name="animals_empty_search">No animals match your search.</string>
+    <string name="animals_new">New animal</string>
+    <string name="animals_selected_count">%1$d selected</string>
+    <string name="animals_select_all">Select all</string>
+    <string name="animals_clear_selection">Clear selection</string>
+    <string name="animals_change_status">Change status</string>
+    <string name="animals_delete_selected">Delete selected</string>
+    <string name="animals_status_dialog_title">Set status for selected animals</string>
+    <string name="animals_confirm_delete_one">Delete %1$s? This cannot be undone.</string>
+    <string name="animals_confirm_delete_many">Delete %1$d animals? This cannot be undone.</string>
+    <string name="animals_confirm_status">Mark %1$d animals as %2$s?</string>
+    <string name="animals_saved">Changes saved.</string>
+    <string name="animals_detail_title">Animal record</string>
+    <string name="animals_no_photo">No photo</string>
+    <string name="animals_edit">Edit</string>
+    <string name="animals_open_record">View record</string>
+
+    <!-- Animal fields -->
+    <string name="animal_tag">Code</string>
+    <string name="animal_name">Name</string>
+    <string name="animal_species">Animal type</string>
+    <string name="animal_breed">Breed</string>
+    <string name="animal_gender">Sex</string>
+    <string name="animal_birth_date">Birth date</string>
+    <string name="animal_weight">Weight (kg)</string>
+    <string name="animal_status">Status</string>
+    <string name="animal_herd">Farm</string>
+    <string name="animal_corral">Corral</string>
+    <string name="animal_source">Origin</string>
+    <string name="animal_age_range">Approximate age</string>
+    <string name="animal_photo">Photo</string>
+    <string name="animal_no_birth_date">No date</string>
+    <string name="animal_no_corral">No corral</string>
+    <string name="animal_select">Select</string>
+
+    <!-- Animal form -->
+    <string name="animal_form_new">Register animal</string>
+    <string name="animal_form_edit">Edit animal</string>
+    <string name="animal_form_subtitle">Complete the record to start tracking this animal.</string>
+    <string name="animal_mode_individual">Individual</string>
+    <string name="animal_mode_bulk">Several (corral)</string>
+    <string name="animal_quantity">Number of animals</string>
+    <string name="animal_bulk_hint">One record is created per animal, with a code generated from the corral name.</string>
+    <string name="animal_bulk_photo_hint">We recommend a photo of the corral with all the animals, not of a single one.</string>
+    <string name="animal_no_corrals_for_herd">This farm has no corrals yet.</string>
+    <string name="animal_create_corral">Create a corral</string>
+    <string name="animal_choose_date">Choose date</string>
+    <string name="animal_invalid_weight">Enter a valid weight</string>
+    <string name="animal_error_placement">The corral does not belong to the selected farm.</string>
+    <string name="animal_error_batch_size">Enter a number between 1 and 500.</string>
+    <string name="animal_error_nothing_selected">Select at least one animal.</string>
+    <string name="animal_save_error">The animal could not be saved.</string>
+
+    <!-- Animal photo -->
+    <string name="animal_photo_take">Take photo</string>
+    <string name="animal_photo_choose">Choose from gallery</string>
+    <string name="animal_photo_remove">Remove photo</string>
+    <string name="animal_photo_uploading">Uploading photo…</string>
+    <string name="animal_photo_error">The photo could not be uploaded. Try again.</string>
+    <string name="animal_photo_camera_denied">Camera permission was denied. You can still choose a photo from the gallery.</string>
+    <string name="animal_photo_camera_unavailable">No camera is available on this device.</string>
+
+    <!-- Status -->
+    <string name="status_healthy">Healthy</string>
+    <string name="status_observation">Under observation</string>
+    <string name="status_in_treatment">In treatment</string>
+    <string name="status_sold">Sold</string>
+
+    <!-- Option values -->
+    <string name="species_cattle">Cattle</string>
+    <string name="species_sheep">Sheep</string>
+    <string name="species_goat">Goat</string>
+    <string name="species_pig">Pig</string>
+    <string name="species_horse">Horse</string>
+    <string name="species_chicken">Chicken</string>
+    <string name="species_duck">Duck</string>
+    <string name="species_hen">Hen</string>
+    <string name="species_turkey">Turkey</string>
+    <string name="species_guinea_pig">Guinea pig</string>
+    <string name="species_other">Other</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_mixed">Mixed</string>
+    <string name="source_purchased">Purchased</string>
+    <string name="source_born_on_farm">Born on the farm</string>
+    <string name="source_donation">Donation</string>
+    <string name="source_other">Other</string>
+    <string name="age_young">Young</string>
+    <string name="age_juvenile">Juvenile</string>
+    <string name="age_adult">Adult</string>
+    <string name="herdtype_poultry">Poultry</string>
+
+    <!-- Herds (farms) -->
+    <string name="herds_subtitle">Manage your farms and livestock units.</string>
+    <string name="herds_empty">No farms registered yet.</string>
+    <string name="herds_new">New farm</string>
+    <string name="herd_form_new">New farm</string>
+    <string name="herd_form_edit">Edit farm</string>
+    <string name="herd_form_subtitle">Farms group your corrals and animals.</string>
+    <string name="herd_name">Farm name</string>
+    <string name="herd_location">Location</string>
+    <string name="herd_owner">Owner</string>
+    <string name="herd_main_type">Main livestock</string>
+    <string name="herd_animals_count">%1$d animals</string>
+    <string name="herd_corrals_count">%1$d corrals</string>
+    <string name="herd_confirm_delete">Delete the farm %1$s?</string>
+    <string name="herd_delete_blocked">This farm still has corrals or animals. Move or delete them first.</string>
+    <string name="herd_save_error">The farm could not be saved.</string>
+
+    <!-- Corrals -->
+    <string name="corrals_subtitle">Manage the physical corrals inside your farms.</string>
+    <string name="corrals_empty">No corrals registered yet.</string>
+    <string name="corrals_new">New corral</string>
+    <string name="corral_form_new">New corral</string>
+    <string name="corral_form_edit">Edit corral</string>
+    <string name="corral_form_subtitle">Animals are registered inside a corral.</string>
+    <string name="corral_name">Corral name</string>
+    <string name="corral_herd">Farm</string>
+    <string name="corral_no_herds">Create a farm first to add corrals.</string>
+    <string name="corral_confirm_delete">Delete the corral %1$s?</string>
+    <string name="corral_confirm_delete_with_animals">Delete the corral %1$s? Its %2$d animals will be left without a corral.</string>
+    <string name="corral_animals_count">%1$d animals</string>
+    <string name="corral_save_error">The corral could not be saved.</string>
+</resources>

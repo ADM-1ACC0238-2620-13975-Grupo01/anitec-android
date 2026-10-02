@@ -46,6 +46,14 @@ import com.anitec.platform.R
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.TermsScreen
+import com.anitec.platform.livestock.interfaces.ui.AnimalFormScreen
+import com.anitec.platform.livestock.interfaces.ui.AnimalListScreen
+import com.anitec.platform.livestock.interfaces.ui.CorralFormScreen
+import com.anitec.platform.livestock.interfaces.ui.CorralListScreen
+import com.anitec.platform.livestock.interfaces.ui.HerdFormScreen
+import com.anitec.platform.livestock.interfaces.ui.HerdListScreen
+import com.anitec.platform.sanitary.interfaces.ui.HealthFormScreen
+import com.anitec.platform.sanitary.interfaces.ui.HealthListScreen
 
 private data class BottomDestination(
     val route: Any,
@@ -121,10 +129,28 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             startDestination = HomeRoute,
             modifier = Modifier.padding(padding),
         ) {
-            composable<HomeRoute> { HomeScreen(session) }
-            composable<AnimalsRoute> { ComingSoonScreen() }
+            composable<HomeRoute> {
+                HomeScreen(
+                    session = session,
+                    onRegisterAnimal = { navController.navigate(AnimalFormRoute()) },
+                    onRecordHealth = { navController.navigate(HealthFormRoute()) },
+                    onViewAllHealth = { navController.navigateToTopLevel(HealthRoute) },
+                )
+            }
+            composable<AnimalsRoute> {
+                AnimalListScreen(
+                    onNewAnimal = { navController.navigate(AnimalFormRoute()) },
+                    onEditAnimal = { id -> navController.navigate(AnimalFormRoute(id)) },
+                )
+            }
             composable<PatientsRoute> { ComingSoonScreen() }
-            composable<HealthRoute> { ComingSoonScreen() }
+            composable<HealthRoute> {
+                HealthListScreen(
+                    onNew = { navController.navigate(HealthFormRoute()) },
+                    onEdit = { id -> navController.navigate(HealthFormRoute(eventId = id)) },
+                )
+            }
+            composable<HealthFormRoute> { HealthFormScreen(onBack = { navController.popBackStack() }) }
             composable<ActivitiesRoute> { ComingSoonScreen() }
             composable<MoreRoute> {
                 MoreScreen(
@@ -134,6 +160,28 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                 )
             }
             composable<TermsRoute> { TermsScreen(onBack = { navController.popBackStack() }) }
+            composable<AnimalFormRoute> {
+                AnimalFormScreen(
+                    onBack = { navController.popBackStack() },
+                    onCreateCorral = { navController.navigate(CorralFormRoute()) },
+                )
+            }
+            composable<HerdsRoute> {
+                HerdListScreen(
+                    onBack = { navController.popBackStack() },
+                    onNew = { navController.navigate(HerdFormRoute()) },
+                    onEdit = { id -> navController.navigate(HerdFormRoute(id)) },
+                )
+            }
+            composable<HerdFormRoute> { HerdFormScreen(onBack = { navController.popBackStack() }) }
+            composable<CorralsRoute> {
+                CorralListScreen(
+                    onBack = { navController.popBackStack() },
+                    onNew = { navController.navigate(CorralFormRoute()) },
+                    onEdit = { id -> navController.navigate(CorralFormRoute(id)) },
+                )
+            }
+            composable<CorralFormRoute> { CorralFormScreen(onBack = { navController.popBackStack() }) }
             composable<PlaceholderRoute> { entry ->
                 PlaceholderScreen(
                     titleRes = entry.toRoute<PlaceholderRoute>().titleRes,

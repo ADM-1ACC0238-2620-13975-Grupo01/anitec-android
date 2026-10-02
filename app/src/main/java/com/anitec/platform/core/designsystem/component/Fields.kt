@@ -1,6 +1,7 @@
 package com.anitec.platform.core.designsystem.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -44,11 +45,13 @@ fun AniTecTextField(
     label: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     error: String? = null,
     singleLine: Boolean = true,
     minLines: Int = 1,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
+    onImeAction: (() -> Unit)? = null,
     placeholder: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: (@Composable () -> Unit)? = null,
@@ -58,6 +61,7 @@ fun AniTecTextField(
         onValueChange = onValueChange,
         modifier = modifier,
         enabled = enabled,
+        readOnly = readOnly,
         label = { Text(label) },
         placeholder = placeholder?.let { { Text(it) } },
         isError = error != null,
@@ -65,6 +69,7 @@ fun AniTecTextField(
         singleLine = singleLine,
         minLines = minLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = KeyboardActions(onDone = { onImeAction?.invoke() }, onGo = { onImeAction?.invoke() }),
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         shape = MaterialTheme.shapes.medium,
@@ -82,6 +87,7 @@ fun PasswordField(
     modifier: Modifier = Modifier,
     error: String? = null,
     imeAction: ImeAction = ImeAction.Next,
+    onImeAction: (() -> Unit)? = null,
 ) {
     var visible by remember { mutableStateOf(false) }
     AniTecTextField(
@@ -92,6 +98,7 @@ fun PasswordField(
         error = error,
         keyboardType = KeyboardType.Password,
         imeAction = imeAction,
+        onImeAction = onImeAction,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             IconButton(onClick = { visible = !visible }) {
@@ -117,6 +124,8 @@ fun <T> DropdownField(
     enabled: Boolean = true,
     error: String? = null,
     placeholder: String? = null,
+    /** Shown as the value when nothing is selected, e.g. "All farms" for a filter. */
+    emptyLabel: String? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -125,7 +134,7 @@ fun <T> DropdownField(
         modifier = modifier,
     ) {
         OutlinedTextField(
-            value = selected?.let { optionLabel(it) }.orEmpty(),
+            value = selected?.let { optionLabel(it) } ?: emptyLabel.orEmpty(),
             onValueChange = {},
             readOnly = true,
             enabled = enabled,

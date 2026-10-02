@@ -15,5 +15,15 @@ import kotlinx.serialization.Serializable
 @Serializable data object ActivitiesRoute
 @Serializable data object MoreRoute
 
+// Livestock
+@Serializable data object HerdsRoute
+@Serializable data class HerdFormRoute(val herdId: Int? = null)
+@Serializable data object CorralsRoute
+@Serializable data class CorralFormRoute(val corralId: Int? = null)
+@Serializable data class AnimalFormRoute(val animalId: Int? = null)
+
+// Sanitary
+@Serializable data class HealthFormRoute(val eventId: Int? = null, val animalId: Int? = null)
+
 /** Stand-in for sections that are not built yet; replaced by real routes as each phase lands. */
 @Serializable data class PlaceholderRoute(val titleRes: Int)

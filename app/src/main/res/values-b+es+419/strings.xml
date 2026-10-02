@@ -16,6 +16,8 @@
     <string name="common_show_password">Mostrar contraseña</string>
     <string name="common_hide_password">Ocultar contraseña</string>
     <string name="common_loading">Cargando…</string>
+    <string name="common_choose_date">Elegir fecha</string>
+    <string name="common_clear_date">Quitar fecha</string>
     <string name="common_coming_soon">Esta sección estará disponible pronto.</string>
 
     <!-- Errors -->

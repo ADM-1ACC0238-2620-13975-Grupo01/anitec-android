@@ -63,6 +63,7 @@ fun SignInScreen(
             modifier = Modifier.fillMaxWidth(),
             error = if (state.passwordMissing) required else null,
             imeAction = ImeAction.Done,
+            onImeAction = viewModel::submit,
         )
         state.errorRes?.let { ErrorMessage(stringResource(it)) }
         PrimaryButton(

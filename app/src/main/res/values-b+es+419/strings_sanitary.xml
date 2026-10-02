@@ -1,0 +1,46 @@
+<resources>
+    <!-- Health records -->
+    <string name="health_subtitle">Historial sanitario de tus animales.</string>
+    <string name="health_empty">Aún no hay registros sanitarios.</string>
+    <string name="health_new">Nuevo registro</string>
+    <string name="health_form_new">Nuevo registro sanitario</string>
+    <string name="health_form_edit">Editar registro sanitario</string>
+    <string name="health_form_subtitle">Registra una incidencia, vacuna, tratamiento o revisión.</string>
+    <string name="health_type">Tipo</string>
+    <string name="health_date">Fecha</string>
+    <string name="health_next_due">Próxima fecha (opcional)</string>
+    <string name="health_veterinarian">Veterinario</string>
+    <string name="health_description">Descripción</string>
+    <string name="health_diagnosis">Diagnóstico</string>
+    <string name="health_treatment">Tratamiento</string>
+    <string name="health_prescription">Receta</string>
+    <string name="health_follow_up">Notas de seguimiento</string>
+    <string name="health_tag_follow_up">Seguimiento</string>
+    <string name="health_tag_closed">Cerrado</string>
+    <string name="health_confirm_delete">¿Eliminar este registro sanitario? Esta acción no se puede deshacer.</string>
+    <string name="health_no_animals">Primero registra un animal para agregar registros sanitarios.</string>
+    <string name="health_save_error">No se pudo guardar el registro.</string>
+    <string name="health_choose_date">Elegir fecha</string>
+    <string name="health_clear_date">Quitar fecha</string>
+    <string name="health_type_incident">Incidencia</string>
+    <string name="health_type_vaccine">Vacuna</string>
+    <string name="health_type_treatment">Tratamiento</string>
+    <string name="health_type_diagnosis">Diagnóstico</string>
+    <string name="health_type_checkup">Revisión</string>
+
+    <!-- Rancher home -->
+    <string name="home_subtitle">Así va tu ganado.</string>
+    <string name="home_all_farms">Todas las fincas</string>
+    <string name="home_farm_filter">Finca</string>
+    <string name="home_metric_animals">Animales</string>
+    <string name="home_metric_attention">Requieren atención</string>
+    <string name="home_metric_records">Registros sanitarios</string>
+    <string name="home_metric_followups">Seguimientos pendientes</string>
+    <string name="home_metric_attention_caption">En observación o en tratamiento</string>
+    <string name="home_quick_title">Acciones rápidas</string>
+    <string name="home_action_register_animal">Registrar animal</string>
+    <string name="home_action_record_health">Registrar sanidad</string>
+    <string name="home_recent_title">Registros sanitarios recientes</string>
+    <string name="home_recent_empty">Aún no hay registros sanitarios.</string>
+    <string name="home_view_all">Ver todos</string>
+</resources>

@@ -1,0 +1,131 @@
+<resources>
+    <!-- Animal list -->
+    <string name="animals_search_hint">Buscar por código, nombre, especie, raza, finca o estado</string>
+    <string name="animals_filter_corral">Corral</string>
+    <string name="animals_all_corrals">Todos los corrales</string>
+    <string name="animals_count">%1$d de %2$d animales</string>
+    <string name="animals_empty">Aún no hay animales registrados.</string>
+    <string name="animals_empty_search">Ningún animal coincide con tu búsqueda.</string>
+    <string name="animals_new">Nuevo animal</string>
+    <string name="animals_selected_count">%1$d seleccionados</string>
+    <string name="animals_select_all">Seleccionar todos</string>
+    <string name="animals_clear_selection">Quitar selección</string>
+    <string name="animals_change_status">Cambiar estado</string>
+    <string name="animals_delete_selected">Eliminar seleccionados</string>
+    <string name="animals_status_dialog_title">Estado para los animales seleccionados</string>
+    <string name="animals_confirm_delete_one">¿Eliminar a %1$s? Esta acción no se puede deshacer.</string>
+    <string name="animals_confirm_delete_many">¿Eliminar %1$d animales? Esta acción no se puede deshacer.</string>
+    <string name="animals_confirm_status">¿Marcar %1$d animales como %2$s?</string>
+    <string name="animals_saved">Cambios guardados.</string>
+    <string name="animals_detail_title">Ficha técnica del animal</string>
+    <string name="animals_no_photo">Sin foto</string>
+    <string name="animals_edit">Editar</string>
+    <string name="animals_open_record">Ver ficha técnica</string>
+
+    <!-- Animal fields -->
+    <string name="animal_tag">Código</string>
+    <string name="animal_name">Nombre</string>
+    <string name="animal_species">Animal</string>
+    <string name="animal_breed">Raza</string>
+    <string name="animal_gender">Sexo</string>
+    <string name="animal_birth_date">Nacimiento</string>
+    <string name="animal_weight">Peso (kg)</string>
+    <string name="animal_status">Estado</string>
+    <string name="animal_herd">Finca</string>
+    <string name="animal_corral">Corral</string>
+    <string name="animal_source">Procedencia</string>
+    <string name="animal_age_range">Rango de edad aproximada</string>
+    <string name="animal_photo">Foto</string>
+    <string name="animal_no_birth_date">Sin fecha</string>
+    <string name="animal_no_corral">Sin corral</string>
+    <string name="animal_select">Seleccionar</string>
+
+    <!-- Animal form -->
+    <string name="animal_form_new">Registrar animal</string>
+    <string name="animal_form_edit">Editar animal</string>
+    <string name="animal_form_subtitle">Completa la ficha para iniciar el seguimiento de este animal.</string>
+    <string name="animal_mode_individual">Individual</string>
+    <string name="animal_mode_bulk">Varios (corral)</string>
+    <string name="animal_quantity">Cantidad de animales</string>
+    <string name="animal_bulk_hint">Se crea un registro por animal, con un código generado a partir del nombre del corral.</string>
+    <string name="animal_bulk_photo_hint">Recomendamos que la foto sea del corral con todos los animales, no de uno solo.</string>
+    <string name="animal_no_corrals_for_herd">Esta finca todavía no tiene corrales.</string>
+    <string name="animal_create_corral">Crear un corral</string>
+    <string name="animal_choose_date">Elegir fecha</string>
+    <string name="animal_invalid_weight">Ingresa un peso válido</string>
+    <string name="animal_error_placement">El corral no pertenece a la finca seleccionada.</string>
+    <string name="animal_error_batch_size">Ingresa un número entre 1 y 500.</string>
+    <string name="animal_error_nothing_selected">Selecciona al menos un animal.</string>
+    <string name="animal_save_error">No se pudo guardar el animal.</string>
+
+    <!-- Animal photo -->
+    <string name="animal_photo_take">Tomar foto</string>
+    <string name="animal_photo_choose">Elegir de la galería</string>
+    <string name="animal_photo_remove">Quitar foto</string>
+    <string name="animal_photo_uploading">Subiendo foto…</string>
+    <string name="animal_photo_error">No se pudo subir la foto. Inténtalo de nuevo.</string>
+    <string name="animal_photo_camera_denied">Se denegó el permiso de cámara. Aún puedes elegir una foto de la galería.</string>
+    <string name="animal_photo_camera_unavailable">Este dispositivo no tiene cámara disponible.</string>
+
+    <!-- Status -->
+    <string name="status_healthy">Saludable</string>
+    <string name="status_observation">En observación</string>
+    <string name="status_in_treatment">En tratamiento</string>
+    <string name="status_sold">Vendido</string>
+
+    <!-- Option values -->
+    <string name="species_cattle">Bovino</string>
+    <string name="species_sheep">Ovino</string>
+    <string name="species_goat">Caprino</string>
+    <string name="species_pig">Porcino</string>
+    <string name="species_horse">Equino</string>
+    <string name="species_chicken">Pollo</string>
+    <string name="species_duck">Pato</string>
+    <string name="species_hen">Gallina</string>
+    <string name="species_turkey">Pavo</string>
+    <string name="species_guinea_pig">Cuy</string>
+    <string name="species_other">Otro</string>
+    <string name="gender_female">Hembra</string>
+    <string name="gender_male">Macho</string>
+    <string name="gender_mixed">Mixto</string>
+    <string name="source_purchased">Comprado</string>
+    <string name="source_born_on_farm">Nacido en la finca</string>
+    <string name="source_donation">Donación</string>
+    <string name="source_other">Otro</string>
+    <string name="age_young">Cría</string>
+    <string name="age_juvenile">Juvenil</string>
+    <string name="age_adult">Adulto</string>
+    <string name="herdtype_poultry">Aves</string>
+
+    <!-- Herds (farms) -->
+    <string name="herds_subtitle">Administra tus fincas o unidades ganaderas.</string>
+    <string name="herds_empty">Aún no hay fincas registradas.</string>
+    <string name="herds_new">Nueva finca</string>
+    <string name="herd_form_new">Nueva finca</string>
+    <string name="herd_form_edit">Editar finca</string>
+    <string name="herd_form_subtitle">Las fincas agrupan tus corrales y animales.</string>
+    <string name="herd_name">Nombre de la finca</string>
+    <string name="herd_location">Ubicación</string>
+    <string name="herd_owner">Propietario</string>
+    <string name="herd_main_type">Ganado principal</string>
+    <string name="herd_animals_count">%1$d animales</string>
+    <string name="herd_corrals_count">%1$d corrales</string>
+    <string name="herd_confirm_delete">¿Eliminar la finca %1$s?</string>
+    <string name="herd_delete_blocked">Esta finca aún tiene corrales o animales. Muévelos o elimínalos primero.</string>
+    <string name="herd_save_error">No se pudo guardar la finca.</string>
+
+    <!-- Corrals -->
+    <string name="corrals_subtitle">Administra los corrales o recintos físicos dentro de tus fincas.</string>
+    <string name="corrals_empty">Aún no hay corrales registrados.</string>
+    <string name="corrals_new">Nuevo corral</string>
+    <string name="corral_form_new">Nuevo corral</string>
+    <string name="corral_form_edit">Editar corral</string>
+    <string name="corral_form_subtitle">Los animales se registran dentro de un corral.</string>
+    <string name="corral_name">Nombre del corral</string>
+    <string name="corral_herd">Finca</string>
+    <string name="corral_no_herds">Primero crea una finca para agregar corrales.</string>
+    <string name="corral_confirm_delete">¿Eliminar el corral %1$s?</string>
+    <string name="corral_confirm_delete_with_animals">¿Eliminar el corral %1$s? Sus %2$d animales quedarán sin corral.</string>
+    <string name="corral_animals_count">%1$d animales</string>
+    <string name="corral_save_error">No se pudo guardar el corral.</string>
+</resources>

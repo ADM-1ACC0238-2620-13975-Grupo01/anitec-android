@@ -47,8 +47,8 @@ private data class MoreItem(@StringRes val label: Int, val icon: ImageVector, va
 
 private fun moreItems(role: UserRole): List<MoreItem> = when (role) {
     UserRole.Rancher -> listOf(
-        MoreItem(R.string.nav_herds, Icons.Filled.Place, PlaceholderRoute(R.string.nav_herds)),
-        MoreItem(R.string.nav_corrals, Icons.Filled.GridView, PlaceholderRoute(R.string.nav_corrals)),
+        MoreItem(R.string.nav_herds, Icons.Filled.Place, HerdsRoute),
+        MoreItem(R.string.nav_corrals, Icons.Filled.GridView, CorralsRoute),
         MoreItem(R.string.nav_finance, Icons.Filled.AccountBalanceWallet, PlaceholderRoute(R.string.nav_finance)),
         MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, PlaceholderRoute(R.string.nav_analytics)),
         MoreItem(R.string.nav_iot, Icons.Filled.Sensors, PlaceholderRoute(R.string.nav_iot)),

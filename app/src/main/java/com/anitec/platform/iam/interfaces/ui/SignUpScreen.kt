@@ -93,6 +93,7 @@ fun SignUpScreen(
             modifier = Modifier.fillMaxWidth(),
             error = if (state.passwordsMismatch) stringResource(R.string.auth_passwords_mismatch) else null,
             imeAction = ImeAction.Done,
+            onImeAction = viewModel::submit,
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {

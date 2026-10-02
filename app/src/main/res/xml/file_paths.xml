@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Camera captures are written here before being compressed and uploaded. -->
+    <cache-path name="camera_captures" path="images/" />
+</paths>
