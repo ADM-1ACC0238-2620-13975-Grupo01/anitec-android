@@ -1,0 +1,103 @@
+<resources>
+    <string name="app_name">AniTec</string>
+    <string name="app_tagline">Smart livestock management</string>
+
+    <!-- Common -->
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_new">New</string>
+    <string name="common_back">Back</string>
+    <string name="common_close">Close</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_search">Search</string>
+    <string name="common_confirm_delete_title">Confirm deletion</string>
+    <string name="common_show_password">Show password</string>
+    <string name="common_hide_password">Hide password</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_coming_soon">This section is coming soon.</string>
+
+    <!-- Errors -->
+    <string name="error_network">Could not reach the server. Check your connection and try again.</string>
+    <string name="error_unauthorized">Your session is not valid. Please sign in again.</string>
+    <string name="error_session_expired">Your session expired. Please sign in again.</string>
+    <string name="error_forbidden">You do not have permission to do this.</string>
+    <string name="error_not_found">The requested item was not found.</string>
+    <string name="error_conflict">This item already exists.</string>
+    <string name="error_server">The server had a problem. Please try again later.</string>
+    <string name="error_unknown">Something went wrong. Please try again.</string>
+    <string name="error_field_required">This field is required</string>
+
+    <!-- Language -->
+    <string name="language_label">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+
+    <!-- Roles -->
+    <string name="role_rancher">Rancher</string>
+    <string name="role_veterinarian">Veterinarian</string>
+
+    <!-- Authentication -->
+    <string name="auth_hero_chip">Livestock management</string>
+    <string name="auth_hero_title">Care for every animal, from any field.</string>
+    <string name="auth_hero_subtitle">Records, health history and activities for ranchers and veterinarians.</string>
+    <string name="auth_sign_in_title">Welcome back</string>
+    <string name="auth_sign_in_subtitle">Sign in to continue with your livestock records.</string>
+    <string name="auth_sign_in_action">Sign in</string>
+    <string name="auth_sign_up_title">Create your account</string>
+    <string name="auth_sign_up_subtitle">Choose your role to get the right tools.</string>
+    <string name="auth_sign_up_action">Create account</string>
+    <string name="auth_username">Username</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_confirm_password">Confirm password</string>
+    <string name="auth_full_name">Full name</string>
+    <string name="auth_role">Account type</string>
+    <string name="auth_role_rancher_badge">Rancher account</string>
+    <string name="auth_role_veterinarian_badge">Veterinarian account</string>
+    <string name="auth_no_account">Don\'t have an account? Create one</string>
+    <string name="auth_have_account">Already have an account? Sign in</string>
+    <string name="auth_passwords_mismatch">Passwords do not match</string>
+    <string name="auth_invalid_credentials">Invalid username or password.</string>
+    <string name="auth_username_taken">That username is already taken.</string>
+    <string name="auth_accept_terms">I accept the Terms of Service</string>
+    <string name="auth_read_terms">Read the Terms of Service</string>
+    <string name="auth_terms_required">You must accept the Terms of Service to create an account.</string>
+
+    <!-- Terms of Service -->
+    <string name="terms_title">Terms of Service</string>
+    <string name="terms_intro">By creating an AniTec account you agree to the following terms. This text is a working draft prepared by the team and must be reviewed before publication.</string>
+    <string name="terms_section_use_title">1. Purpose</string>
+    <string name="terms_section_use_body">AniTec helps ranchers and veterinarians record animals, health events and farm activities. It does not replace professional veterinary judgment.</string>
+    <string name="terms_section_account_title">2. Your account</string>
+    <string name="terms_section_account_body">You are responsible for the accuracy of the information you register and for keeping your credentials private. Each account belongs to one person and one role.</string>
+    <string name="terms_section_data_title">3. Data and privacy</string>
+    <string name="terms_section_data_body">We store only the data needed to provide the service: your profile, your animals, farms, health records, activities and subscription information. Veterinarians can see only the ranchers who have been linked to them. We do not sell personal data.</string>
+    <string name="terms_section_ethics_title">4. Professional and ethical use</string>
+    <string name="terms_section_ethics_body">Users must register truthful health information and respect animal welfare. Veterinarians must follow the ethical principles of their profession and the applicable ACM/IEEE software engineering code of ethics for the use of this tool.</string>
+    <string name="terms_section_payments_title">5. Subscriptions and payments</string>
+    <string name="terms_section_payments_body">Paid plans are processed by Stripe. AniTec does not store card numbers. Current payments run in test mode.</string>
+    <string name="terms_section_availability_title">6. Availability</string>
+    <string name="terms_section_availability_body">The service is provided as is and may be unavailable during maintenance. Data saved on the device may be synchronized later when a connection is available.</string>
+    <string name="terms_section_changes_title">7. Changes</string>
+    <string name="terms_section_changes_body">These terms may change. We will notify users inside the app when they do.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_animals">Animals</string>
+    <string name="nav_patients">Patients</string>
+    <string name="nav_health">Health</string>
+    <string name="nav_activities">Activities</string>
+    <string name="nav_more">More</string>
+    <string name="nav_herds">Farms</string>
+    <string name="nav_corrals">Corrals</string>
+    <string name="nav_finance">Finance</string>
+    <string name="nav_analytics">Analytics</string>
+    <string name="nav_iot">IoT devices</string>
+    <string name="nav_subscriptions">Subscriptions</string>
+    <string name="nav_clients">Clients</string>
+    <string name="nav_terms">Terms of Service</string>
+    <string name="nav_sign_out">Sign out</string>
+    <string name="shell_signed_in_as">%1$s · %2$s</string>
+    <string name="home_greeting">Hello, %1$s</string>
+</resources>

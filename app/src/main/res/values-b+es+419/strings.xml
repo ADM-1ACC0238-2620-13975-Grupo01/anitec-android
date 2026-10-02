@@ -1,0 +1,103 @@
+<resources>
+    <string name="app_name">AniTec</string>
+    <string name="app_tagline">Gestión ganadera inteligente</string>
+
+    <!-- Common -->
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_edit">Editar</string>
+    <string name="common_new">Nuevo</string>
+    <string name="common_back">Volver</string>
+    <string name="common_close">Cerrar</string>
+    <string name="common_retry">Reintentar</string>
+    <string name="common_search">Buscar</string>
+    <string name="common_confirm_delete_title">Confirmar eliminación</string>
+    <string name="common_show_password">Mostrar contraseña</string>
+    <string name="common_hide_password">Ocultar contraseña</string>
+    <string name="common_loading">Cargando…</string>
+    <string name="common_coming_soon">Esta sección estará disponible pronto.</string>
+
+    <!-- Errors -->
+    <string name="error_network">No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="error_unauthorized">Tu sesión no es válida. Inicia sesión de nuevo.</string>
+    <string name="error_session_expired">Tu sesión expiró. Inicia sesión de nuevo.</string>
+    <string name="error_forbidden">No tienes permiso para hacer esto.</string>
+    <string name="error_not_found">No se encontró el elemento solicitado.</string>
+    <string name="error_conflict">Este elemento ya existe.</string>
+    <string name="error_server">El servidor tuvo un problema. Inténtalo más tarde.</string>
+    <string name="error_unknown">Algo salió mal. Inténtalo de nuevo.</string>
+    <string name="error_field_required">Este campo es obligatorio</string>
+
+    <!-- Language -->
+    <string name="language_label">Idioma</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+
+    <!-- Roles -->
+    <string name="role_rancher">Ganadero</string>
+    <string name="role_veterinarian">Veterinario</string>
+
+    <!-- Authentication -->
+    <string name="auth_hero_chip">Gestión ganadera</string>
+    <string name="auth_hero_title">Cuida a cada animal, desde cualquier campo.</string>
+    <string name="auth_hero_subtitle">Registros, historial sanitario y actividades para ganaderos y veterinarios.</string>
+    <string name="auth_sign_in_title">Bienvenido de nuevo</string>
+    <string name="auth_sign_in_subtitle">Inicia sesión para continuar con tus registros ganaderos.</string>
+    <string name="auth_sign_in_action">Iniciar sesión</string>
+    <string name="auth_sign_up_title">Crea tu cuenta</string>
+    <string name="auth_sign_up_subtitle">Elige tu rol para acceder a las herramientas adecuadas.</string>
+    <string name="auth_sign_up_action">Crear cuenta</string>
+    <string name="auth_username">Usuario</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="auth_confirm_password">Confirmar contraseña</string>
+    <string name="auth_full_name">Nombre completo</string>
+    <string name="auth_role">Tipo de cuenta</string>
+    <string name="auth_role_rancher_badge">Cuenta ganadera</string>
+    <string name="auth_role_veterinarian_badge">Cuenta veterinaria</string>
+    <string name="auth_no_account">¿No tienes cuenta? Crea una</string>
+    <string name="auth_have_account">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="auth_passwords_mismatch">Las contraseñas no coinciden</string>
+    <string name="auth_invalid_credentials">Usuario o contraseña incorrectos.</string>
+    <string name="auth_username_taken">Ese nombre de usuario ya está en uso.</string>
+    <string name="auth_accept_terms">Acepto los Términos de Servicio</string>
+    <string name="auth_read_terms">Leer los Términos de Servicio</string>
+    <string name="auth_terms_required">Debes aceptar los Términos de Servicio para crear una cuenta.</string>
+
+    <!-- Terms of Service -->
+    <string name="terms_title">Términos de Servicio</string>
+    <string name="terms_intro">Al crear una cuenta de AniTec aceptas los siguientes términos. Este texto es un borrador de trabajo preparado por el equipo y debe revisarse antes de su publicación.</string>
+    <string name="terms_section_use_title">1. Finalidad</string>
+    <string name="terms_section_use_body">AniTec ayuda a ganaderos y veterinarios a registrar animales, eventos sanitarios y actividades de la finca. No reemplaza el criterio profesional veterinario.</string>
+    <string name="terms_section_account_title">2. Tu cuenta</string>
+    <string name="terms_section_account_body">Eres responsable de la veracidad de la información que registres y de mantener tus credenciales en privado. Cada cuenta pertenece a una persona y a un solo rol.</string>
+    <string name="terms_section_data_title">3. Datos y privacidad</string>
+    <string name="terms_section_data_body">Almacenamos solo los datos necesarios para prestar el servicio: tu perfil, tus animales, fincas, registros sanitarios, actividades e información de suscripción. Los veterinarios solo ven a los ganaderos vinculados con ellos. No vendemos datos personales.</string>
+    <string name="terms_section_ethics_title">4. Uso profesional y ético</string>
+    <string name="terms_section_ethics_body">Los usuarios deben registrar información sanitaria veraz y respetar el bienestar animal. Los veterinarios deben seguir los principios éticos de su profesión y el código de ética de ingeniería de software de ACM/IEEE aplicable al uso de esta herramienta.</string>
+    <string name="terms_section_payments_title">5. Suscripciones y pagos</string>
+    <string name="terms_section_payments_body">Los planes de pago los procesa Stripe. AniTec no almacena números de tarjeta. Actualmente los pagos funcionan en modo de prueba.</string>
+    <string name="terms_section_availability_title">6. Disponibilidad</string>
+    <string name="terms_section_availability_body">El servicio se ofrece tal como está y puede no estar disponible durante mantenimientos. Los datos guardados en el dispositivo pueden sincronizarse después, cuando haya conexión.</string>
+    <string name="terms_section_changes_title">7. Cambios</string>
+    <string name="terms_section_changes_body">Estos términos pueden cambiar. Avisaremos dentro de la aplicación cuando ocurra.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_animals">Animales</string>
+    <string name="nav_patients">Pacientes</string>
+    <string name="nav_health">Sanidad</string>
+    <string name="nav_activities">Actividades</string>
+    <string name="nav_more">Más</string>
+    <string name="nav_herds">Fincas</string>
+    <string name="nav_corrals">Corrales</string>
+    <string name="nav_finance">Finanzas</string>
+    <string name="nav_analytics">Analítica</string>
+    <string name="nav_iot">Dispositivos IoT</string>
+    <string name="nav_subscriptions">Suscripciones</string>
+    <string name="nav_clients">Clientes</string>
+    <string name="nav_terms">Términos de Servicio</string>
+    <string name="nav_sign_out">Cerrar sesión</string>
+    <string name="shell_signed_in_as">%1$s · %2$s</string>
+    <string name="home_greeting">Hola, %1$s</string>
+</resources>

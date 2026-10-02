@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- AppCompat parent is required by AppCompatActivity, which provides per-app language switching on API < 33. -->
+    <style name="Theme.AniTec" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/anitec_cream</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>
