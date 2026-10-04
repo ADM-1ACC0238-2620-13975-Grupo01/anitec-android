@@ -56,6 +56,10 @@ import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
 import com.anitec.platform.sanitary.interfaces.ui.HealthRecordCard
 
+/**
+ * Role-aware home entry: ranchers get the full dashboard ([RancherHome]);
+ * veterinarians see a greeting plus a "coming soon" placeholder until the veterinary module lands.
+ */
 @Composable
 fun HomeScreen(
     session: UserSession,
@@ -77,6 +81,7 @@ fun HomeScreen(
     }
 }
 
+/** Top panel with app chip, personalized greeting, optional subtitle and role tag. */
 @Composable
 private fun GreetingPanel(session: UserSession, subtitle: String? = null) {
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
@@ -89,6 +94,10 @@ private fun GreetingPanel(session: UserSession, subtitle: String? = null) {
     }
 }
 
+/**
+ * Rancher dashboard: quick actions, optional farm filter, metric cards, recent health records,
+ * pull-to-refresh and snackbar messages driven by [HomeViewModel].
+ */
 @Composable
 private fun RancherHome(
     session: UserSession,
@@ -182,11 +191,15 @@ private fun RancherHome(
     }
 }
 
+/** Full-screen empty state used for unfinished sections. */
 @Composable
 fun ComingSoonScreen(modifier: Modifier = Modifier) {
     EmptyState(stringResource(R.string.common_coming_soon), modifier = modifier.fillMaxSize().padding(top = 48.dp))
 }
 
+/**
+ * Temporary screen with a top bar and back navigation for routes that are not built yet.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceholderScreen(@StringRes titleRes: Int, onBack: () -> Unit, modifier: Modifier = Modifier) {
