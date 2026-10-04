@@ -8,7 +8,15 @@ import com.anitec.platform.app.AniTecApp
 import com.anitec.platform.core.designsystem.AniTecTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-// AppCompatActivity (not ComponentActivity) so the in-app language switch also works below Android 13.
+/**
+ * Single Activity host for the Compose UI.
+ *
+ * Extends [AppCompatActivity] (not ComponentActivity) so the in-app language switch
+ * also works below Android 13 via AppCompat's locale APIs. Marked with [AndroidEntryPoint]
+ * so Hilt can inject into this Activity and into Compose destinations under it.
+ *
+ * [onCreate] enables edge-to-edge drawing and mounts [AniTecApp] inside [AniTecTheme].
+ */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
