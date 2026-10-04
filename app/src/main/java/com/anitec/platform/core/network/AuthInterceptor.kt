@@ -7,9 +7,15 @@ import java.util.Locale
 import javax.inject.Inject
 
 /**
- * Adds the Bearer token and the UI language to every request, and ends the session when the
- * server rejects the token. (The web client has no 401 handling; the app needs it because
- * tokens last 7 days and cannot be refreshed.)
+ * OkHttp interceptor that attaches credentials and locale to outbound API calls.
+ *
+ * - Always sets `Accept-Language` from the device locale so the backend can localize messages.
+ * - When a session token exists, sets `Authorization: Bearer <token>`.
+ * - If the server answers HTTP 401 on a request that carried a token, calls
+ *   [SessionStore.onUnauthorized] so the app signs the user out.
+ *
+ * The web client has no 401 handling; the app needs it because tokens last 7 days and
+ * cannot be refreshed. A 401 without a prior token (e.g. failed sign-in) is left alone.
  */
 class AuthInterceptor @Inject constructor(
     private val sessionStore: SessionStore,

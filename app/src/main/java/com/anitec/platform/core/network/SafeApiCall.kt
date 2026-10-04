@@ -12,6 +12,7 @@ import kotlinx.serialization.json.contentOrNull
 import retrofit2.HttpException
 import java.io.IOException
 
+/** Lenient parser used only for error bodies; unknown keys are ignored. */
 private val errorJson = Json { ignoreUnknownKeys = true }
 
 /**
@@ -20,6 +21,9 @@ private val errorJson = Json { ignoreUnknownKeys = true }
  * The backend answers errors with four different shapes (ProblemDetails, `{message}`,
  * `{message, errors[]}` and validation dictionaries), so only the HTTP status drives behavior;
  * any text found in the body is kept as a hint.
+ *
+ * [CancellationException] is rethrown so coroutine cancellation is not swallowed.
+ * [IOException] becomes [AppError.Network]; any other unexpected exception becomes [AppError.Unknown].
  */
 suspend fun <T> safeApiCall(block: suspend () -> T): AppResult<T> = try {
     AppResult.Success(block())
@@ -33,6 +37,10 @@ suspend fun <T> safeApiCall(block: suspend () -> T): AppResult<T> = try {
     AppResult.Failure(AppError.Unknown(e.message))
 }
 
+/**
+ * Maps an HTTP status code to the matching [AppError] variant.
+ * Optional body text from [parseErrorMessages] is attached only for validation and conflict.
+ */
 internal fun HttpException.toAppError(): AppError {
     val messages = parseErrorMessages(response()?.errorBody()?.string())
     return when (code()) {
@@ -46,6 +54,11 @@ internal fun HttpException.toAppError(): AppError {
     }
 }
 
+/**
+ * Best-effort extraction of human-readable hints from a JSON error body.
+ * Supports `message`, `detail`, and nested `errors` (array or field-keyed object).
+ * Returns an empty list when the body is missing or not a JSON object.
+ */
 internal fun parseErrorMessages(body: String?): List<String> {
     if (body.isNullOrBlank()) return emptyList()
     val root = runCatching { errorJson.parseToJsonElement(body) }.getOrNull() as? JsonObject ?: return emptyList()
@@ -56,6 +69,7 @@ internal fun parseErrorMessages(body: String?): List<String> {
     return messages.distinct()
 }
 
+/** Recursively collects string leaves from primitives, arrays and objects. */
 private fun collectStrings(element: JsonElement, out: MutableList<String>) {
     when (element) {
         is JsonPrimitive -> element.contentOrNull?.let(out::add)

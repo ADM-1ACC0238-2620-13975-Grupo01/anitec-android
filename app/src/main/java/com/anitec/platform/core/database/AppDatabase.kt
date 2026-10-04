@@ -22,7 +22,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Local cache of the signed-in user's records. Its contents are always rebuildable from the API. */
+/**
+ * Room database that caches the signed-in user's livestock and sanitary records.
+ *
+ * Contents are always rebuildable from the API after sync; schema is exported under
+ * `app/schemas` for review. Version bumps currently wipe the DB via destructive migration.
+ */
 @Database(
     entities = [HerdEntity::class, CorralEntity::class, AnimalEntity::class, HealthEventEntity::class],
     version = 2,
@@ -33,12 +38,17 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sanitaryDao(): SanitaryDao
 }
 
+/**
+ * [UserDataCleaner] backed by Room: clears every table on the IO dispatcher
+ * when the session ends so the next user starts with an empty cache.
+ */
 class RoomUserDataCleaner @Inject constructor(
     private val database: AppDatabase,
 ) : UserDataCleaner {
     override suspend fun clear() = withContext(Dispatchers.IO) { database.clearAllTables() }
 }
 
+/** Binds [RoomUserDataCleaner] as the app-wide [UserDataCleaner]. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DatabaseBindingsModule {
@@ -46,6 +56,10 @@ abstract class DatabaseBindingsModule {
     abstract fun bindUserDataCleaner(impl: RoomUserDataCleaner): UserDataCleaner
 }
 
+/**
+ * Provides the singleton [AppDatabase] (`anitec.db`) and its DAOs.
+ * Destructive migration is intentional: the cache is disposable and refilled from the API.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {

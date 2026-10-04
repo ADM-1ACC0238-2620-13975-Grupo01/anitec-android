@@ -12,11 +12,19 @@ import com.anitec.platform.iam.infrastructure.remote.SignInRequestDto
 import com.anitec.platform.iam.infrastructure.remote.SignUpRequestDto
 import javax.inject.Inject
 
+/**
+ * Retrofit-backed [AuthRepository]: talks to [AuthApi], maps DTOs to [UserSession],
+ * and persists or clears the session through [SessionStore].
+ */
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val sessionStore: SessionStore,
 ) : AuthRepository {
 
+    /**
+     * Calls the sign-in endpoint via [safeApiCall], rejects unknown roles,
+     * then saves the session (encrypted token) before returning success.
+     */
     override suspend fun signIn(username: String, password: String): AppResult<UserSession> {
         val result = safeApiCall { api.signIn(SignInRequestDto(username, password)) }
         return when (result) {
@@ -32,6 +40,10 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Creates the account, then signs in because the register response has no token.
+     * Registration failures are returned as-is without attempting sign-in.
+     */
     override suspend fun signUp(
         fullName: String,
         username: String,
@@ -45,6 +57,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Local-only: clears the encrypted session from DataStore. */
     override suspend fun signOut() {
         sessionStore.clear()
     }
