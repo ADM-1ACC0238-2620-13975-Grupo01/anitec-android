@@ -1,6 +1,9 @@
 package com.anitec.platform.livestock.domain
 
-/** An animal with the names of the herd and corral it belongs to, ready to be searched and displayed. */
+/**
+ * List-row projection: an [Animal] plus the display names of its herd and corral,
+ * so the UI can search and show location without joining tables again.
+ */
 data class AnimalView(
     val animal: Animal,
     val herdName: String,
@@ -8,8 +11,12 @@ data class AnimalView(
 )
 
 /**
- * Same matching as the web list: a case-insensitive substring over code, name, species, breed, gender,
- * status, weight, birth date, herd and corral, optionally narrowed to one corral.
+ * Filters animals with the same rules as the web livestock list.
+ *
+ * Matching is a case-insensitive substring over tag, name, species, breed, gender,
+ * status, weight, birth date, herd name and corral name. When [corralId] is non-null,
+ * only animals in that corral are kept. An empty/blank [query] returns every animal
+ * that passes the optional corral filter.
  */
 fun List<AnimalView>.filterBy(query: String, corralId: Int?): List<AnimalView> {
     val term = query.trim().lowercase()
