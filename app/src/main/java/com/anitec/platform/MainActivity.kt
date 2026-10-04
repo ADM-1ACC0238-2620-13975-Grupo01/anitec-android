@@ -8,6 +8,7 @@ import com.anitec.platform.app.AniTecApp
 import com.anitec.platform.core.designsystem.AniTecTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+// AppCompatActivity (not ComponentActivity) so the in-app language switch also works below Android 13.
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
