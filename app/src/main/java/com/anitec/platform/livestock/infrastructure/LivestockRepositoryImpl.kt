@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
 class LivestockRepositoryImpl @Inject constructor(
     private val api: LivestockApi,
@@ -117,3 +118,4 @@ class LivestockRepositoryImpl @Inject constructor(
     override suspend fun deleteAnimals(ids: List<Int>): AppResult<Unit> =
         safeApiCall { api.deleteAnimals(AnimalIdsDto(ids)) }.onSuccess { dao.deleteAnimals(ids) }
 }
+
