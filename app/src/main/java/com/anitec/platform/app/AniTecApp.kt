@@ -35,7 +35,11 @@ fun AniTecApp(viewModel: AppViewModel = hiltViewModel()) {
         is SessionState.SignedIn -> MainShell(session = state.session, onSignOut = viewModel::onSignOut)
     }
 }
-
+/**
+ * Navigation host for the authentication flow.
+ * Uses Type-Safe Navigation Compose and follows unidirectional data flow
+ * by exposing lambdas instead of passing the NavController to the screens.
+ */
 @Composable
 private fun AuthNavHost(sessionExpired: Boolean) {
     val navController = rememberNavController()
