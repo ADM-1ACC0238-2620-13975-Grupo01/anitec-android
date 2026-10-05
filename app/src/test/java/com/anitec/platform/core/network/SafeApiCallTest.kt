@@ -17,6 +17,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
 
+
 @Serializable
 private data class PingDto(val value: String)
 
@@ -30,6 +31,8 @@ class SafeApiCallTest {
     private lateinit var server: MockWebServer
     private lateinit var api: PingApi
 
+
+    
     @Before
     fun setUp() {
         server = MockWebServer()
@@ -127,3 +130,5 @@ class SafeApiCallTest {
         assertEquals(emptyList<String>(), parseErrorMessages("[]"))
     }
 }
+
+
