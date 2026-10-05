@@ -70,6 +70,7 @@ class AnimalStatusTest {
     }
 }
 
+
 class LivestockScopeTest {
     private val herds = listOf(
         herd(1, ownerId = 10),
@@ -186,3 +187,5 @@ class MediaUrlTest {
         assertNull(resolveMediaUrl("  ", "http://server"))
     }
 }
+
+
