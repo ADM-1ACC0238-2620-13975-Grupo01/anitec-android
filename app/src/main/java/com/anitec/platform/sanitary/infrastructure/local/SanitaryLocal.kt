@@ -24,6 +24,7 @@ data class HealthEventEntity(
     val nextDueDate: String?,
 )
 
+
 @Dao
 interface SanitaryDao {
     @Query("SELECT * FROM health_events ORDER BY date DESC, id DESC")
@@ -40,3 +41,4 @@ interface SanitaryDao {
         upsertAll(events)
     }
 }
+
