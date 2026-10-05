@@ -127,7 +127,9 @@ fun MoreScreen(
         )
     }
 }
-
+/**
+ * Renders a clickable navigation row item for the menu.
+ */
 @Composable
 private fun MoreRow(@StringRes label: Int, icon: ImageVector, onClick: () -> Unit) {
     Row(
