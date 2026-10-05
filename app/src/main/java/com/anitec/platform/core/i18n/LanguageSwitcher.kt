@@ -50,7 +50,9 @@ fun LanguageSwitcher(
         }
     }
 }
-
+/**
+ * Renders a customized filter chip for language selection supporting light and dark background states.
+ */
 @Composable
 private fun LanguageChip(label: String, selected: Boolean, onDark: Boolean, onClick: () -> Unit) {
     val colors = if (onDark) {
