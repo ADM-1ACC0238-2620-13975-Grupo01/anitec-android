@@ -18,7 +18,9 @@ import androidx.lifecycle.ViewModel
 import com.anitec.platform.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-
+/**
+ * ViewModel responsible for managing application language preferences and state.
+ */
 @HiltViewModel
 class LanguageViewModel @Inject constructor(
     private val languageManager: LanguageManager,
