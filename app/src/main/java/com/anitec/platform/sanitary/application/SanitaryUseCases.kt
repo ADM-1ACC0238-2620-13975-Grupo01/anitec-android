@@ -1,3 +1,4 @@
+
 package com.anitec.platform.sanitary.application
 
 import com.anitec.platform.core.common.AppResult
@@ -33,3 +34,4 @@ class SaveHealthEventUseCase @Inject constructor(private val repository: Sanitar
 class DeleteHealthEventUseCase @Inject constructor(private val repository: SanitaryRepository) {
     suspend operator fun invoke(id: Int): AppResult<Unit> = repository.delete(id)
 }
+
