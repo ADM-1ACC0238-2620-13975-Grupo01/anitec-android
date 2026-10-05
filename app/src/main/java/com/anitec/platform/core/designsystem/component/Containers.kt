@@ -153,7 +153,9 @@ fun FormHero(
         }
     }
 }
-
+/**
+ * Renders an empty state placeholder message centered within a padded container.
+ */
 @Composable
 fun EmptyState(text: String, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
