@@ -18,9 +18,11 @@ import androidx.lifecycle.ViewModel
 import com.anitec.platform.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+
 /**
  * ViewModel responsible for managing application language preferences and state.
  */
+
 @HiltViewModel
 class LanguageViewModel @Inject constructor(
     private val languageManager: LanguageManager,
@@ -32,7 +34,9 @@ class LanguageViewModel @Inject constructor(
 /**
  * EN / ES toggle. Changing the language recreates the activity, so the current value is read on each composition.
  * [onDark] switches to light chip colors for use over photos.
+
  */
+ 
 @Composable
 fun LanguageSwitcher(
     modifier: Modifier = Modifier,
@@ -73,3 +77,4 @@ private fun LanguageChip(label: String, selected: Boolean, onDark: Boolean, onCl
         border = if (onDark) BorderStroke(1.dp, Color.White.copy(alpha = 0.7f)) else FilterChipDefaults.filterChipBorder(true, selected),
     )
 }
+
