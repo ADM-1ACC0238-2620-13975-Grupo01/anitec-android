@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+
 class LivestockUseCasesTest {
 
     private val repository = mockk<LivestockRepository>()
@@ -94,6 +95,7 @@ class LivestockUseCasesTest {
         coVerify(exactly = 0) { repository.deleteAnimals(any()) }
     }
 
+    
     @Test
     fun `bulk actions forward the selected ids`() = runTest {
         coEvery { repository.updateAnimalsStatus(any(), any()) } returns AppResult.Success(emptyList())
@@ -106,3 +108,5 @@ class LivestockUseCasesTest {
         coVerify { repository.deleteAnimals(listOf(3, 4)) }
     }
 }
+
+
