@@ -100,6 +100,9 @@ fun MoreScreen(
                 }
             }
         }
+        /**
+         * Renders a settings row with a language icon, label, and language switcher.
+         */
 
         AniTecPanel(modifier = Modifier.fillMaxWidth()) {
             Row(
