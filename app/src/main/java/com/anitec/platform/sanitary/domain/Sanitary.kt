@@ -20,7 +20,9 @@ data class HealthEvent(
     /** Open events carry a next due date; the dashboard counts them as pending follow-ups. */
     val hasFollowUp: Boolean get() = nextDueDate != null
 }
-
+/**
+ * Data transfer object representing a draft version of a health event prior to persistence.
+ */
 data class HealthEventDraft(
     val animalId: Int,
     val type: String,
