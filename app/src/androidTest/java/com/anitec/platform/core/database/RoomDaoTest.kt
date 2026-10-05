@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /** Runs the real SQL of the cache on a device with an in-memory database. */
+
 @RunWith(AndroidJUnit4::class)
 class RoomDaoTest {
 
@@ -100,6 +101,7 @@ class RoomDaoTest {
         assertEquals(listOf(1, 3, 5), livestock.animalIds().sorted())
     }
 
+    
     @Test
     fun healthEvents_areNewestFirstAndScopedByReplaceAll() = runTest {
         sanitary.replaceAll(listOf(event(1, 1, "2026-01-10"), event(2, 1, "2026-03-05"), event(3, 2, "2026-02-01")))
@@ -109,6 +111,7 @@ class RoomDaoTest {
         assertEquals(listOf(9), sanitary.observeEvents().first().map { it.id })
     }
 
+    
     @Test
     fun clearAllTables_removesEveryUsersData() = runTest {
         livestock.replaceAll(listOf(herd(1)), listOf(corral(1, 1)), listOf(animal(1)))
@@ -122,3 +125,4 @@ class RoomDaoTest {
         assertTrue(sanitary.observeEvents().first().isEmpty())
     }
 }
+
