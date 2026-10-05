@@ -80,7 +80,9 @@ fun AniTecTextField(
         colors = aniTecFieldColors(),
     )
 }
-
+/**
+ * Renders a specialized password text field with a visibility toggle icon button.
+ */
 @Composable
 fun PasswordField(
     value: String,
