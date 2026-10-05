@@ -23,6 +23,7 @@ import com.anitec.platform.livestock.infrastructure.remote.HerdDto
  */
 
 /** Remote API DTO → domain model (read path after sync). */
+
 fun HerdDto.toDomain() = Herd(id, name, location, owner, ownerId, veterinarianId, mainType)
 
 /** Remote API DTO → domain model (read path after sync). */
@@ -71,3 +72,4 @@ fun AnimalBatchDraft.toDto() = AnimalBatchDto(
     status = status, herdId = herdId, corralId = corralId, quantity = quantity, source = source,
     ageRange = ageRange, imageUrl = imageUrl,
 )
+
