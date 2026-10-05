@@ -15,6 +15,7 @@ import com.anitec.platform.livestock.domain.LivestockRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+
 /** Codes carried in [AppError.Validation] when a rule is broken before any request is made. */
 object LivestockValidation {
     const val INVALID_PLACEMENT = "livestock.invalid_placement"
@@ -23,8 +24,6 @@ object LivestockValidation {
 }
 
 private fun invalid(code: String) = AppResult.Failure(AppError.Validation(listOf(code)))
-
-// --- reading ---
 
 class ObserveHerdsUseCase @Inject constructor(private val repository: LivestockRepository) {
     operator fun invoke(): Flow<List<Herd>> = repository.observeHerds()
