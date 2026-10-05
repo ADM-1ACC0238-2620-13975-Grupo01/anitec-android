@@ -24,10 +24,10 @@ To use a physical device with a backend on your computer, add this line to `loca
 ```
 anitec.debugServerUrl=http://192.168.1.50:5191
 ```
-
+```
 Command line:
 
-```
+
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 ./gradlew installDebug
