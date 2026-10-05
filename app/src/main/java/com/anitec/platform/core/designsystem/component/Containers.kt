@@ -94,7 +94,9 @@ fun PanelHeader(
         }
     }
 }
-
+/**
+ * Renders a metric card displaying an icon, label, primary value, and optional caption.
+ */
 @Composable
 fun MetricCard(
     label: String,
