@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
@@ -57,36 +56,47 @@ fun AuthScaffold(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
             .imePadding(),
     ) {
-        AuthHero()
-        AniTecPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp)) {
-            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(R.drawable.anitec_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(52.dp),
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.tertiary,
-                    )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            AuthHero()
+            AniTecPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp)) {
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.anitec_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(52.dp),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.tertiary,
+                        )
+                    }
+                    SectionChip(stringResource(R.string.auth_hero_chip))
+                    Text(title, style = MaterialTheme.typography.headlineMedium)
+                    Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    content()
                 }
-                SectionChip(stringResource(R.string.auth_hero_chip))
-                Text(title, style = MaterialTheme.typography.headlineMedium)
-                Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                content()
             }
+            Spacer(Modifier.navigationBarsPadding().height(72.dp))
         }
-        Spacer(Modifier.navigationBarsPadding().height(8.dp))
+        LanguageSwitcher(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+        )
     }
 }
 
@@ -105,10 +115,6 @@ private fun AuthHero() {
                 .background(Brush.verticalGradient(listOf(Color(0x99163A12), Color(0xE62A4A22)))),
         )
         LightStatusBarIcons()
-        LanguageSwitcher(
-            modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(horizontal = 12.dp, vertical = 4.dp),
-            onDark = true,
-        )
         Surface(
             modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).clip(MaterialTheme.shapes.medium),
             color = Color.White.copy(alpha = 0.14f),
