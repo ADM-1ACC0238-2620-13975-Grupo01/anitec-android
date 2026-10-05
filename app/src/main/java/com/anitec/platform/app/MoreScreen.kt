@@ -63,7 +63,9 @@ private fun moreItems(role: UserRole): List<MoreItem> = when (role) {
         MoreItem(R.string.nav_terms, Icons.Filled.Description, TermsRoute),
     )
 }
-
+/**
+ * Displays the secondary/profile menu screen.
+ */
 @Composable
 fun MoreScreen(
     session: UserSession,
