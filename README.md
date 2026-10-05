@@ -6,8 +6,6 @@ Course project for 1ACC0238 – Aplicaciones para Dispositivos Móviles (UPC, 20
 
 ## Requirements
 
-
-
 - Android Studio (current stable) with Android SDK 37 installed.
 - Run Gradle with the JDK bundled in Android Studio (**Settings → Build Tools → Gradle → Gradle JDK**). Do not use a system JDK newer than the one Android Studio ships.
 - A running backend (see below), or the hosted one.
