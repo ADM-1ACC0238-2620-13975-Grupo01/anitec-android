@@ -88,6 +88,9 @@ fun MoreScreen(
                 )
             }
         }
+        /**
+         * Renders a list of menu items inside a panel with divider separators.
+         */
 
         AniTecPanel(modifier = Modifier.fillMaxWidth()) {
             Column {
