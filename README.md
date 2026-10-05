@@ -52,5 +52,5 @@ com.anitec.platform
 
 - Code, identifiers and commit messages in English.
 - GitFlow (`main`, `develop`, `feature/*`, `release/*`, `hotfix/*`), Conventional Commits, Semantic Versioning.
-- English is the default UI language; Latin American Spanish (`es-419`) is selectable in the app. All user-facing text lives in `strings.xml`.
+- English is the default UI language; Latin American Spanish (`es-419`) is selectable in the app. All user-facing text lives in `strings.xml`. 
 - Accessibility: every icon-only control has a content description; touch targets are at least 48 dp.
