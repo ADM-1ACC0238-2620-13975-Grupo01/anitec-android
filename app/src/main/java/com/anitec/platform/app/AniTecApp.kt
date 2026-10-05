@@ -61,7 +61,10 @@ private fun AuthNavHost(sessionExpired: Boolean) {
         }
     }
 }
-
+/**
+ * Displays the application splash screen with a centered logo
+ * and the current theme background.
+ */
 @Composable
 private fun SplashScreen() {
     Box(
