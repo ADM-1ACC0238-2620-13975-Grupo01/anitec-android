@@ -17,7 +17,7 @@ val localProperties = Properties().apply {
 }
 // 10.0.2.2 is the host machine as seen from the Android emulator.
 val debugServerUrl = localProperties.getProperty("anitec.debugServerUrl", "http://10.0.2.2:5191").trimEnd('/')
-val releaseServerUrl = "https://anitec-backend.onrender.com"
+val releaseServerUrl = "https://anitec-backend-android.onrender.com"
 
 android {
     namespace = "com.anitec.platform"
