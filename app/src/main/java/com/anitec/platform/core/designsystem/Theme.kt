@@ -50,7 +50,10 @@ private val AniTecShapes = Shapes(
     large = RoundedCornerShape(12.dp),
     extraLarge = RoundedCornerShape(16.dp),
 )
-
+/**
+ * Applies the application theme wrapping the MaterialTheme with custom color scheme,
+ * typography, shapes, and localized status colors.
+ */
 @Composable
 fun AniTecTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalStatusColors provides StatusColors()) {
