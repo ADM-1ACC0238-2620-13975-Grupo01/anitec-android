@@ -39,7 +39,9 @@ private fun aniTecFieldColors() = OutlinedTextFieldDefaults.colors(
     unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
     errorBorderColor = MaterialTheme.colorScheme.error,
 )
-
+/**
+ * Renders a customized OutlinedTextField component supporting validation, custom icons, and keyboard actions.
+ */
 @Composable
 fun AniTecTextField(
     value: String,
