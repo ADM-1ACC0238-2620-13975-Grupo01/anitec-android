@@ -51,6 +51,7 @@ object HealthTypes {
     val all = listOf(INCIDENT, VACCINE, TREATMENT, DIAGNOSIS, CHECKUP)
 }
 
+
 object SanitaryScope {
     /** The API returns every record; a user only sees the ones of animals they can see. */
     
