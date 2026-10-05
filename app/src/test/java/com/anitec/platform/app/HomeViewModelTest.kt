@@ -27,6 +27,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
@@ -101,6 +102,7 @@ class HomeViewModelTest {
         assertEquals("A1", state.recent.first().animalName)
     }
 
+    
     @Test
     fun `a selected farm that no longer exists falls back to all farms`() = runTest(UnconfinedTestDispatcher()) {
         val viewModel = viewModel()
@@ -112,3 +114,4 @@ class HomeViewModelTest {
         assertEquals(4, state.animalCount)
     }
 }
+
