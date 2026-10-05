@@ -42,7 +42,9 @@ private val AniTecColorScheme = lightColorScheme(
     onErrorContainer = Color(0xFFA23B2E),
     scrim = AniTecInk,
 )
-
+/**
+ * Defines the custom shape collection (rounded corners) for the design system.
+ */
 private val AniTecShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),
     small = RoundedCornerShape(8.dp),
