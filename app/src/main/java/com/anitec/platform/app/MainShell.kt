@@ -191,7 +191,11 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
         }
     }
 }
-
+/**
+ * Navigates to a top-level destination while managing the back stack efficiently.
+ * It pops up to the start destination to avoid building up a large back stack,
+ * ensures a single top instance, and saves/restores state.
+ */
 private fun NavHostController.navigateToTopLevel(route: Any) {
     navigate(route) {
         popUpTo(graph.findStartDestination().id) { saveState = true }
