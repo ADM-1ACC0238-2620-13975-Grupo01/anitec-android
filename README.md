@@ -10,6 +10,8 @@ Course project for 1ACC0238 – Aplicaciones para Dispositivos Móviles (UPC, 20
 - Run Gradle with the JDK bundled in Android Studio (**Settings → Build Tools → Gradle → Gradle JDK**). Do not use a system JDK newer than the one Android Studio ships.
 - A running backend (see below), or the hosted one.
 
+
+
 ## Run
 
 Open the `anitec-android` folder in Android Studio, let Gradle sync, then run the `app` configuration.
