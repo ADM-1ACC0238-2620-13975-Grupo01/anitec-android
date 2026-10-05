@@ -65,7 +65,9 @@ fun AniTecPanel(
         content = content,
     )
 }
-
+/**
+ * Renders a header with a title, optional chip, subtitle, and action content.
+ */
 @Composable
 fun PanelHeader(
     title: String,
