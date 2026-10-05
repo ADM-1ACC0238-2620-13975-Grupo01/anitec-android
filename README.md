@@ -1,3 +1,8 @@
+# AniTec Android
+
+Native Android client (Kotlin, Jetpack Compose) of **AniTec**, a livestock management platform for ranchers and veterinarians.
+It is the mobile counterpart of the web app (`anitec-frontend`) and consumes the same ASP.NET Core API (`anitec-backend`).
+Course project for 1ACC0238 – Aplicaciones para Dispositivos Móviles (UPC, 202620).
 
 ## Requirements
 
