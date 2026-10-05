@@ -174,7 +174,9 @@ fun LoadingState(modifier: Modifier = Modifier) {
         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }
-
+/**
+ * Renders a centered loading spinner inside a padded container.
+ */
 @Composable
 fun ErrorMessage(text: String, modifier: Modifier = Modifier) {
     Text(text, modifier = modifier, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
