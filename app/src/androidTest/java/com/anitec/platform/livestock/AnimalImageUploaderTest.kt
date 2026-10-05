@@ -27,6 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 /** Runs the real decode/compress code on a device, with a fake API that captures what would be uploaded. */
+
 @RunWith(AndroidJUnit4::class)
 class AnimalImageUploaderTest {
 
@@ -71,6 +72,7 @@ class AnimalImageUploaderTest {
         assertEquals(300, bitmap.height)
     }
 
+    
     @Test
     fun aLargePhotoIsDownscaledBeforeUpload() = runTest {
         val part = slot<MultipartBody.Part>()
@@ -112,3 +114,4 @@ class AnimalImageUploaderTest {
         assertEquals(4, AnimalImageUploaderImpl.sampleSizeFor(6400, 4800))
     }
 }
+
