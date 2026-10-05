@@ -17,6 +17,7 @@ import javax.inject.Inject
 
 
 /** Codes carried in [AppError.Validation] when a rule is broken before any request is made. */
+
 object LivestockValidation {
     const val INVALID_PLACEMENT = "livestock.invalid_placement"
     const val INVALID_BATCH_SIZE = "livestock.invalid_batch_size"
@@ -64,6 +65,7 @@ class DeleteCorralUseCase @Inject constructor(private val repository: LivestockR
     suspend operator fun invoke(id: Int): AppResult<Unit> = repository.deleteCorral(id)
 }
 
+  
 // --- animals ---
 
 class SaveAnimalUseCase @Inject constructor(private val repository: LivestockRepository) {
@@ -75,6 +77,7 @@ class SaveAnimalUseCase @Inject constructor(private val repository: LivestockRep
         return if (id == null) repository.createAnimal(draft) else repository.updateAnimal(id, draft)
     }
 }
+
 
 class RegisterAnimalBatchUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(draft: AnimalBatchDraft, corrals: List<Corral>): AppResult<List<Animal>> {
@@ -107,3 +110,4 @@ class DeleteAnimalsUseCase @Inject constructor(private val repository: Livestock
 class UploadAnimalImageUseCase @Inject constructor(private val uploader: AnimalImageUploader) {
     suspend operator fun invoke(uri: String): AppResult<String> = uploader.upload(uri)
 }
+
