@@ -108,7 +108,9 @@ fun SecondaryButton(
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
 }
-
+/**
+ * Renders a customizable secondary outlined button with an optional icon.
+ */
 @Composable
 fun DangerTextButton(
     text: String,
