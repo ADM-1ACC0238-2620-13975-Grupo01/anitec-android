@@ -1,0 +1,23 @@
+<resources>
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_subtitle">Indicators and traceability.</string>
+    <string name="analytics_animals">Registered animals</string>
+    <string name="analytics_alerts">Health alerts</string>
+    <string name="analytics_records">Health records</string>
+    <string name="analytics_clients">Assigned clients</string>
+    <string name="analytics_patients">Monitored patients</string>
+    <string name="analytics_active_farms">%1$d active farms</string>
+    <string name="analytics_healthy_count">%1$d healthy</string>
+    <string name="analytics_balance">Balance %1$s</string>
+    <string name="analytics_farms_followed">%1$d farms followed</string>
+    <string name="analytics_need_attention">%1$d need attention</string>
+    <string name="analytics_pending_follow_ups">%1$d pending follow-ups</string>
+    <string name="analytics_chip_production">Production</string>
+    <string name="analytics_chip_health">Health</string>
+    <string name="analytics_chip_clients">Clients</string>
+    <string name="analytics_herd_status">Herd status</string>
+    <string name="analytics_records_by_type">Records by type</string>
+    <string name="analytics_visits_by_herd">Health visits by farm</string>
+    <string name="analytics_kind_other">Other</string>
+    <string name="analytics_no_data">No data yet.</string>
+</resources>

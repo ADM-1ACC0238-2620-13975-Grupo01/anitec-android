@@ -44,6 +44,7 @@ import com.anitec.platform.core.designsystem.component.FormHero
 import com.anitec.platform.core.designsystem.component.FormScreenScaffold
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.PanelHeader
+import com.anitec.platform.core.designsystem.component.pluralCount
 import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
@@ -109,7 +110,7 @@ fun CorralListScreen(
                         RecordCard(
                             title = item.corral.name,
                             kicker = item.herdName,
-                            details = listOf(stringResource(R.string.nav_animals) to stringResource(R.string.corral_animals_count, item.animalCount)),
+                            details = listOf(stringResource(R.string.nav_animals) to pluralCount(R.plurals.count_animals, item.animalCount)),
                             footer = if (state.canEdit) {
                                 {
                                     SecondaryButton(

@@ -39,13 +39,14 @@ class LivestockRepositoryTest {
     private val api = mockk<LivestockApi>()
     private val veterinaryApi = mockk<VeterinaryApi>()
     private val dao = mockk<LivestockDao>(relaxed = true)
+    private val outbox = mockk<com.anitec.platform.core.outbox.OutboxQueue>(relaxed = true)
 
     private fun repository(role: UserRole, userId: Int): LivestockRepositoryImpl {
         val sessionStore = mockk<SessionStore>()
         every { sessionStore.state } returns MutableStateFlow<SessionState>(
             SessionState.SignedIn(UserSession(userId, "user", "User", role, "token")),
         )
-        return LivestockRepositoryImpl(api, veterinaryApi, dao, sessionStore)
+        return LivestockRepositoryImpl(api, veterinaryApi, dao, sessionStore, outbox)
     }
 
     private fun herdDto(id: Int, ownerId: Int, vetId: Int? = null) = HerdDto(id, "Farm $id", "Cajamarca", "Owner $ownerId", ownerId, vetId, "Mixto")

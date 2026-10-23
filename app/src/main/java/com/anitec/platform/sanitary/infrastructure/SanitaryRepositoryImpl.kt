@@ -1,8 +1,11 @@
 package com.anitec.platform.sanitary.infrastructure
 
+import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
+import com.anitec.platform.core.outbox.OutboxKinds
+import com.anitec.platform.core.outbox.OutboxQueue
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.sanitary.domain.HealthEvent
 import com.anitec.platform.sanitary.domain.HealthEventDraft
@@ -30,6 +33,7 @@ class SanitaryRepositoryImpl @Inject constructor(
     private val api: SanitaryApi,
     private val dao: SanitaryDao,
     private val livestockDao: LivestockDao,
+    private val outbox: OutboxQueue,
 ) : SanitaryRepository {
 
     override fun observeEvents(): Flow<List<HealthEvent>> = dao.observeEvents().map { list -> list.map { it.toDomain() } }
@@ -40,8 +44,18 @@ class SanitaryRepositoryImpl @Inject constructor(
         dao.replaceAll(visible.map { it.toEntity() })
     }
 
-    override suspend fun create(draft: HealthEventDraft): AppResult<HealthEvent> =
-        safeApiCall { api.createEvent(draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
+    override suspend fun create(draft: HealthEventDraft): AppResult<HealthEvent> {
+        val body = draft.toDto()
+        val result = safeApiCall { api.createEvent(body).toDomain() }
+        if (result is AppResult.Failure && result.error == AppError.Network) {
+            // No connection: keep the record locally under a temporary id and send it later.
+            val localId = outbox.enqueue(OutboxKinds.CREATE_HEALTH_EVENT, HealthEventDto.serializer(), body)
+            val pending = body.toDomain().copy(id = localId)
+            dao.upsert(pending.toEntity())
+            return AppResult.Success(pending)
+        }
+        return result.onSuccess { dao.upsert(it.toEntity()) }
+    }
 
     override suspend fun update(id: Int, draft: HealthEventDraft): AppResult<HealthEvent> =
         safeApiCall { api.updateEvent(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }

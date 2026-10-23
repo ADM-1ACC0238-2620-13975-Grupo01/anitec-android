@@ -93,11 +93,15 @@ fun RecordCard(
     trailing: (@Composable () -> Unit)? = null,
     details: List<Pair<String, String>> = emptyList(),
     footer: (@Composable RowScope.() -> Unit)? = null,
+    pendingSync: Boolean = false,
 ) {
     AniTecPanel(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
+                    if (pendingSync) {
+                        PendingSyncTag(modifier = Modifier.padding(bottom = 4.dp))
+                    }
                     if (kicker != null) {
                         Text(kicker, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
                     }
@@ -124,4 +128,10 @@ fun RecordCard(
             }
         }
     }
+}
+
+/** Marks a record created offline that has not reached the server yet. */
+@Composable
+fun PendingSyncTag(modifier: Modifier = Modifier) {
+    StatusTag(stringResource(R.string.sync_pending_tag), com.anitec.platform.core.designsystem.Severity.Warn, modifier)
 }

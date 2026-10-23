@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.R
@@ -74,6 +75,15 @@ fun SignUpScreen(
             label = stringResource(R.string.auth_username),
             modifier = Modifier.fillMaxWidth(),
             error = if (state.usernameMissing) required else null,
+        )
+        AniTecTextField(
+            value = state.email,
+            onValueChange = viewModel::onEmailChange,
+            label = stringResource(R.string.auth_email),
+            placeholder = stringResource(R.string.auth_email_hint),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardType = KeyboardType.Email,
+            error = if (state.emailInvalid) stringResource(R.string.auth_email_invalid) else null,
         )
         PasswordField(
             value = state.password,

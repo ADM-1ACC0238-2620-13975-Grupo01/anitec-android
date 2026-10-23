@@ -1,0 +1,42 @@
+<resources>
+    <string name="iot_title">Dispositivos IoT</string>
+    <string name="iot_subtitle">Lecturas básicas de sensores vinculados a fincas o animales.</string>
+    <string name="iot_new">Agregar dispositivo</string>
+    <string name="iot_empty">No hay dispositivos vinculados a tus fincas o animales.</string>
+    <string name="iot_series">Número de serie</string>
+    <string name="iot_location">Ubicación</string>
+    <string name="iot_location_farm">Finca: %1$s</string>
+    <string name="iot_location_animal">Animal: %1$s</string>
+    <string name="iot_unassigned">Sin asignar</string>
+    <string name="iot_readings">Lecturas</string>
+    <string name="iot_readings_count">%1$d registradas</string>
+    <string name="iot_latest">Última</string>
+    <string name="iot_no_readings">Sin lecturas</string>
+    <string name="iot_confirm_delete">¿Eliminar el dispositivo "%1$s"? Esta acción no se puede deshacer.</string>
+    <string name="iot_form_new">Agregar dispositivo IoT</string>
+    <string name="iot_form_edit">Editar dispositivo IoT</string>
+    <string name="iot_form_subtitle">Registra el dispositivo y asígnalo a una finca o a un animal.</string>
+    <string name="iot_name">Nombre</string>
+    <string name="iot_name_placeholder">Ej. Collar sensor 01</string>
+    <string name="iot_type">Tipo</string>
+    <string name="iot_serial">Número de serie</string>
+    <string name="iot_serial_placeholder">Ej. IOT-ANI-001</string>
+    <string name="iot_status">Estado</string>
+    <string name="iot_assign_to">Asignar a</string>
+    <string name="iot_farm">Finca</string>
+    <string name="iot_animal">Animal</string>
+
+    <string name="iot_type_scale">Balanza</string>
+    <string name="iot_type_collar">Collar inteligente</string>
+    <string name="iot_type_ear_tag">Arete de identificación</string>
+    <string name="iot_type_thermal_camera">Cámara térmica</string>
+    <string name="iot_type_weather_station">Estación meteorológica</string>
+    <string name="iot_type_environmental">Sensor ambiental</string>
+    <string name="iot_status_online">En línea</string>
+    <string name="iot_status_maintenance">Mantenimiento</string>
+    <string name="iot_status_offline">Fuera de línea</string>
+    <string name="iot_metric_weight">Peso</string>
+    <string name="iot_metric_temperature">Temperatura</string>
+    <string name="iot_metric_humidity">Humedad</string>
+    <string name="iot_metric_heart_rate">Frecuencia cardíaca</string>
+</resources>

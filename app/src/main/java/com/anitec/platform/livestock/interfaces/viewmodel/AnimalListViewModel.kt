@@ -1,9 +1,12 @@
 package com.anitec.platform.livestock.interfaces.viewmodel
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.anitec.platform.R
+import com.anitec.platform.app.AnimalsRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
@@ -68,6 +71,7 @@ private data class LocalState(
 
 @HiltViewModel
 class AnimalListViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     observeAnimals: ObserveAnimalsUseCase,
     observeHerds: ObserveHerdsUseCase,
     observeCorrals: ObserveCorralsUseCase,
@@ -81,7 +85,8 @@ class AnimalListViewModel @Inject constructor(
     // Only ranchers edit livestock; veterinarians read it.
     private val canEdit = (sessionStore.state.value as? SessionState.SignedIn)?.session?.role == UserRole.Rancher
 
-    private val local = MutableStateFlow(LocalState())
+    // The scanner can open the list straight on one animal's record.
+    private val local = MutableStateFlow(LocalState(detailId = savedStateHandle.toRoute<AnimalsRoute>().openAnimalId))
 
     val state: StateFlow<AnimalListUiState> = combine(
         observeAnimals(), observeHerds(), observeCorrals(), local,

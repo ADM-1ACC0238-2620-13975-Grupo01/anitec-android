@@ -1,0 +1,31 @@
+<resources>
+    <string name="finance_title">Financial management</string>
+    <string name="finance_subtitle">Income, expenses and profitability.</string>
+    <string name="finance_new">New transaction</string>
+    <string name="finance_empty">No financial transactions registered.</string>
+    <string name="finance_income">Income</string>
+    <string name="finance_expenses">Expenses</string>
+    <string name="finance_balance">Balance</string>
+    <string name="finance_type">Type</string>
+    <string name="finance_category">Category</string>
+    <string name="finance_amount">Amount</string>
+    <string name="finance_date">Date</string>
+    <string name="finance_description">Description</string>
+    <string name="finance_description_placeholder">Transaction detail, receipt or reason</string>
+    <string name="finance_detail">Details</string>
+    <string name="finance_detail_title">Transaction detail</string>
+    <string name="finance_confirm_delete">Do you want to delete this transaction?</string>
+    <string name="finance_form_new">Register transaction</string>
+    <string name="finance_form_edit">Edit transaction</string>
+    <string name="finance_form_subtitle">Record income or expenses to keep the production balance updated.</string>
+    <string name="finance_amount_invalid">Enter an amount greater than 0 with up to two decimals.</string>
+
+    <string name="finance_type_income">Income</string>
+    <string name="finance_type_expense">Expense</string>
+    <string name="finance_category_milk">Milk sales</string>
+    <string name="finance_category_livestock">Livestock sales</string>
+    <string name="finance_category_feed">Feed</string>
+    <string name="finance_category_veterinary">Veterinary</string>
+    <string name="finance_category_transport">Transport</string>
+    <string name="finance_category_other">Other</string>
+</resources>

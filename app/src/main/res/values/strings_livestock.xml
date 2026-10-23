@@ -108,8 +108,6 @@
     <string name="herd_location">Location</string>
     <string name="herd_owner">Owner</string>
     <string name="herd_main_type">Main livestock</string>
-    <string name="herd_animals_count">%1$d animals</string>
-    <string name="herd_corrals_count">%1$d corrals</string>
     <string name="herd_confirm_delete">Delete the farm %1$s?</string>
     <string name="herd_delete_blocked">This farm still has corrals or animals. Move or delete them first.</string>
     <string name="herd_save_error">The farm could not be saved.</string>
@@ -126,6 +124,5 @@
     <string name="corral_no_herds">Create a farm first to add corrals.</string>
     <string name="corral_confirm_delete">Delete the corral %1$s?</string>
     <string name="corral_confirm_delete_with_animals">Delete the corral %1$s? Its %2$d animals will be left without a corral.</string>
-    <string name="corral_animals_count">%1$d animals</string>
     <string name="corral_save_error">The corral could not be saved.</string>
 </resources>

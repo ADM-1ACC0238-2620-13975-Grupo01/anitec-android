@@ -3,6 +3,9 @@ package com.anitec.platform.app
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anitec.platform.activities.application.ObserveActivitiesUseCase
+import com.anitec.platform.activities.application.RefreshActivitiesUseCase
+import com.anitec.platform.activities.domain.Activity
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
 import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -29,6 +33,9 @@ data class HomeUiState(
     val attentionCount: Int = 0,
     val recordCount: Int = 0,
     val followUpCount: Int = 0,
+    val upcomingCount: Int = 0,
+    val upcoming: List<Activity> = emptyList(),
+    val today: LocalDate = LocalDate.now(),
     val recent: List<HealthItem> = emptyList(),
     val refreshing: Boolean = false,
     @StringRes val messageRes: Int? = null,
@@ -46,18 +53,22 @@ class HomeViewModel @Inject constructor(
     observeHerds: ObserveHerdsUseCase,
     observeAnimals: ObserveAnimalsUseCase,
     observeEvents: ObserveHealthEventsUseCase,
+    observeActivities: ObserveActivitiesUseCase,
     private val refreshLivestock: RefreshLivestockUseCase,
     private val refreshSanitary: RefreshSanitaryUseCase,
+    private val refreshActivities: RefreshActivitiesUseCase,
 ) : ViewModel() {
 
     private val local = MutableStateFlow(HomeLocal())
 
-    val state: StateFlow<HomeUiState> = combine(observeHerds(), observeAnimals(), observeEvents(), local) { herds, animals, events, local ->
+    val state: StateFlow<HomeUiState> = combine(observeHerds(), observeAnimals(), observeEvents(), observeActivities(), local) { herds, animals, events, activities, local ->
         val selected = local.selectedHerdId?.takeIf { id -> herds.any { it.id == id } }
         val scopedAnimals = animals.filter { selected == null || it.herdId == selected }
         val animalIds = scopedAnimals.map { it.id }.toSet()
         val names = animals.associate { it.id to it.name }
         val scopedEvents = events.filter { it.animalId in animalIds }
+        val today = LocalDate.now()
+        val upcoming = activities.filter { it.isUpcoming(today) }.sortedBy { it.date }
         HomeUiState(
             herds = herds,
             selectedHerdId = selected,
@@ -65,6 +76,9 @@ class HomeViewModel @Inject constructor(
             attentionCount = scopedAnimals.count { it.healthStatus.needsAttention },
             recordCount = scopedEvents.size,
             followUpCount = scopedEvents.count { it.hasFollowUp },
+            upcomingCount = upcoming.size,
+            upcoming = upcoming.take(3),
+            today = today,
             recent = scopedEvents.take(4).map { HealthItem(it, names[it.animalId].orEmpty()) },
             refreshing = local.refreshing,
             messageRes = local.messageRes,
@@ -80,7 +94,10 @@ class HomeViewModel @Inject constructor(
             local.update { it.copy(refreshing = true) }
             val result = when (val livestock = refreshLivestock()) {
                 is AppResult.Failure -> livestock
-                is AppResult.Success -> refreshSanitary()
+                is AppResult.Success -> when (val sanitary = refreshSanitary()) {
+                    is AppResult.Failure -> sanitary
+                    is AppResult.Success -> refreshActivities()
+                }
             }
             local.update { it.copy(refreshing = false, messageRes = (result as? AppResult.Failure)?.error?.messageRes()) }
         }
