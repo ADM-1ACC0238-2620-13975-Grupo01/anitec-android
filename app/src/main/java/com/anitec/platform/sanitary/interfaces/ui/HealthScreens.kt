@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.R
+import com.anitec.platform.core.outbox.isPendingSync
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.component.AniTecTextField
 import com.anitec.platform.core.designsystem.component.ConfirmDialog
@@ -90,7 +91,8 @@ fun HealthRecordCard(item: HealthItem, modifier: Modifier = Modifier, footer: (@
         kicker = event.date,
         trailing = { FollowUpTag(event.hasFollowUp) },
         details = details,
-        footer = footer,
+        footer = if (event.id.isPendingSync) null else footer,
+        pendingSync = event.id.isPendingSync,
         modifier = modifier,
     )
 }

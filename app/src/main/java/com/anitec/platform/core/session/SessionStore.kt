@@ -68,6 +68,7 @@ class SessionStore @Inject constructor(
             prefs[USER_ID] = session.userId
             prefs[USERNAME] = session.username
             prefs[FULL_NAME] = session.fullName
+            if (session.email != null) prefs[EMAIL] = session.email else prefs.remove(EMAIL)
             prefs[ROLE] = session.role.apiValue
             prefs[TOKEN] = encrypt(session.token)
         }
@@ -104,6 +105,7 @@ class SessionStore @Inject constructor(
                     fullName = prefs[FULL_NAME].orEmpty(),
                     role = role,
                     token = decrypt(encrypted),
+                    email = prefs[EMAIL],
                 ),
             )
         }
@@ -128,6 +130,7 @@ class SessionStore @Inject constructor(
         val USER_ID = intPreferencesKey("user_id")
         val USERNAME = stringPreferencesKey("username")
         val FULL_NAME = stringPreferencesKey("full_name")
+        val EMAIL = stringPreferencesKey("email")
         val ROLE = stringPreferencesKey("role")
         val TOKEN = stringPreferencesKey("token")
     }

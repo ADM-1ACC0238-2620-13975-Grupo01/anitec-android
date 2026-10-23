@@ -49,7 +49,8 @@ class SanitaryRepositoryTest {
     private val api = mockk<SanitaryApi>()
     private val dao = mockk<SanitaryDao>(relaxed = true)
     private val livestockDao = mockk<LivestockDao>()
-    private val repository = SanitaryRepositoryImpl(api, dao, livestockDao)
+    private val outbox = mockk<com.anitec.platform.core.outbox.OutboxQueue>(relaxed = true)
+    private val repository = SanitaryRepositoryImpl(api, dao, livestockDao, outbox)
 
     private fun dto(id: Int, animalId: Int) = HealthEventDto(id = id, animalId = animalId, type = "Incidencia", date = "2026-09-01")
 

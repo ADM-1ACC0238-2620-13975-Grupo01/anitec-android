@@ -17,7 +17,7 @@ val localProperties = Properties().apply {
 }
 // 10.0.2.2 is the host machine as seen from the Android emulator.
 val debugServerUrl = localProperties.getProperty("anitec.debugServerUrl", "http://10.0.2.2:5191").trimEnd('/')
-val releaseServerUrl = "https://anitec-backend.onrender.com"
+val releaseServerUrl = "https://anitec-backend-android.onrender.com"
 
 android {
     namespace = "com.anitec.platform"
@@ -88,6 +88,16 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Camera and barcode scanning
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
 
     // Networking
     implementation(libs.retrofit)

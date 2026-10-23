@@ -1,0 +1,37 @@
+<resources>
+    <!-- Clients -->
+    <string name="vet_clients_subtitle">Ranchers whose animals you look after.</string>
+    <string name="vet_clients_empty">You have no clients yet. Add a rancher to start.</string>
+    <string name="vet_add_client">Add client</string>
+    <string name="vet_add_client_subtitle">Link a rancher to see their farms and animals.</string>
+    <string name="vet_search_ranchers">Search by name or username</string>
+    <string name="vet_no_ranchers">No ranchers available to add.</string>
+    <string name="vet_client_added">Client added</string>
+    <string name="vet_view_patients">View patients</string>
+    <string name="vet_remove_client">Remove client</string>
+    <string name="vet_confirm_remove">Remove %1$s from your clients? You will stop seeing their farms, animals and records.</string>
+    <string name="vet_no_alerts">No alerts</string>
+    <string name="vet_no_farms">No farms</string>
+
+    <!-- Patients and clinical history -->
+    <string name="vet_patients_subtitle">Animals of your clients.</string>
+    <string name="vet_select_client">Client</string>
+    <string name="vet_pick_client">Add a client to see their patients.</string>
+    <string name="vet_patients_context">%1$s · %2$s shown</string>
+    <string name="vet_patients_empty">This client has no animals to show.</string>
+    <string name="vet_view_history">View history</string>
+    <string name="vet_history_title">Clinical history</string>
+    <string name="vet_history_empty">This animal has no health records yet.</string>
+    <string name="vet_history_new">New record</string>
+    <string name="vet_history_not_found">This animal is not available.</string>
+
+    <!-- Dashboard -->
+    <string name="vet_home_subtitle">An overview of your clients and their animals.</string>
+    <string name="vet_all_clients">All clients</string>
+    <string name="vet_metric_clients">Clients</string>
+    <string name="vet_metric_patients">Need attention</string>
+    <string name="vet_metric_records">Clinical records</string>
+    <string name="vet_metric_followups">Pending follow-ups</string>
+    <string name="vet_overview_title">Your clients</string>
+    <string name="vet_review_records">Review records</string>
+</resources>

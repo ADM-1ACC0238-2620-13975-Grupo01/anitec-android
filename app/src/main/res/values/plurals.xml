@@ -1,0 +1,34 @@
+<resources>
+    <plurals name="count_farms">
+        <item quantity="one">%d farm</item>
+        <item quantity="other">%d farms</item>
+    </plurals>
+    <plurals name="count_animals">
+        <item quantity="one">%d animal</item>
+        <item quantity="other">%d animals</item>
+    </plurals>
+    <plurals name="count_corrals">
+        <item quantity="one">%d corral</item>
+        <item quantity="other">%d corrals</item>
+    </plurals>
+    <plurals name="count_species">
+        <item quantity="one">%d species</item>
+        <item quantity="other">%d species</item>
+    </plurals>
+    <plurals name="count_alerts">
+        <item quantity="one">%d alert</item>
+        <item quantity="other">%d alerts</item>
+    </plurals>
+    <plurals name="count_records">
+        <item quantity="one">%d record</item>
+        <item quantity="other">%d records</item>
+    </plurals>
+    <plurals name="count_followups">
+        <item quantity="one">%d follow-up</item>
+        <item quantity="other">%d follow-ups</item>
+    </plurals>
+    <plurals name="count_ranchers_found">
+        <item quantity="one">%d rancher found</item>
+        <item quantity="other">%d ranchers found</item>
+    </plurals>
+</resources>

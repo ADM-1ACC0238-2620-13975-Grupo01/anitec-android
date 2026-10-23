@@ -1,0 +1,34 @@
+<resources>
+    <plurals name="count_farms">
+        <item quantity="one">%d finca</item>
+        <item quantity="other">%d fincas</item>
+    </plurals>
+    <plurals name="count_animals">
+        <item quantity="one">%d animal</item>
+        <item quantity="other">%d animales</item>
+    </plurals>
+    <plurals name="count_corrals">
+        <item quantity="one">%d corral</item>
+        <item quantity="other">%d corrales</item>
+    </plurals>
+    <plurals name="count_species">
+        <item quantity="one">%d especie</item>
+        <item quantity="other">%d especies</item>
+    </plurals>
+    <plurals name="count_alerts">
+        <item quantity="one">%d alerta</item>
+        <item quantity="other">%d alertas</item>
+    </plurals>
+    <plurals name="count_records">
+        <item quantity="one">%d registro</item>
+        <item quantity="other">%d registros</item>
+    </plurals>
+    <plurals name="count_followups">
+        <item quantity="one">%d seguimiento</item>
+        <item quantity="other">%d seguimientos</item>
+    </plurals>
+    <plurals name="count_ranchers_found">
+        <item quantity="one">%d ganadero encontrado</item>
+        <item quantity="other">%d ganaderos encontrados</item>
+    </plurals>
+</resources>

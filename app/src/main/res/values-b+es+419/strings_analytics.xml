@@ -1,0 +1,23 @@
+<resources>
+    <string name="analytics_title">Analítica</string>
+    <string name="analytics_subtitle">Indicadores y trazabilidad.</string>
+    <string name="analytics_animals">Animales registrados</string>
+    <string name="analytics_alerts">Alertas sanitarias</string>
+    <string name="analytics_records">Registros sanitarios</string>
+    <string name="analytics_clients">Clientes asignados</string>
+    <string name="analytics_patients">Pacientes monitoreados</string>
+    <string name="analytics_active_farms">%1$d fincas activas</string>
+    <string name="analytics_healthy_count">%1$d saludables</string>
+    <string name="analytics_balance">Balance %1$s</string>
+    <string name="analytics_farms_followed">%1$d fincas bajo seguimiento</string>
+    <string name="analytics_need_attention">%1$d requieren atención</string>
+    <string name="analytics_pending_follow_ups">%1$d seguimientos pendientes</string>
+    <string name="analytics_chip_production">Producción</string>
+    <string name="analytics_chip_health">Sanidad</string>
+    <string name="analytics_chip_clients">Clientes</string>
+    <string name="analytics_herd_status">Estado del hato</string>
+    <string name="analytics_records_by_type">Registros por tipo</string>
+    <string name="analytics_visits_by_herd">Atenciones sanitarias por finca</string>
+    <string name="analytics_kind_other">Otros</string>
+    <string name="analytics_no_data">Aún no hay datos.</string>
+</resources>

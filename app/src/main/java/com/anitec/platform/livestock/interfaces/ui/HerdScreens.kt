@@ -46,6 +46,7 @@ import com.anitec.platform.core.designsystem.component.FormHero
 import com.anitec.platform.core.designsystem.component.FormScreenScaffold
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.PanelHeader
+import com.anitec.platform.core.designsystem.component.pluralCount
 import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
@@ -113,8 +114,8 @@ fun HerdListScreen(
                             details = listOf(
                                 stringResource(R.string.herd_location) to item.herd.location,
                                 stringResource(R.string.herd_owner) to item.herd.owner,
-                                stringResource(R.string.nav_corrals) to stringResource(R.string.herd_corrals_count, item.corralCount),
-                                stringResource(R.string.nav_animals) to stringResource(R.string.herd_animals_count, item.animalCount),
+                                stringResource(R.string.nav_corrals) to pluralCount(R.plurals.count_corrals, item.corralCount),
+                                stringResource(R.string.nav_animals) to pluralCount(R.plurals.count_animals, item.animalCount),
                             ),
                             footer = {
                                 SecondaryButton(

@@ -54,6 +54,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import com.anitec.platform.R
+import com.anitec.platform.core.designsystem.component.PendingSyncTag
+import com.anitec.platform.core.outbox.isPendingSync
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.AniTecTextField
 import com.anitec.platform.core.designsystem.component.ConfirmDialog
@@ -115,11 +117,11 @@ fun AnimalListScreen(
                                 view = view,
                                 selected = view.animal.id in state.selectedIds,
                                 selectionMode = state.selectionMode,
-                                canSelect = state.canEdit,
+                                canSelect = state.canEdit && !view.animal.id.isPendingSync,
                                 onClick = {
                                     if (state.selectionMode) viewModel.toggleSelection(view.animal.id) else viewModel.openDetail(view.animal.id)
                                 },
-                                onLongClick = { if (state.canEdit) viewModel.toggleSelection(view.animal.id) },
+                                onLongClick = { if (state.canEdit && !view.animal.id.isPendingSync) viewModel.toggleSelection(view.animal.id) },
                             )
                         }
                     }
@@ -143,7 +145,7 @@ fun AnimalListScreen(
     state.detail?.let { detail ->
         AnimalDetailSheet(
             view = detail,
-            canEdit = state.canEdit,
+            canEdit = state.canEdit && !detail.animal.id.isPendingSync,
             onDismiss = viewModel::closeDetail,
             onEdit = {
                 viewModel.closeDetail()
@@ -256,6 +258,7 @@ private fun AnimalRow(
             AnimalThumbnail(animal.imageUrl, animal.name)
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
+                if (animal.id.isPendingSync) PendingSyncTag(modifier = Modifier.padding(bottom = 2.dp))
                 Text(animal.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(animal.tag, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                 Text(

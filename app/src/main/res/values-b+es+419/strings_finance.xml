@@ -1,0 +1,31 @@
+<resources>
+    <string name="finance_title">Gestión financiera</string>
+    <string name="finance_subtitle">Ingresos, egresos y rentabilidad.</string>
+    <string name="finance_new">Nuevo movimiento</string>
+    <string name="finance_empty">No hay movimientos financieros registrados.</string>
+    <string name="finance_income">Ingresos</string>
+    <string name="finance_expenses">Egresos</string>
+    <string name="finance_balance">Balance</string>
+    <string name="finance_type">Tipo</string>
+    <string name="finance_category">Categoría</string>
+    <string name="finance_amount">Monto</string>
+    <string name="finance_date">Fecha</string>
+    <string name="finance_description">Descripción</string>
+    <string name="finance_description_placeholder">Detalle, comprobante o motivo del movimiento</string>
+    <string name="finance_detail">Detalle</string>
+    <string name="finance_detail_title">Detalle del movimiento</string>
+    <string name="finance_confirm_delete">¿Deseas eliminar este movimiento?</string>
+    <string name="finance_form_new">Registrar movimiento</string>
+    <string name="finance_form_edit">Editar movimiento</string>
+    <string name="finance_form_subtitle">Registra ingresos o egresos para mantener actualizado el balance de producción.</string>
+    <string name="finance_amount_invalid">Ingresa un monto mayor que 0 con hasta dos decimales.</string>
+
+    <string name="finance_type_income">Ingreso</string>
+    <string name="finance_type_expense">Egreso</string>
+    <string name="finance_category_milk">Venta de leche</string>
+    <string name="finance_category_livestock">Venta de ganado</string>
+    <string name="finance_category_feed">Alimento</string>
+    <string name="finance_category_veterinary">Veterinaria</string>
+    <string name="finance_category_transport">Transporte</string>
+    <string name="finance_category_other">Otros</string>
+</resources>
