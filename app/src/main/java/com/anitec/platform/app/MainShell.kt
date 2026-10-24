@@ -358,7 +358,13 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
  * It pops up to the start destination to avoid building up a large back stack,
  * ensures a single top instance, and saves/restores state.
  */
-private fun NavHostController.navigateToTopLevel(route: Any) {
+internal fun NavHostController.navigateToTopLevel(route: Any) {
+    if (route == HomeRoute) {
+        // Home is the start destination and screens opened from it (a client's patients) sit above it. Restoring
+        // the saved stack would bring those screens back instead of Home, so go back down to Home itself.
+        popBackStack(HomeRoute, inclusive = false, saveState = true)
+        return
+    }
     navigate(route) {
         popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
