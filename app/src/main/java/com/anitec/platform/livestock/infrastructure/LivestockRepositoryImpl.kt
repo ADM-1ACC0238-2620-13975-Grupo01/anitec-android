@@ -20,6 +20,7 @@ import com.anitec.platform.livestock.domain.LivestockRepository
 import com.anitec.platform.livestock.domain.LivestockScope
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.livestock.infrastructure.remote.AnimalIdsDto
+import com.anitec.platform.livestock.infrastructure.remote.AnimalStatusDto
 import com.anitec.platform.livestock.infrastructure.remote.AnimalsStatusDto
 import com.anitec.platform.livestock.infrastructure.remote.AnimalDto
 import com.anitec.platform.livestock.infrastructure.remote.LivestockApi
@@ -128,6 +129,10 @@ class LivestockRepositoryImpl @Inject constructor(
     override suspend fun updateAnimalsStatus(ids: List<Int>, status: String): AppResult<List<Animal>> =
         safeApiCall { api.updateAnimalsStatus(AnimalsStatusDto(ids, status)).map { it.toDomain() } }
             .onSuccess { updated -> dao.upsertAnimals(updated.map { it.toEntity() }) }
+
+    override suspend fun updateAnimalStatus(id: Int, status: String): AppResult<Animal> =
+        safeApiCall { api.updateAnimalStatus(id, AnimalStatusDto(status)).toDomain() }
+            .onSuccess { updated -> dao.upsertAnimals(listOf(updated.toEntity())) }
 
     override suspend fun deleteAnimals(ids: List<Int>): AppResult<Unit> =
         safeApiCall { api.deleteAnimals(AnimalIdsDto(ids)) }.onSuccess { dao.deleteAnimals(ids) }

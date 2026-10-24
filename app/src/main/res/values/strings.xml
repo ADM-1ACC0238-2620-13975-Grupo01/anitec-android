@@ -19,7 +19,6 @@
     <string name="common_choose_date">Choose date</string>
     <string name="common_clear_date">Clear date</string>
     <string name="common_date_placeholder">yyyy-mm-dd</string>
-    <string name="common_coming_soon">This section is coming soon.</string>
 
     <!-- Errors -->
     <string name="error_network">Could not reach the server. Check your connection and try again.</string>

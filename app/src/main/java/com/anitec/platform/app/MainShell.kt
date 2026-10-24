@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.sync.SyncBanner
@@ -60,7 +61,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import com.anitec.platform.subscriptions.domain.CheckoutReturn
+import com.anitec.platform.subscriptions.interfaces.ui.SubscriptionResultScreen
+import com.anitec.platform.subscriptions.interfaces.ui.SubscriptionsScreen
+import com.anitec.platform.subscriptions.interfaces.viewmodel.CheckoutReturnViewModel
 import com.anitec.platform.R
 import com.anitec.platform.activities.interfaces.ui.ActivityFormScreen
 import com.anitec.platform.activities.interfaces.ui.ActivityListScreen
@@ -125,6 +129,19 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
     val layout = navigationLayoutFor(activity?.let { calculateWindowSizeClass(it).widthSizeClass } ?: WindowWidthSizeClass.Compact)
     val syncViewModel: SyncStatusViewModel = hiltViewModel()
     val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
+    val checkoutReturnViewModel: CheckoutReturnViewModel = hiltViewModel()
+    val checkoutReturn by checkoutReturnViewModel.pending.collectAsStateWithLifecycle()
+    // The browser sends the user back with a link. Show the result once, then clear the link.
+    LaunchedEffect(checkoutReturn) {
+        val link = checkoutReturn ?: return@LaunchedEffect
+        navController.navigate(
+            when (link) {
+                is CheckoutReturn.Success -> SubscriptionResultRoute(sessionId = link.sessionId)
+                CheckoutReturn.Cancelled -> SubscriptionResultRoute(cancelled = true)
+            },
+        )
+        checkoutReturnViewModel.consume()
+    }
     val destinations = remember(session.role) { bottomDestinations(session.role) }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -318,10 +335,16 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                 )
             }
             composable<CorralFormRoute> { CorralFormScreen(onBack = { navController.popBackStack() }) }
-            composable<PlaceholderRoute> { entry ->
-                PlaceholderScreen(
-                    titleRes = entry.toRoute<PlaceholderRoute>().titleRes,
-                    onBack = { navController.popBackStack() },
+            composable<SubscriptionsRoute> { SubscriptionsScreen(onBack = { navController.popBackStack() }) }
+            composable<SubscriptionResultRoute> {
+                SubscriptionResultScreen(
+                    onDone = {
+                        // Back to the plan list, replacing the result so the back arrow does not return to it.
+                        navController.navigate(SubscriptionsRoute) {
+                            popUpTo<SubscriptionResultRoute> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
         }

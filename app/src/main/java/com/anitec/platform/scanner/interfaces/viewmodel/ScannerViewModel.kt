@@ -2,7 +2,7 @@ package com.anitec.platform.scanner.interfaces.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
+import com.anitec.platform.livestock.application.ObserveAllAnimalsUseCase
 import com.anitec.platform.livestock.application.RefreshLivestockUseCase
 import com.anitec.platform.livestock.domain.Animal
 import com.anitec.platform.scanner.domain.TagResolver
@@ -30,7 +30,7 @@ data class ScannerUiState(
  */
 @HiltViewModel
 class ScannerViewModel @Inject constructor(
-    observeAnimals: ObserveAnimalsUseCase,
+    observeAnimals: ObserveAllAnimalsUseCase,
     refreshLivestock: RefreshLivestockUseCase,
 ) : ViewModel() {
 

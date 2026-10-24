@@ -4,6 +4,8 @@ import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
+import com.anitec.platform.core.outbox.OutboxKinds
+import com.anitec.platform.core.outbox.OutboxQueue
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.financial.domain.FinancialRecord
@@ -37,6 +39,7 @@ class FinancialRepositoryImpl @Inject constructor(
     private val api: FinancialApi,
     private val dao: FinancialDao,
     private val sessionStore: SessionStore,
+    private val outbox: OutboxQueue,
 ) : FinancialRepository {
 
     override fun observeRecords(): Flow<List<FinancialRecord>> = dao.observeRecords().map { list -> list.map { it.toDomain() } }
@@ -50,8 +53,18 @@ class FinancialRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun create(draft: FinancialRecordDraft): AppResult<FinancialRecord> =
-        safeApiCall { api.create(draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
+    override suspend fun create(draft: FinancialRecordDraft): AppResult<FinancialRecord> {
+        val body = draft.toDto()
+        val result = safeApiCall { api.create(body).toDomain() }
+        if (result is AppResult.Failure && result.error == AppError.Network) {
+            // No connection: keep the record locally under a temporary id and send it later.
+            val localId = outbox.enqueue(OutboxKinds.CREATE_FINANCIAL_RECORD, FinancialRecordDto.serializer(), body)
+            val pending = body.toDomain().copy(id = localId)
+            dao.upsert(pending.toEntity())
+            return AppResult.Success(pending)
+        }
+        return result.onSuccess { dao.upsert(it.toEntity()) }
+    }
 
     override suspend fun update(id: Int, draft: FinancialRecordDraft): AppResult<FinancialRecord> =
         safeApiCall { api.update(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }

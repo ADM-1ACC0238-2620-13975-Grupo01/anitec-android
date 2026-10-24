@@ -2,6 +2,9 @@ package com.anitec.platform.financial
 
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.outbox.OutboxKinds
+import com.anitec.platform.core.outbox.OutboxQueue
+import com.anitec.platform.core.outbox.isPendingSync
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
@@ -103,11 +106,12 @@ class FinancialRulesTest {
 class FinancialRepositoryTest {
     private val api = mockk<FinancialApi>()
     private val dao = mockk<FinancialDao>(relaxed = true)
+    private val queue = mockk<OutboxQueue>()
 
     private fun repository(userId: Int = 10): FinancialRepositoryImpl {
         val sessionStore = mockk<SessionStore>()
         every { sessionStore.state } returns MutableStateFlow<SessionState>(SessionState.SignedIn(UserSession(userId, "u", "U", UserRole.Rancher, "t")))
-        return FinancialRepositoryImpl(api, dao, sessionStore)
+        return FinancialRepositoryImpl(api, dao, sessionStore, queue)
     }
 
     private fun dto(id: Int, ownerId: Int) = FinancialRecordDto(id, ownerId, "Ingreso", "Alimento", 5.0, "2026-10-01", "")
@@ -121,6 +125,32 @@ class FinancialRepositoryTest {
         assertEquals(AppResult.Success(Unit), repository().refresh())
 
         assertEquals(listOf(1), cached.captured.map { it.id })
+    }
+
+    @Test
+    fun `creating without a connection queues the record and keeps it locally under a negative id`() = runTest {
+        coEvery { api.create(any()) } throws IOException("offline")
+        coEvery {
+            queue.enqueue(OutboxKinds.CREATE_FINANCIAL_RECORD, any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any())
+        } returns -6
+
+        val result = repository().create(FinancialRecordDraft(10, "Ingreso", "Venta de leche", 80.0, "2026-10-01", "Milk"))
+
+        val record = (result as AppResult.Success).value
+        assertEquals(-6, record.id)
+        assertTrue(record.id.isPendingSync)
+        assertEquals(80.0, record.amount, 0.0)
+        coVerify { dao.upsert(match { it.id == -6 && it.ownerId == 10 }) }
+    }
+
+    @Test
+    fun `a refusal from the server is reported and nothing is queued`() = runTest {
+        coEvery { api.create(any()) } throws retrofit2.HttpException(retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, "")))
+
+        val result = repository().create(FinancialRecordDraft(10, "Egreso", "Alimento", 5.0, "2026-10-01", "x"))
+
+        assertTrue(result is AppResult.Failure)
+        coVerify(exactly = 0) { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any()) }
     }
 
     @Test

@@ -68,6 +68,8 @@ import com.anitec.platform.core.designsystem.component.LoadingState
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.StatusTag
 import com.anitec.platform.core.network.resolveMediaUrl
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material3.FilterChip
 import com.anitec.platform.livestock.domain.AnimalStatus
 import com.anitec.platform.livestock.domain.AnimalView
 import com.anitec.platform.livestock.domain.Corral
@@ -95,10 +97,11 @@ fun AnimalListScreen(
                     onClose = viewModel::clearSelection,
                     onSelectAll = viewModel::selectAllVisible,
                     onChangeStatus = viewModel::requestStatusChange,
+                    onArchive = viewModel::requestArchiveSelected,
                     onDelete = viewModel::requestDeleteSelected,
                 )
             } else {
-                SearchBar(state, viewModel::onQueryChange, viewModel::onCorralFilterChange)
+                SearchBar(state, viewModel::onQueryChange, viewModel::onCorralFilterChange, viewModel::onShowArchivedChange)
             }
 
             PullToRefreshBox(
@@ -109,7 +112,13 @@ fun AnimalListScreen(
                 when {
                     state.loading -> LoadingState()
                     state.items.isEmpty() -> EmptyState(
-                        stringResource(if (state.totalCount == 0) R.string.animals_empty else R.string.animals_empty_search),
+                        stringResource(
+                            when {
+                                state.totalCount > 0 -> R.string.animals_empty_search
+                                state.showArchived -> R.string.animals_archived_empty
+                                else -> R.string.animals_empty
+                            },
+                        ),
                     )
                     else -> LazyColumn(
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 96.dp),
@@ -154,6 +163,8 @@ fun AnimalListScreen(
                 viewModel.closeDetail()
                 onEditAnimal(detail.animal.id)
             },
+            onArchive = { viewModel.requestArchive(detail) },
+            onRestore = { viewModel.restore(detail) },
             onDelete = { viewModel.requestDelete(detail) },
         )
     }
@@ -166,8 +177,21 @@ private fun SearchBar(
     state: AnimalListUiState,
     onQueryChange: (String) -> Unit,
     onCorralFilterChange: (Int?) -> Unit,
+    onShowArchivedChange: (Boolean) -> Unit,
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = !state.showArchived,
+                onClick = { onShowArchivedChange(false) },
+                label = { Text(stringResource(R.string.animals_tab_active)) },
+            )
+            FilterChip(
+                selected = state.showArchived,
+                onClick = { onShowArchivedChange(true) },
+                label = { Text(stringResource(R.string.animals_tab_archived, state.archivedCount)) },
+            )
+        }
         AniTecTextField(
             value = state.query,
             onValueChange = onQueryChange,
@@ -200,6 +224,7 @@ private fun SelectionBar(
     onClose: () -> Unit,
     onSelectAll: () -> Unit,
     onChangeStatus: () -> Unit,
+    onArchive: () -> Unit,
     onDelete: () -> Unit,
 ) {
     AniTecPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -219,7 +244,15 @@ private fun SelectionBar(
                 Icon(Icons.Filled.DoneAll, contentDescription = stringResource(R.string.animals_select_all))
             }
             IconButton(onClick = onChangeStatus) {
-                Icon(Icons.Filled.SwapHoriz, contentDescription = stringResource(R.string.animals_change_status))
+                Icon(
+                    Icons.Filled.SwapHoriz,
+                    contentDescription = stringResource(if (state.showArchived) R.string.animals_restore_selected else R.string.animals_change_status),
+                )
+            }
+            if (!state.showArchived) {
+                IconButton(onClick = onArchive) {
+                    Icon(Icons.Filled.Archive, contentDescription = stringResource(R.string.animals_archive_selected))
+                }
             }
             IconButton(onClick = onDelete) {
                 Icon(
@@ -330,6 +363,22 @@ private fun PendingActionDialogs(state: AnimalListUiState, viewModel: AnimalList
             title = stringResource(R.string.common_confirm_delete_title),
             message = stringResource(R.string.animals_confirm_delete_many, state.selectedIds.size),
             confirmLabel = stringResource(R.string.common_delete),
+            dismissLabel = stringResource(R.string.common_cancel),
+            onConfirm = viewModel::confirmPending,
+            onDismiss = viewModel::dismissPending,
+        )
+        is PendingAction.ArchiveOne -> ConfirmDialog(
+            title = stringResource(R.string.animals_archive),
+            message = stringResource(R.string.animals_confirm_archive_one, pending.name),
+            confirmLabel = stringResource(R.string.animals_archive),
+            dismissLabel = stringResource(R.string.common_cancel),
+            onConfirm = viewModel::confirmPending,
+            onDismiss = viewModel::dismissPending,
+        )
+        PendingAction.ArchiveSelected -> ConfirmDialog(
+            title = stringResource(R.string.animals_archive),
+            message = stringResource(R.string.animals_confirm_archive_many, state.selectedIds.size),
+            confirmLabel = stringResource(R.string.animals_archive),
             dismissLabel = stringResource(R.string.common_cancel),
             onConfirm = viewModel::confirmPending,
             onDismiss = viewModel::dismissPending,

@@ -90,14 +90,13 @@ fun AuthScaffold(
                     content()
                 }
             }
-            Spacer(Modifier.navigationBarsPadding().height(72.dp))
+            // The language switcher scrolls with the form. Floating it at the bottom put it over the password
+            // field and the sign-in button as soon as the keyboard opened.
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
+                LanguageSwitcher()
+            }
+            Spacer(Modifier.navigationBarsPadding().height(16.dp))
         }
-        LanguageSwitcher(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-        )
     }
 }
 

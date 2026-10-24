@@ -2,6 +2,9 @@ package com.anitec.platform.sync
 
 import com.anitec.platform.activities.infrastructure.ActivitiesRepositoryImpl
 import com.anitec.platform.activities.infrastructure.local.ActivitiesDao
+import com.anitec.platform.financial.infrastructure.local.FinancialDao
+import com.anitec.platform.financial.infrastructure.remote.FinancialApi
+import com.anitec.platform.financial.infrastructure.remote.FinancialRecordDto
 import com.anitec.platform.activities.infrastructure.remote.ActivitiesApi
 import com.anitec.platform.activities.infrastructure.remote.FarmActivityDto
 import com.anitec.platform.activities.domain.ActivityDraft
@@ -79,7 +82,11 @@ class OutboxProcessorTest {
     private val sanitaryDao = mockk<SanitaryDao>(relaxed = true)
     private val activitiesApi = mockk<ActivitiesApi>()
     private val activitiesDao = mockk<ActivitiesDao>(relaxed = true)
-    private val processor = OutboxProcessor(fake.dao, livestockApi, livestockDao, sanitaryApi, sanitaryDao, activitiesApi, activitiesDao, json)
+    private val financialApi = mockk<FinancialApi>()
+    private val financialDao = mockk<FinancialDao>(relaxed = true)
+    private val processor = OutboxProcessor(
+        fake.dao, livestockApi, livestockDao, sanitaryApi, sanitaryDao, activitiesApi, activitiesDao, financialApi, financialDao, json,
+    )
 
     private fun queueAnimal(localId: Int, dto: AnimalDto = animalDto(), attempts: Int = 0) =
         fake.add(OutboxKinds.CREATE_ANIMAL, localId, json.encodeToString(AnimalDto.serializer(), dto), attempts)
@@ -137,6 +144,38 @@ class OutboxProcessorTest {
 
         coVerify(exactly = 0) { livestockApi.createAnimal(any()) }
         coVerify { livestockDao.upsertAnimal(match { it.id == 77 }) }
+    }
+
+    @Test
+    fun `a sent financial record replaces its local copy and leaves the queue`() = runTest {
+        fake.add(
+            OutboxKinds.CREATE_FINANCIAL_RECORD, -1,
+            json.encodeToString(FinancialRecordDto.serializer(), FinancialRecordDto(ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")),
+        )
+        coEvery { financialApi.create(any()) } returns FinancialRecordDto(id = 77, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
+
+        assertEquals(SyncOutcome.Done, processor.run())
+
+        coVerify { financialDao.delete(-1) }
+        coVerify { financialDao.upsert(match { it.id == 77 }) }
+        assertTrue(fake.rows.isEmpty())
+    }
+
+    @Test
+    fun `a refused financial record is marked failed and discarding removes its local copy`() = runTest {
+        fake.add(
+            OutboxKinds.CREATE_FINANCIAL_RECORD, -3,
+            json.encodeToString(FinancialRecordDto.serializer(), FinancialRecordDto(ownerId = 10, type = "Egreso", amount = 1.0, date = "2026-10-01")),
+        )
+        coEvery { financialApi.create(any()) } throws httpError(400)
+
+        assertEquals(SyncOutcome.Done, processor.run())
+        assertTrue(fake.rows.single().failed)
+
+        processor.discardFailed()
+
+        coVerify { financialDao.delete(-3) }
+        assertTrue(fake.rows.isEmpty())
     }
 
     @Test

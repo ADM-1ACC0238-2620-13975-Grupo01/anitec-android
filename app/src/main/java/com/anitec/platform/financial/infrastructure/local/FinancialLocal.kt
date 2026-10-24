@@ -27,7 +27,8 @@ interface FinancialDao {
     @Upsert suspend fun upsert(record: FinancialRecordEntity)
     @Upsert suspend fun upsertAll(records: List<FinancialRecordEntity>)
     @Query("DELETE FROM financial_records WHERE id = :id") suspend fun delete(id: Int)
-    @Query("DELETE FROM financial_records") suspend fun clear()
+    // Records created offline have a negative id and stay until they are sent.
+    @Query("DELETE FROM financial_records WHERE id >= 0") suspend fun clear()
 
     @Transaction
     suspend fun replaceAll(records: List<FinancialRecordEntity>) {

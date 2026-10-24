@@ -12,7 +12,8 @@ import javax.inject.Inject
  * - Always sets `Accept-Language` from the device locale so the backend can localize messages.
  * - When a session token exists, sets `Authorization: Bearer <token>`.
  * - If the server answers HTTP 401 on a request that carried a token, calls
- *   [SessionStore.onUnauthorized] so the app signs the user out.
+ *   [SessionStore.onUnauthorized] so the app signs the user out. A late 401 from a session that has
+ *   already been replaced (the user signed in again meanwhile) does not end the new one.
  *
  * The web client has no 401 handling; the app needs it because tokens last 7 days and
  * cannot be refreshed. A 401 without a prior token (e.g. failed sign-in) is left alone.
@@ -27,7 +28,7 @@ class AuthInterceptor @Inject constructor(
             .apply { if (token != null) header("Authorization", "Bearer $token") }
             .build()
         val response = chain.proceed(request)
-        if (response.code == 401 && token != null) sessionStore.onUnauthorized()
+        if (response.code == 401 && token != null && sessionStore.currentToken() == token) sessionStore.onUnauthorized()
         return response
     }
 }

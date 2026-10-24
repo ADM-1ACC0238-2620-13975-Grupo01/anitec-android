@@ -1,0 +1,32 @@
+<resources>
+    <string name="subscriptions_title">Suscripciones</string>
+    <string name="subscriptions_current">Plan actual</string>
+    <string name="subscriptions_none">Aún no tienes un plan activo. Elige uno abajo.</string>
+    <string name="subscriptions_unknown_plan">Plan activo</string>
+    <string name="subscriptions_since">Desde %1$s</string>
+    <string name="subscriptions_status_active">Activo</string>
+    <string name="subscriptions_plans">Planes disponibles</string>
+    <string name="subscriptions_plans_empty">No hay planes disponibles por ahora.</string>
+    <string name="subscriptions_price_month">%1$s al mes</string>
+    <string name="subscriptions_animals_limit">Hasta %1$d animales</string>
+    <string name="subscriptions_current_plan_tag">Tu plan actual</string>
+    <string name="subscriptions_subscribe">Suscribirme</string>
+    <string name="subscriptions_switch">Cambiar a este plan</string>
+    <string name="subscriptions_checkout_note">Pagarás en la página segura de Stripe, en tu navegador. Después vuelves a AniTec.</string>
+    <string name="subscriptions_no_browser">No hay un navegador disponible para completar el pago.</string>
+    <string name="subscriptions_payments">Historial de pagos</string>
+    <string name="subscriptions_payments_empty">Aún no hay pagos.</string>
+    <string name="subscriptions_payment_paid">Pagado</string>
+
+    <string name="subscriptions_result_title">Suscripción</string>
+    <string name="subscriptions_result_confirming">Confirmando tu pago…</string>
+    <string name="subscriptions_result_success">Pago confirmado</string>
+    <string name="subscriptions_result_success_body">Tu plan %1$s ya está activo.</string>
+    <string name="subscriptions_result_success_body_generic">Tu suscripción ya está activa.</string>
+    <string name="subscriptions_result_cancelled">Pago cancelado</string>
+    <string name="subscriptions_result_cancelled_body">No se te cobró nada.</string>
+    <string name="subscriptions_result_missing">No se pudo identificar el pago. Abre Suscripciones para revisar tu plan.</string>
+    <string name="subscriptions_result_not_completed">Stripe aún no confirmó este pago. Si ya pagaste, vuelve a intentarlo en un momento.</string>
+    <string name="subscriptions_result_retry">Reintentar</string>
+    <string name="subscriptions_result_done">Volver a suscripciones</string>
+</resources>

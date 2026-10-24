@@ -19,7 +19,6 @@
     <string name="common_choose_date">Elegir fecha</string>
     <string name="common_clear_date">Quitar fecha</string>
     <string name="common_date_placeholder">aaaa-mm-dd</string>
-    <string name="common_coming_soon">Esta sección estará disponible pronto.</string>
 
     <!-- Errors -->
     <string name="error_network">No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.</string>

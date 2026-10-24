@@ -39,6 +39,8 @@ import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
 import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.network.resolveMediaUrl
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Unarchive
 import com.anitec.platform.livestock.domain.AnimalView
 
 /** The animal's technical record: photo and every field, with edit/delete for ranchers. */
@@ -49,6 +51,8 @@ fun AnimalDetailSheet(
     canEdit: Boolean,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
+    onArchive: () -> Unit,
+    onRestore: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val animal = view.animal
@@ -122,6 +126,21 @@ fun AnimalDetailSheet(
                         onClick = onDelete,
                         icon = Icons.Filled.Delete,
                         modifier = Modifier.weight(1f),
+                    )
+                }
+                if (animal.isArchived) {
+                    SecondaryButton(
+                        text = stringResource(R.string.animals_restore),
+                        onClick = onRestore,
+                        icon = Icons.Filled.Unarchive,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    SecondaryButton(
+                        text = stringResource(R.string.animals_archive),
+                        onClick = onArchive,
+                        icon = Icons.Filled.Archive,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

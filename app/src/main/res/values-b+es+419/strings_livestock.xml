@@ -20,6 +20,17 @@
     <string name="animals_confirm_delete_many">¿Eliminar %1$d animales? Esta acción no se puede deshacer.</string>
     <string name="animals_confirm_status">¿Marcar %1$d animales como %2$s?</string>
     <string name="animals_saved">Cambios guardados.</string>
+    <string name="animals_tab_active">Activos</string>
+    <string name="animals_tab_archived">Archivados (%1$d)</string>
+    <string name="animals_archive">Archivar</string>
+    <string name="animals_restore">Devolver al hato</string>
+    <string name="animals_archive_selected">Archivar seleccionados</string>
+    <string name="animals_restore_selected">Restaurar seleccionados (cambiar estado)</string>
+    <string name="animals_confirm_archive_one">¿Archivar a %1$s? Su ficha y su historial se conservan, pero deja de contarse en el hato. Puedes restaurarlo después.</string>
+    <string name="animals_confirm_archive_many">¿Archivar %1$d animales? Sus fichas e historial se conservan, pero dejan de contarse en el hato. Puedes restaurarlos después.</string>
+    <string name="animals_archived">Archivado. Lo encuentras en Archivados.</string>
+    <string name="animals_restored">Devuelto al hato como saludable.</string>
+    <string name="animals_archived_empty">No hay animales archivados.</string>
     <string name="animals_detail_title">Ficha técnica del animal</string>
     <string name="animals_no_photo">Sin foto</string>
     <string name="animals_edit">Editar</string>
@@ -75,6 +86,7 @@
     <string name="status_observation">En observación</string>
     <string name="status_in_treatment">En tratamiento</string>
     <string name="status_sold">Vendido</string>
+    <string name="status_archived">Archivado</string>
 
     <!-- Option values -->
     <string name="species_cattle">Bovino</string>

@@ -11,13 +11,16 @@ import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
+import com.anitec.platform.livestock.application.ArchiveAnimalUseCase
+import com.anitec.platform.livestock.application.ArchiveAnimalsUseCase
 import com.anitec.platform.livestock.application.ChangeAnimalsStatusUseCase
 import com.anitec.platform.livestock.application.DeleteAnimalUseCase
 import com.anitec.platform.livestock.application.DeleteAnimalsUseCase
-import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
+import com.anitec.platform.livestock.application.ObserveAllAnimalsUseCase
 import com.anitec.platform.livestock.application.ObserveCorralsUseCase
 import com.anitec.platform.livestock.application.ObserveHerdsUseCase
 import com.anitec.platform.livestock.application.RefreshLivestockUseCase
+import com.anitec.platform.livestock.application.RestoreAnimalUseCase
 import com.anitec.platform.livestock.domain.AnimalStatus
 import com.anitec.platform.livestock.domain.AnimalView
 import com.anitec.platform.livestock.domain.Corral
@@ -37,13 +40,19 @@ import javax.inject.Inject
 sealed interface PendingAction {
     data class DeleteOne(val animalId: Int, val name: String) : PendingAction
     data object DeleteSelected : PendingAction
+    data class ArchiveOne(val animalId: Int, val name: String) : PendingAction
+    data object ArchiveSelected : PendingAction
     data object PickStatus : PendingAction
     data class ChangeStatus(val status: AnimalStatus) : PendingAction
 }
 
 data class AnimalListUiState(
     val items: List<AnimalView> = emptyList(),
+    /** How many animals the current list (active or archived) has before the search and corral filters. */
     val totalCount: Int = 0,
+    /** True while the list shows the archived animals instead of the active ones. */
+    val showArchived: Boolean = false,
+    val archivedCount: Int = 0,
     val corrals: List<Corral> = emptyList(),
     val query: String = "",
     val corralFilter: Int? = null,
@@ -61,6 +70,7 @@ data class AnimalListUiState(
 private data class LocalState(
     val query: String = "",
     val corralFilter: Int? = null,
+    val showArchived: Boolean = false,
     val selectedIds: Set<Int> = emptySet(),
     val detailId: Int? = null,
     val pending: PendingAction? = null,
@@ -72,13 +82,16 @@ private data class LocalState(
 @HiltViewModel
 class AnimalListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    observeAnimals: ObserveAnimalsUseCase,
+    observeAnimals: ObserveAllAnimalsUseCase,
     observeHerds: ObserveHerdsUseCase,
     observeCorrals: ObserveCorralsUseCase,
     private val refreshLivestock: RefreshLivestockUseCase,
     private val deleteAnimal: DeleteAnimalUseCase,
     private val changeStatus: ChangeAnimalsStatusUseCase,
     private val deleteAnimals: DeleteAnimalsUseCase,
+    private val archiveAnimal: ArchiveAnimalUseCase,
+    private val archiveAnimals: ArchiveAnimalsUseCase,
+    private val restoreAnimal: RestoreAnimalUseCase,
     sessionStore: SessionStore,
 ) : ViewModel() {
 
@@ -95,9 +108,12 @@ class AnimalListViewModel @Inject constructor(
         val corralNames = corrals.associate { it.id to it.name }
         val all = animals.map { AnimalView(it, herdNames[it.herdId].orEmpty(), it.corralId?.let(corralNames::get)) }
         val existingIds = all.map { it.animal.id }.toSet()
+        val inList = all.filter { it.animal.isArchived == local.showArchived }
         AnimalListUiState(
-            items = all.filterBy(local.query, local.corralFilter),
-            totalCount = all.size,
+            items = inList.filterBy(local.query, local.corralFilter),
+            totalCount = inList.size,
+            showArchived = local.showArchived,
+            archivedCount = all.count { it.animal.isArchived },
             corrals = corrals,
             query = local.query,
             corralFilter = local.corralFilter,
@@ -134,6 +150,9 @@ class AnimalListViewModel @Inject constructor(
 
     fun onCorralFilterChange(corralId: Int?) = local.update { it.copy(corralFilter = corralId) }
 
+    /** Switches between the active animals and the archived ones; a selection made in one list does not carry over. */
+    fun onShowArchivedChange(showArchived: Boolean) = local.update { it.copy(showArchived = showArchived, selectedIds = emptySet()) }
+
     fun toggleSelection(animalId: Int) = local.update {
         val next = if (animalId in it.selectedIds) it.selectedIds - animalId else it.selectedIds + animalId
         it.copy(selectedIds = next)
@@ -153,6 +172,25 @@ class AnimalListViewModel @Inject constructor(
 
     fun requestDeleteSelected() = local.update { it.copy(pending = PendingAction.DeleteSelected) }
 
+    fun requestArchive(view: AnimalView) = local.update {
+        it.copy(detailId = null, pending = PendingAction.ArchiveOne(view.animal.id, view.animal.name))
+    }
+
+    fun requestArchiveSelected() = local.update { it.copy(pending = PendingAction.ArchiveSelected) }
+
+    /** Brings an archived animal back to the herd; no confirmation, because nothing is lost. */
+    fun restore(view: AnimalView) {
+        local.update { it.copy(detailId = null) }
+        viewModelScope.launch {
+            val result = restoreAnimal(view.animal.id)
+            local.update {
+                it.copy(
+                    messageRes = if (result is AppResult.Failure) result.error.livestockMessageRes() else R.string.animals_restored,
+                )
+            }
+        }
+    }
+
     fun requestStatusChange() = local.update { it.copy(pending = PendingAction.PickStatus) }
 
     fun onStatusPicked(status: AnimalStatus) = local.update { it.copy(pending = PendingAction.ChangeStatus(status)) }
@@ -169,6 +207,8 @@ class AnimalListViewModel @Inject constructor(
             val result: AppResult<*> = when (action) {
                 is PendingAction.DeleteOne -> deleteAnimal(action.animalId)
                 PendingAction.DeleteSelected -> deleteAnimals(selected)
+                is PendingAction.ArchiveOne -> archiveAnimal(action.animalId)
+                PendingAction.ArchiveSelected -> archiveAnimals(selected)
                 is PendingAction.ChangeStatus -> changeStatus(selected, action.status.apiValue)
                 PendingAction.PickStatus -> return@launch
             }
@@ -176,7 +216,11 @@ class AnimalListViewModel @Inject constructor(
                 when (result) {
                     is AppResult.Success<*> -> it.copy(
                         selectedIds = if (action is PendingAction.DeleteOne) it.selectedIds else emptySet(),
-                        messageRes = R.string.animals_saved,
+                        messageRes = if (action is PendingAction.ArchiveOne || action == PendingAction.ArchiveSelected) {
+                            R.string.animals_archived
+                        } else {
+                            R.string.animals_saved
+                        },
                     )
                     is AppResult.Failure -> it.copy(messageRes = result.error.livestockMessageRes())
                 }

@@ -22,6 +22,7 @@ object OutboxKinds {
     const val CREATE_ANIMAL = "create_animal"
     const val CREATE_HEALTH_EVENT = "create_health_event"
     const val CREATE_ACTIVITY = "create_activity"
+    const val CREATE_FINANCIAL_RECORD = "create_financial_record"
 }
 
 /** Why a change was given up on; shown to the user as a generic message, never the server text. */

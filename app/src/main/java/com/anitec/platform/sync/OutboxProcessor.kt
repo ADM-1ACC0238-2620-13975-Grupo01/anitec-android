@@ -12,6 +12,11 @@ import com.anitec.platform.core.outbox.OutboxDao
 import com.anitec.platform.core.outbox.OutboxFailures
 import com.anitec.platform.core.outbox.OutboxKinds
 import com.anitec.platform.core.outbox.PendingOperationEntity
+import com.anitec.platform.financial.infrastructure.local.FinancialDao
+import com.anitec.platform.financial.infrastructure.remote.FinancialApi
+import com.anitec.platform.financial.infrastructure.remote.FinancialRecordDto
+import com.anitec.platform.financial.infrastructure.toDomain
+import com.anitec.platform.financial.infrastructure.toEntity
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.livestock.infrastructure.remote.AnimalDto
 import com.anitec.platform.livestock.infrastructure.remote.LivestockApi
@@ -51,6 +56,8 @@ class OutboxProcessor @Inject constructor(
     private val sanitaryDao: SanitaryDao,
     private val activitiesApi: ActivitiesApi,
     private val activitiesDao: ActivitiesDao,
+    private val financialApi: FinancialApi,
+    private val financialDao: FinancialDao,
     private val json: Json,
 ) {
     private enum class Step { Next, Retry, Stop }
@@ -82,6 +89,7 @@ class OutboxProcessor @Inject constructor(
         OutboxKinds.CREATE_ANIMAL -> sendAnimal(operation)
         OutboxKinds.CREATE_HEALTH_EVENT -> sendHealthEvent(operation)
         OutboxKinds.CREATE_ACTIVITY -> sendActivity(operation)
+        OutboxKinds.CREATE_FINANCIAL_RECORD -> sendFinancialRecord(operation)
         else -> fail(operation, OutboxFailures.REJECTED)
     }
 
@@ -138,6 +146,19 @@ class OutboxProcessor @Inject constructor(
         }
     }
 
+    private suspend fun sendFinancialRecord(operation: PendingOperationEntity): Step {
+        val body = json.decodeFromString(FinancialRecordDto.serializer(), operation.payload)
+        return when (val result = safeApiCall { financialApi.create(body) }) {
+            is AppResult.Success -> {
+                financialDao.delete(operation.localId)
+                financialDao.upsert(result.value.toDomain().toEntity())
+                outboxDao.delete(operation.seq)
+                Step.Next
+            }
+            is AppResult.Failure -> failure(operation, result.error)
+        }
+    }
+
     /** Health records queued for an animal that just got its real id must point to it. */
     private suspend fun repointDependents(localAnimalId: Int, realAnimalId: Int) {
         outboxDao.all().filter { it.kind == OutboxKinds.CREATE_HEALTH_EVENT }.forEach { dependent ->
@@ -179,6 +200,7 @@ class OutboxProcessor @Inject constructor(
             OutboxKinds.CREATE_ANIMAL -> livestockDao.deleteAnimal(operation.localId)
             OutboxKinds.CREATE_HEALTH_EVENT -> sanitaryDao.delete(operation.localId)
             OutboxKinds.CREATE_ACTIVITY -> activitiesDao.delete(operation.localId)
+            OutboxKinds.CREATE_FINANCIAL_RECORD -> financialDao.delete(operation.localId)
         }
     }
 

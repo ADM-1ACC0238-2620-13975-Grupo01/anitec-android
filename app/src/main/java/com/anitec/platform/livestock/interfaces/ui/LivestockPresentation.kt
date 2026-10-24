@@ -68,6 +68,7 @@ fun AnimalStatus.labelRes(): Int? = when (this) {
     AnimalStatus.Observation -> R.string.status_observation
     AnimalStatus.InTreatment -> R.string.status_in_treatment
     AnimalStatus.Sold -> R.string.status_sold
+    AnimalStatus.Archived -> R.string.status_archived
     AnimalStatus.Unknown -> null
 }
 
@@ -76,7 +77,7 @@ fun AnimalStatus.severity(): Severity = when (this) {
     AnimalStatus.Healthy -> Severity.Success
     AnimalStatus.Sold -> Severity.Info
     AnimalStatus.Observation, AnimalStatus.InTreatment -> Severity.Warn
-    AnimalStatus.Unknown -> Severity.Neutral
+    AnimalStatus.Archived, AnimalStatus.Unknown -> Severity.Neutral
 }
 
 @Composable

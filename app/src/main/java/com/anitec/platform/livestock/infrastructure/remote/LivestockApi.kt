@@ -68,6 +68,9 @@ data class AnimalIdsDto(val animalIds: List<Int>)
 data class AnimalsStatusDto(val animalIds: List<Int>, val status: String)
 
 @Serializable
+data class AnimalStatusDto(val status: String)
+
+@Serializable
 data class UploadedImageDto(val url: String)
 
 /** Retrofit contract of the Livestock endpoints. PUT bodies are the full resource, as the API expects. */
@@ -89,6 +92,7 @@ interface LivestockApi {
 
     @POST("animals/bulk") suspend fun createAnimalBatch(@Body body: AnimalBatchDto): List<AnimalDto>
     @PATCH("animals/bulk-status") suspend fun updateAnimalsStatus(@Body body: AnimalsStatusDto): List<AnimalDto>
+    @PATCH("animals/{id}/status") suspend fun updateAnimalStatus(@Path("id") id: Int, @Body body: AnimalStatusDto): AnimalDto
 
     // The API expects a JSON body on this DELETE, which Retrofit only sends with an explicit @HTTP.
     @HTTP(method = "DELETE", path = "animals/bulk", hasBody = true)

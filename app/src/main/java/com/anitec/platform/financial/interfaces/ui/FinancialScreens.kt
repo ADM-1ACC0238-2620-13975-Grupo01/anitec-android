@@ -64,6 +64,7 @@ import com.anitec.platform.core.designsystem.component.ServerMessages
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
+import com.anitec.platform.core.outbox.isPendingSync
 import com.anitec.platform.financial.domain.FinancialRecord
 import com.anitec.platform.financial.domain.RecordCategories
 import com.anitec.platform.financial.domain.RecordTypes
@@ -193,22 +194,28 @@ fun FinancialListScreen(
                                 add(stringResource(R.string.finance_amount) to formatSoles(record.amount))
                                 if (record.description.isNotBlank()) add(stringResource(R.string.finance_description) to record.description)
                             },
-                            footer = {
-                                SecondaryButton(
-                                    text = stringResource(R.string.finance_detail),
-                                    onClick = { viewModel.showDetail(record) },
-                                    icon = Icons.Filled.Info,
-                                )
-                                SecondaryButton(
-                                    text = stringResource(R.string.common_edit),
-                                    onClick = { onEdit(record.id) },
-                                    icon = Icons.Filled.Edit,
-                                )
-                                DangerTextButton(
-                                    text = stringResource(R.string.common_delete),
-                                    onClick = { viewModel.requestDelete(record) },
-                                    icon = Icons.Filled.Delete,
-                                )
+                            // A record still waiting to be sent can only be seen: it has no server id to edit or delete.
+                            pendingSync = record.id.isPendingSync,
+                            footer = if (record.id.isPendingSync) {
+                                null
+                            } else {
+                                {
+                                    SecondaryButton(
+                                        text = stringResource(R.string.finance_detail),
+                                        onClick = { viewModel.showDetail(record) },
+                                        icon = Icons.Filled.Info,
+                                    )
+                                    SecondaryButton(
+                                        text = stringResource(R.string.common_edit),
+                                        onClick = { onEdit(record.id) },
+                                        icon = Icons.Filled.Edit,
+                                    )
+                                    DangerTextButton(
+                                        text = stringResource(R.string.common_delete),
+                                        onClick = { viewModel.requestDelete(record) },
+                                        icon = Icons.Filled.Delete,
+                                    )
+                                }
                             },
                         )
                     }

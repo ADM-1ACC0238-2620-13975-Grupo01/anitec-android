@@ -7,12 +7,14 @@ import com.anitec.platform.livestock.domain.AnimalBatchDraft
 import com.anitec.platform.livestock.domain.AnimalDraft
 import com.anitec.platform.livestock.domain.AnimalImageUploader
 import com.anitec.platform.livestock.domain.AnimalPlacementPolicy
+import com.anitec.platform.livestock.domain.AnimalStatus
 import com.anitec.platform.livestock.domain.Corral
 import com.anitec.platform.livestock.domain.CorralDraft
 import com.anitec.platform.livestock.domain.Herd
 import com.anitec.platform.livestock.domain.HerdDraft
 import com.anitec.platform.livestock.domain.LivestockRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -34,7 +36,13 @@ class ObserveCorralsUseCase @Inject constructor(private val repository: Livestoc
     operator fun invoke(): Flow<List<Corral>> = repository.observeCorrals()
 }
 
+/** The animals in the herd: archived ones are left out, so counts and working lists only see active animals. */
 class ObserveAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
+    operator fun invoke(): Flow<List<Animal>> = repository.observeAnimals().map { animals -> animals.filterNot { it.isArchived } }
+}
+
+/** Every animal, archived ones included: for the livestock list, the scanner and the edit form. */
+class ObserveAllAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
     operator fun invoke(): Flow<List<Animal>> = repository.observeAnimals()
 }
 
@@ -98,6 +106,22 @@ class ChangeAnimalsStatusUseCase @Inject constructor(private val repository: Liv
         if (ids.isEmpty()) return invalid(LivestockValidation.NOTHING_SELECTED)
         return repository.updateAnimalsStatus(ids.toList(), status)
     }
+}
+
+class ArchiveAnimalUseCase @Inject constructor(private val repository: LivestockRepository) {
+    suspend operator fun invoke(id: Int): AppResult<Animal> = repository.updateAnimalStatus(id, AnimalStatus.Archived.apiValue)
+}
+
+class ArchiveAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
+    suspend operator fun invoke(ids: Collection<Int>): AppResult<List<Animal>> {
+        if (ids.isEmpty()) return invalid(LivestockValidation.NOTHING_SELECTED)
+        return repository.updateAnimalsStatus(ids.toList(), AnimalStatus.Archived.apiValue)
+    }
+}
+
+/** Brings an archived animal back to the herd as healthy; the status it had before is not kept. */
+class RestoreAnimalUseCase @Inject constructor(private val repository: LivestockRepository) {
+    suspend operator fun invoke(id: Int): AppResult<Animal> = repository.updateAnimalStatus(id, AnimalStatus.Healthy.apiValue)
 }
 
 class DeleteAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
