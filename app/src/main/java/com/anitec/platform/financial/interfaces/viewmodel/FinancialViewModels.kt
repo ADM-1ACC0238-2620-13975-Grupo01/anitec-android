@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.anitec.platform.app.FinancialFormRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
+import com.anitec.platform.core.common.serverHints
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.financial.application.DeleteFinancialRecordUseCase
@@ -114,6 +115,7 @@ data class FinancialFormUiState(
     val saving: Boolean = false,
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
+    val serverMessages: List<String> = emptyList(),
 ) {
     private val parsedAmount get() = parseAmount(amount)
     val amountInvalid get() = showErrors && parsedAmount?.let { FinancialScope.isValidAmount(it) } != true
@@ -169,7 +171,7 @@ class FinancialFormViewModel @Inject constructor(
             _state.update { it.copy(showErrors = true) }
             return
         }
-        _state.update { it.copy(saving = true, messageRes = null) }
+        _state.update { it.copy(saving = true, messageRes = null, serverMessages = emptyList()) }
         viewModelScope.launch {
             val draft = FinancialRecordDraft(
                 ownerId = user.userId,
@@ -182,7 +184,7 @@ class FinancialFormViewModel @Inject constructor(
             _state.update {
                 when (val result = saveRecord(recordId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes())
+                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
                 }
             }
         }

@@ -123,7 +123,7 @@ private fun PatientCard(view: AnimalView, onOpenHistory: () -> Unit) {
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AnimalThumbnail(animal.imageUrl, animal.name)
+                AnimalThumbnail(animal.imageUrl)
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(animal.name, style = MaterialTheme.typography.titleSmall)
@@ -204,7 +204,7 @@ private fun PatientSummary(view: AnimalView) {
     val animal = view.animal
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            AnimalThumbnail(animal.imageUrl, animal.name)
+            AnimalThumbnail(animal.imageUrl)
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(animal.name, style = MaterialTheme.typography.titleMedium)

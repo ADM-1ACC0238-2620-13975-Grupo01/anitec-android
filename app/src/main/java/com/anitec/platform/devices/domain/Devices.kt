@@ -88,4 +88,10 @@ interface DevicesRepository {
     suspend fun create(draft: DeviceDraft): AppResult<Device>
     suspend fun update(id: Int, draft: DeviceDraft): AppResult<Device>
     suspend fun delete(id: Int): AppResult<Unit>
+
+    /** Every reading the device reported, newest first. Not cached: it needs a connection. */
+    suspend fun history(deviceId: Int): AppResult<List<DeviceReading>>
+
+    /** The newest reading, or null while the device has not reported any. */
+    suspend fun latestReading(deviceId: Int): AppResult<DeviceReading?>
 }

@@ -43,15 +43,15 @@ fun DateField(
         modifier = modifier.fillMaxWidth(),
         readOnly = true,
         error = error,
-        placeholder = "yyyy-mm-dd",
+        placeholder = stringResource(R.string.common_date_placeholder),
         trailingIcon = {
             if (clearable && value.isNotBlank()) {
                 IconButton(onClick = { onChange("") }) {
-                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.common_clear_date))
+                    Icon(Icons.Filled.Close, contentDescription = "${stringResource(R.string.common_clear_date)}: $label")
                 }
             } else {
                 IconButton(onClick = { open = true }) {
-                    Icon(Icons.Filled.CalendarMonth, contentDescription = stringResource(R.string.common_choose_date))
+                    Icon(Icons.Filled.CalendarMonth, contentDescription = "${stringResource(R.string.common_choose_date)}: $label")
                 }
             }
         },

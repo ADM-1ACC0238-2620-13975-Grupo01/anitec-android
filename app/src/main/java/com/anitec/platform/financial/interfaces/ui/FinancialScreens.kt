@@ -60,6 +60,7 @@ import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.MetricCard
 import com.anitec.platform.core.designsystem.component.PanelHeader
 import com.anitec.platform.core.designsystem.component.PrimaryButton
+import com.anitec.platform.core.designsystem.component.ServerMessages
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
@@ -70,8 +71,12 @@ import com.anitec.platform.financial.interfaces.viewmodel.FinancialFormViewModel
 import com.anitec.platform.financial.interfaces.viewmodel.FinancialListViewModel
 import java.util.Locale
 
-/** Peruvian soles as the web shows them, e.g. `S/ 1,250.50`. */
-fun formatSoles(amount: Double, locale: Locale = Locale.getDefault()): String = "S/ " + String.format(locale, "%,.2f", amount)
+/** Amount with thousands separators and two decimals, e.g. `1,250.50`. */
+fun formatAmount(amount: Double, locale: Locale = Locale.getDefault()): String = String.format(locale, "%,.2f", amount)
+
+/** Peruvian soles as the web shows them, e.g. `S/ 1,250.50`; the prefix comes from the string resources. */
+@Composable
+fun formatSoles(amount: Double): String = stringResource(R.string.finance_currency_amount, formatAmount(amount))
 
 @StringRes
 fun recordTypeRes(type: String): Int? = when (type) {
@@ -289,7 +294,7 @@ fun FinancialFormScreen(
             label = stringResource(R.string.finance_amount),
             modifier = Modifier.fillMaxWidth(),
             keyboardType = KeyboardType.Decimal,
-            placeholder = "S/ 0.00",
+            placeholder = formatSoles(0.0),
             error = if (state.amountInvalid) stringResource(R.string.finance_amount_invalid) else null,
         )
         DateField(
@@ -306,6 +311,7 @@ fun FinancialFormScreen(
             imeAction = ImeAction.Default,
             placeholder = stringResource(R.string.finance_description_placeholder),
         )
+        ServerMessages(state.serverMessages)
         PrimaryButton(text = stringResource(R.string.common_save), onClick = viewModel::save, modifier = Modifier.fillMaxWidth(), loading = state.saving)
         SecondaryButton(text = stringResource(R.string.common_cancel), onClick = onBack, modifier = Modifier.fillMaxWidth())
     }

@@ -21,8 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.statusColors
 
@@ -83,7 +87,7 @@ fun PanelHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             if (chip != null) SectionChip(chip)
-            Text(title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(title, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             if (subtitle != null) {
                 Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -105,7 +109,7 @@ fun MetricCard(
     modifier: Modifier = Modifier,
     caption: String? = null,
 ) {
-    AniTecPanel(modifier = modifier) {
+    AniTecPanel(modifier = modifier.mergedSemantics()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
             Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -145,7 +149,7 @@ fun FormHero(
             Spacer(Modifier.width(14.dp))
             Column {
                 if (chip != null) SectionChip(chip)
-                Text(title, style = MaterialTheme.typography.titleLarge)
+                Text(title, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleLarge)
                 if (subtitle != null) {
                     Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -158,7 +162,7 @@ fun FormHero(
  */
 @Composable
 fun EmptyState(text: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxWidth().padding(24.dp).liveStatus(), contentAlignment = Alignment.Center) {
         Text(
             text,
             style = MaterialTheme.typography.bodyMedium,
@@ -170,7 +174,11 @@ fun EmptyState(text: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun LoadingState(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+    val description = stringResource(R.string.common_loading)
+    Box(
+        modifier = modifier.fillMaxWidth().padding(24.dp).semantics(mergeDescendants = true) { contentDescription = description },
+        contentAlignment = Alignment.Center,
+    ) {
         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }
@@ -179,7 +187,7 @@ fun LoadingState(modifier: Modifier = Modifier) {
  */
 @Composable
 fun ErrorMessage(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier = modifier, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+    Text(text, modifier = modifier.liveStatus(assertive = true), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
 }
 
 /** Confirmation before destructive or bulk actions. */

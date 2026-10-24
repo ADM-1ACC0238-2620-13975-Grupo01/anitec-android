@@ -9,6 +9,9 @@
     <string name="animals_new">New animal</string>
     <string name="animals_selected_count">%1$d selected</string>
     <string name="animals_select_all">Select all</string>
+    <string name="animals_open_detail">View details</string>
+    <string name="animals_toggle_selection">Select or deselect</string>
+    <string name="animals_start_selection">Select animals</string>
     <string name="animals_clear_selection">Clear selection</string>
     <string name="animals_change_status">Change status</string>
     <string name="animals_delete_selected">Delete selected</string>

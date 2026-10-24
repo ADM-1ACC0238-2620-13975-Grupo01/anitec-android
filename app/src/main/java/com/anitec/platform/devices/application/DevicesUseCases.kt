@@ -3,6 +3,7 @@ package com.anitec.platform.devices.application
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.devices.domain.Device
 import com.anitec.platform.devices.domain.DeviceDraft
+import com.anitec.platform.devices.domain.DeviceReading
 import com.anitec.platform.devices.domain.DevicesRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -23,4 +24,12 @@ class SaveDeviceUseCase @Inject constructor(private val repository: DevicesRepos
 
 class DeleteDeviceUseCase @Inject constructor(private val repository: DevicesRepository) {
     suspend operator fun invoke(id: Int): AppResult<Unit> = repository.delete(id)
+}
+
+class GetDeviceHistoryUseCase @Inject constructor(private val repository: DevicesRepository) {
+    suspend operator fun invoke(deviceId: Int): AppResult<List<DeviceReading>> = repository.history(deviceId)
+}
+
+class GetLatestDeviceReadingUseCase @Inject constructor(private val repository: DevicesRepository) {
+    suspend operator fun invoke(deviceId: Int): AppResult<DeviceReading?> = repository.latestReading(deviceId)
 }

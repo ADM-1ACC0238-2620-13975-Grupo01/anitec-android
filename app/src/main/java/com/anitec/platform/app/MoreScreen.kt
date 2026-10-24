@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
 import com.anitec.platform.core.designsystem.component.ConfirmDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.DangerTextButton
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.i18n.LanguageSwitcher
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
@@ -89,7 +91,7 @@ fun MoreScreen(
     ) {
         AniTecPanel(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(session.fullName, style = MaterialTheme.typography.titleMedium)
+                Text(session.fullName, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleMedium)
                 session.email?.let {
                     Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -162,7 +164,7 @@ private fun MoreRow(@StringRes label: Int, icon: ImageVector, onClick: () -> Uni
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

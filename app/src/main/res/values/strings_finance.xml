@@ -9,6 +9,7 @@
     <string name="finance_type">Type</string>
     <string name="finance_category">Category</string>
     <string name="finance_amount">Amount</string>
+    <string name="finance_currency_amount">S/ %1$s</string>
     <string name="finance_date">Date</string>
     <string name="finance_description">Description</string>
     <string name="finance_description_placeholder">Transaction detail, receipt or reason</string>

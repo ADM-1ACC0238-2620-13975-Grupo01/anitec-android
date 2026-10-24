@@ -37,4 +37,10 @@ interface DevicesApi {
     @DELETE("devices/{id}") suspend fun delete(@Path("id") id: Int)
 
     @GET("device-metrics") suspend fun getMetrics(): List<DeviceMetricDto>
+
+    /** Newest first; 404 when the device does not exist. */
+    @GET("devices/{id}/metrics") suspend fun getDeviceMetrics(@Path("id") id: Int): List<DeviceMetricDto>
+
+    /** 404 when the device does not exist or has no readings. */
+    @GET("devices/{id}/latest-metric") suspend fun getLatestMetric(@Path("id") id: Int): DeviceMetricDto
 }

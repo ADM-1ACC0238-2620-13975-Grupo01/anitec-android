@@ -14,7 +14,7 @@ import com.anitec.platform.financial.infrastructure.local.FinancialDao
 import com.anitec.platform.financial.infrastructure.local.FinancialRecordEntity
 import com.anitec.platform.financial.infrastructure.remote.FinancialApi
 import com.anitec.platform.financial.infrastructure.remote.FinancialRecordDto
-import com.anitec.platform.financial.interfaces.ui.formatSoles
+import com.anitec.platform.financial.interfaces.ui.formatAmount
 import com.anitec.platform.financial.interfaces.viewmodel.FinancialFormUiState
 import com.anitec.platform.financial.interfaces.viewmodel.parseAmount
 import io.mockk.coEvery
@@ -86,8 +86,9 @@ class FinancialRulesTest {
 
     @Test
     fun `amounts are shown as soles with thousands separators`() {
-        assertEquals("S/ 1,250.50", formatSoles(1250.5, Locale.US))
-        assertEquals("S/ 0.00", formatSoles(0.0, Locale.US))
+        assertEquals("1,250.50", formatAmount(1250.5, Locale.US))
+        assertEquals("0.00", formatAmount(0.0, Locale.US))
+        assertEquals("1.250,50", formatAmount(1250.5, Locale.GERMANY))
     }
 
     @Test

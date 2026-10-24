@@ -48,6 +48,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -55,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.component.PendingSyncTag
+import com.anitec.platform.core.designsystem.component.liveStatus
 import com.anitec.platform.core.outbox.isPendingSync
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.AniTecTextField
@@ -209,7 +212,7 @@ private fun SelectionBar(
             }
             Text(
                 stringResource(R.string.animals_selected_count, state.selectedIds.size),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).liveStatus(),
                 style = MaterialTheme.typography.titleSmall,
             )
             IconButton(onClick = onSelectAll) {
@@ -243,7 +246,15 @@ private fun AnimalRow(
     AniTecPanel(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = stringResource(R.string.animals_selected_count, 1)),
+            // One focus stop per animal: it reads name, tag, place and status together, and whether it is selected.
+            .semantics(mergeDescendants = true) { this.selected = selected }
+            .combinedClickable(
+                onClickLabel = stringResource(if (selectionMode) R.string.animals_toggle_selection else R.string.animals_open_detail),
+                role = Role.Button,
+                onLongClickLabel = stringResource(R.string.animals_start_selection),
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
     ) {
         Row(
             modifier = Modifier
@@ -255,7 +266,7 @@ private fun AnimalRow(
                 Checkbox(checked = selected, onCheckedChange = null)
                 Spacer(Modifier.width(8.dp))
             }
-            AnimalThumbnail(animal.imageUrl, animal.name)
+            AnimalThumbnail(animal.imageUrl)
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 if (animal.id.isPendingSync) PendingSyncTag(modifier = Modifier.padding(bottom = 2.dp))
@@ -276,8 +287,9 @@ private fun AnimalRow(
     }
 }
 
+/** Decorative picture: every caller shows the animal's name right beside it, so it is not read twice. */
 @Composable
-fun AnimalThumbnail(imageUrl: String?, name: String, modifier: Modifier = Modifier) {
+fun AnimalThumbnail(imageUrl: String?, modifier: Modifier = Modifier) {
     val url = resolveMediaUrl(imageUrl)
     Box(
         modifier = modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)),
@@ -290,7 +302,7 @@ fun AnimalThumbnail(imageUrl: String?, name: String, modifier: Modifier = Modifi
             // Shows the paw icon while loading and when the image is missing or broken on the server.
             SubcomposeAsyncImage(
                 model = url,
-                contentDescription = name,
+                contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 loading = { Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) { placeholder() } },

@@ -16,6 +16,7 @@ import com.anitec.platform.devices.infrastructure.remote.DeviceDto
 import com.anitec.platform.devices.infrastructure.remote.DeviceMetricDto
 import com.anitec.platform.devices.infrastructure.remote.DevicesApi
 import com.anitec.platform.devices.interfaces.ui.formatReadingValue
+import com.anitec.platform.devices.interfaces.ui.formatRecordedAt
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -25,7 +26,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 
 private fun device(id: Int, herdId: Int? = null, animalId: Int? = null) =
@@ -72,6 +76,14 @@ class DeviceRulesTest {
         assertEquals("455 kg", formatReadingValue(DeviceReading("Weight", 455.0, "kg", "")))
         assertEquals("38.5 °C", formatReadingValue(DeviceReading("Temperature", 38.5, "°C", "")))
         assertEquals("12", formatReadingValue(DeviceReading("Count", 12.0, "", "")))
+    }
+
+    @Test
+    fun `recorded dates show the day and the minute`() {
+        assertEquals("2026-06-11 10:34", formatRecordedAt("2026-06-11T10:34:52.518313"))
+        assertEquals("2026-06-11 10:34", formatRecordedAt("2026-06-11T10:34:00"))
+        assertEquals("yesterday", formatRecordedAt("yesterday"))
+        assertEquals("", formatRecordedAt(""))
     }
 }
 
@@ -121,5 +133,50 @@ class DevicesRepositoryTest {
 
         assertTrue(result is AppResult.Success)
         coVerify { dao.upsert(match { it.id == 1 && it.readingValue == 455.0 && it.readingCount == 4 }) }
+    }
+
+    @Test
+    fun `history lists every reading of the device newest first`() = runTest {
+        coEvery { api.getDeviceMetrics(1) } returns listOf(
+            DeviceMetricDto(1, 1, "Weight", 450.0, "kg", "2026-06-10T08:00:00"),
+            DeviceMetricDto(3, 1, "Weight", 460.0, "kg", "2026-06-12T08:00:00"),
+            DeviceMetricDto(2, 1, "Weight", 455.0, "kg", "2026-06-11T08:00:00"),
+        )
+
+        val result = repository.history(1) as AppResult.Success
+
+        assertEquals(listOf(460.0, 455.0, 450.0), result.value.map { it.value })
+        assertEquals("kg", result.value.first().unit)
+    }
+
+    @Test
+    fun `history of an unknown device is a not found failure`() = runTest {
+        coEvery { api.getDeviceMetrics(9) } throws HttpException(Response.error<Any>(404, "".toResponseBody()))
+
+        assertEquals(AppResult.Failure(AppError.NotFound), repository.history(9))
+    }
+
+    @Test
+    fun `the latest reading is mapped from the latest metric`() = runTest {
+        coEvery { api.getLatestMetric(1) } returns DeviceMetricDto(3, 1, "Temperature", 38.5, "°C", "2026-06-12T08:00:00")
+
+        assertEquals(
+            AppResult.Success(DeviceReading("Temperature", 38.5, "°C", "2026-06-12T08:00:00")),
+            repository.latestReading(1),
+        )
+    }
+
+    @Test
+    fun `a device without readings has no latest reading instead of an error`() = runTest {
+        coEvery { api.getLatestMetric(1) } throws HttpException(Response.error<Any>(404, "".toResponseBody()))
+
+        assertEquals(AppResult.Success(null), repository.latestReading(1))
+    }
+
+    @Test
+    fun `other failures of the latest reading are kept`() = runTest {
+        coEvery { api.getLatestMetric(1) } throws IOException("offline")
+
+        assertEquals(AppResult.Failure(AppError.Network), repository.latestReading(1))
     }
 }
