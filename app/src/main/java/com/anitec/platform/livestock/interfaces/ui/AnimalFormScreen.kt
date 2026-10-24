@@ -125,6 +125,19 @@ fun AnimalFormScreen(
                 value = state.name, onValueChange = viewModel::onNameChange, label = stringResource(R.string.animal_name),
                 modifier = Modifier.fillMaxWidth(), error = if (state.nameMissing) required else null,
             )
+        } else {
+            // In a batch the name is optional and becomes the base of the numbered names.
+            AniTecTextField(
+                value = state.name, onValueChange = viewModel::onNameChange, label = stringResource(R.string.animal_batch_name),
+                placeholder = stringResource(R.string.animal_batch_name_placeholder), modifier = Modifier.fillMaxWidth(),
+            )
+            Text(
+                state.batchNamePreview?.let { (first, last) ->
+                    if (first == last) stringResource(R.string.animal_batch_name_preview_one, first)
+                    else stringResource(R.string.animal_batch_name_preview, first, last)
+                } ?: stringResource(R.string.animal_batch_name_hint),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         DropdownField(

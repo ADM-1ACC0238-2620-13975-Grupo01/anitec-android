@@ -59,6 +59,7 @@ data class AnimalBatchDto(
     val source: String? = null,
     val ageRange: String? = null,
     val imageUrl: String? = null,
+    val name: String? = null,
 )
 
 @Serializable

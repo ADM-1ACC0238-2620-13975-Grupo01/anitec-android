@@ -19,6 +19,7 @@ import com.anitec.platform.livestock.domain.AnimalBatchDraft
 import com.anitec.platform.livestock.domain.AnimalDraft
 import com.anitec.platform.livestock.domain.AnimalPlacementPolicy
 import com.anitec.platform.livestock.domain.AnimalStatus
+import com.anitec.platform.livestock.domain.BatchNaming
 import com.anitec.platform.livestock.domain.Corral
 import com.anitec.platform.livestock.domain.Herd
 import com.anitec.platform.livestock.interfaces.ui.livestockMessageRes
@@ -63,6 +64,14 @@ data class AnimalFormUiState(
 ) {
     val corralsOfHerd: List<Corral> get() = allCorrals.filter { it.herdId == herdId }
     val bulk: Boolean get() = !isEdit && mode == RegistrationMode.Bulk
+
+    /** The first and last name a batch will get, e.g. polloComercio-001 and polloComercio-010; null without a base name. */
+    val batchNamePreview: Pair<String, String>?
+        get() {
+            val base = name.trim()
+            val count = quantityValue?.takeIf(AnimalPlacementPolicy::isValidBatchSize)
+            return if (!bulk || base.isEmpty() || count == null) null else BatchNaming.nameFor(base, 1) to BatchNaming.nameFor(base, count)
+        }
 
     val weightValue: Double? get() = weight.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it >= 0 }
     val quantityValue: Int? get() = quantity.trim().toIntOrNull()
@@ -207,5 +216,6 @@ class AnimalFormViewModel @Inject constructor(
         species = species, breed = breed.trim(), gender = gender, birthDate = birthDate.ifBlank { null },
         weight = weightValue ?: 0.0, status = status, herdId = herdId!!, corralId = corralId!!,
         quantity = quantityValue ?: 1, source = source, ageRange = ageRange, imageUrl = imageUrl,
+        name = name.trim().ifBlank { null },
     )
 }
