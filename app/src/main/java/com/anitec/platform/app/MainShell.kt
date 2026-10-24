@@ -1,8 +1,20 @@
 package com.anitec.platform.app
 
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.sync.SyncBanner
@@ -55,6 +67,7 @@ import com.anitec.platform.activities.interfaces.ui.ActivityListScreen
 import com.anitec.platform.analytics.interfaces.ui.AnalyticsScreen
 import com.anitec.platform.scanner.interfaces.ui.ScannerScreen
 import com.anitec.platform.devices.interfaces.ui.DeviceFormScreen
+import com.anitec.platform.devices.interfaces.ui.DeviceHistoryScreen
 import com.anitec.platform.devices.interfaces.ui.DeviceListScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialFormScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialListScreen
@@ -91,11 +104,25 @@ private fun bottomDestinations(role: UserRole): List<BottomDestination> = listOf
     BottomDestination(MoreRoute, R.string.nav_more, Icons.Filled.MoreHoriz),
 )
 
-/** Signed-in frame: top bar, role-specific bottom navigation and the nested graph. */
-@OptIn(ExperimentalMaterial3Api::class)
+/** Where the top-level destinations live: under the content on narrow windows, beside it on wider ones. */
+internal enum class NavigationLayout { BottomBar, Rail }
+
+internal fun navigationLayoutFor(widthSizeClass: WindowWidthSizeClass): NavigationLayout =
+    if (widthSizeClass == WindowWidthSizeClass.Compact) NavigationLayout.BottomBar else NavigationLayout.Rail
+
+/** Screens are laid out for a phone; on a tablet they stay this wide, centered, instead of stretching. */
+internal val ContentMaxWidth = 840.dp
+
+/**
+ * Signed-in frame: top bar, role-specific navigation (bottom bar on phones, rail on tablets and in landscape)
+ * and the nested graph.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun MainShell(session: UserSession, onSignOut: () -> Unit) {
     val navController = rememberNavController()
+    val activity = LocalActivity.current
+    val layout = navigationLayoutFor(activity?.let { calculateWindowSizeClass(it).widthSizeClass } ?: WindowWidthSizeClass.Compact)
     val syncViewModel: SyncStatusViewModel = hiltViewModel()
     val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
     val destinations = remember(session.role) { bottomDestinations(session.role) }
@@ -130,7 +157,7 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             }
         },
         bottomBar = {
-            if (current != null) {
+            if (current != null && layout == NavigationLayout.BottomBar) {
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainerLow) {
                     destinations.forEach { item ->
                         val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
@@ -150,12 +177,33 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             }
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
+        Row(modifier = Modifier.padding(padding)) {
+        if (current != null && layout == NavigationLayout.Rail) {
+            // The scaffold padding already keeps clear of the system bars.
+            NavigationRail(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, windowInsets = WindowInsets(0.dp)) {
+                destinations.forEach { item ->
+                    val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+                    NavigationRailItem(
+                        selected = selected,
+                        onClick = { navController.navigateToTopLevel(item.route) },
+                        icon = { Icon(item.icon, contentDescription = null) },
+                        label = { Text(stringResource(item.label)) },
+                        colors = NavigationRailItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
+                    )
+                }
+            }
+        }
+        Column(modifier = Modifier.weight(1f)) {
         SyncBanner(status = syncStatus, onRetry = syncViewModel::retry, onDiscard = syncViewModel::discardFailed)
+        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
         NavHost(
             navController = navController,
             startDestination = HomeRoute,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.widthIn(max = ContentMaxWidth).fillMaxSize(),
         ) {
             composable<HomeRoute> {
                 HomeScreen(
@@ -234,8 +282,10 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                     onBack = { navController.popBackStack() },
                     onNew = { navController.navigate(DeviceFormRoute()) },
                     onEdit = { id -> navController.navigate(DeviceFormRoute(id)) },
+                    onOpenHistory = { id -> navController.navigate(DeviceHistoryRoute(id)) },
                 )
             }
+            composable<DeviceHistoryRoute> { DeviceHistoryScreen(onBack = { navController.popBackStack() }) }
             composable<DeviceFormRoute> { DeviceFormScreen(onBack = { navController.popBackStack() }) }
             composable<MoreRoute> {
                 MoreScreen(
@@ -274,6 +324,8 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                     onBack = { navController.popBackStack() },
                 )
             }
+        }
+        }
         }
         }
     }

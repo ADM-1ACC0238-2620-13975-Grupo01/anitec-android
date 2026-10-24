@@ -18,6 +18,7 @@ import com.anitec.platform.activities.domain.ActivityTypes
 import com.anitec.platform.app.ActivityFormRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
+import com.anitec.platform.core.common.serverHints
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
@@ -131,6 +132,7 @@ data class ActivityFormUiState(
     val saving: Boolean = false,
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
+    val serverMessages: List<String> = emptyList(),
 ) {
     val titleMissing get() = showErrors && title.isBlank()
     val dateMissing get() = showErrors && date.isBlank()
@@ -197,7 +199,7 @@ class ActivityFormViewModel @Inject constructor(
             _state.update { it.copy(showErrors = true) }
             return
         }
-        _state.update { it.copy(saving = true, messageRes = null) }
+        _state.update { it.copy(saving = true, messageRes = null, serverMessages = emptyList()) }
         viewModelScope.launch {
             val (ownerId, veterinarianId) = existing?.let { it.ownerId to it.veterinarianId }
                 ?: ActivityScope.ownership(user.role, user.userId, current.clientId)
@@ -208,7 +210,7 @@ class ActivityFormViewModel @Inject constructor(
             _state.update {
                 when (val result = saveActivity(activityId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes())
+                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
                 }
             }
         }

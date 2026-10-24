@@ -37,6 +37,7 @@ import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.component.DangerTextButton
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.network.resolveMediaUrl
 import com.anitec.platform.livestock.domain.AnimalView
 
@@ -64,7 +65,7 @@ fun AnimalDetailSheet(
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(stringResource(R.string.animals_detail_title), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.animals_detail_title), modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleLarge)
 
             val url = resolveMediaUrl(animal.imageUrl)
             Box(

@@ -51,6 +51,7 @@ import com.anitec.platform.core.designsystem.component.FormScreenScaffold
 import com.anitec.platform.core.designsystem.component.LoadingState
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.PrimaryButton
+import com.anitec.platform.core.designsystem.component.ServerMessages
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
@@ -250,6 +251,7 @@ fun ActivityFormScreen(
             onSelected = viewModel::onStatusChange,
             optionLabel = { activityStatusLabel(it) },
         )
+        ServerMessages(state.serverMessages)
         PrimaryButton(text = stringResource(R.string.common_save), onClick = viewModel::save, modifier = Modifier.fillMaxWidth(), loading = state.saving)
         SecondaryButton(text = stringResource(R.string.common_cancel), onClick = onBack, modifier = Modifier.fillMaxWidth())
     }

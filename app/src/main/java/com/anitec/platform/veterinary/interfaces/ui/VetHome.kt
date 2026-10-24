@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +43,7 @@ import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.SectionChip
 import com.anitec.platform.core.designsystem.component.StatusTag
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
 import com.anitec.platform.sanitary.interfaces.ui.HealthRecordCard
@@ -70,7 +73,7 @@ fun VetHome(
                 AniTecPanel(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         SectionChip(stringResource(R.string.app_name))
-                        Text(stringResource(R.string.home_greeting, session.fullName), style = MaterialTheme.typography.headlineMedium)
+                        Text(stringResource(R.string.home_greeting, session.fullName), modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.headlineMedium)
                         Text(stringResource(R.string.vet_home_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         StatusTag(stringResource(session.role.labelRes()), Severity.Success)
                     }
@@ -113,8 +116,13 @@ fun VetHome(
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.vet_overview_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    TextButton(onClick = onOpenClients) { Text(stringResource(R.string.home_view_all), color = MaterialTheme.colorScheme.primary) }
+                    val overviewTitle = stringResource(R.string.vet_overview_title)
+                    val viewAll = stringResource(R.string.home_view_all)
+                    Text(overviewTitle, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).sectionHeading())
+                    TextButton(
+                        onClick = onOpenClients,
+                        modifier = Modifier.semantics { contentDescription = "${viewAll}, $overviewTitle" },
+                    ) { Text(viewAll, color = MaterialTheme.colorScheme.primary) }
                 }
                 if (state.clients.isEmpty()) {
                     EmptyState(stringResource(R.string.vet_clients_empty))
@@ -124,7 +132,7 @@ fun VetHome(
                     }
                 }
 
-                Text(stringResource(R.string.home_recent_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.home_recent_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.sectionHeading())
                 if (state.recent.isEmpty()) {
                     EmptyState(stringResource(R.string.home_recent_empty))
                 } else {

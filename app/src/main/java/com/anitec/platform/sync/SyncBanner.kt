@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.Severity
+import com.anitec.platform.core.designsystem.component.liveStatus
 import com.anitec.platform.core.designsystem.statusColors
 
 /**
@@ -44,7 +45,7 @@ fun SyncBanner(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Icon(if (failed) Icons.Filled.SyncProblem else Icons.Filled.CloudOff, contentDescription = null)
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).liveStatus()) {
                 Text(
                     text = if (failed) {
                         pluralStringResource(R.plurals.sync_failed, status.failed, status.failed)

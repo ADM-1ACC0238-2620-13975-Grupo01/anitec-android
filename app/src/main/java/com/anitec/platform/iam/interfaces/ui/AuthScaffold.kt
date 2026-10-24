@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.SectionChip
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.i18n.LanguageSwitcher
 import com.anitec.platform.core.session.UserRole
 
@@ -84,7 +85,7 @@ fun AuthScaffold(
                         )
                     }
                     SectionChip(stringResource(R.string.auth_hero_chip))
-                    Text(title, style = MaterialTheme.typography.headlineMedium)
+                    Text(title, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.headlineMedium)
                     Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     content()
                 }

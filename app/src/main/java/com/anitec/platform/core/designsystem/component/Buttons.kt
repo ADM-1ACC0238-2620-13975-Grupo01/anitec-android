@@ -26,7 +26,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.AniTecGreen
 import com.anitec.platform.core.designsystem.AniTecGreenDark
 
@@ -41,6 +45,7 @@ fun PrimaryButton(
     icon: ImageVector? = null,
 ) {
     val active = enabled && !loading
+    val loadingDescription = stringResource(R.string.common_loading)
     val background = if (active) {
         Brush.linearGradient(listOf(AniTecGreenDark, AniTecGreen))
     } else {
@@ -48,7 +53,7 @@ fun PrimaryButton(
     }
     Button(
         onClick = onClick,
-        modifier = modifier.heightIn(min = 48.dp),
+        modifier = modifier.heightIn(min = 48.dp).semantics { if (loading) stateDescription = loadingDescription },
         enabled = active,
         shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(

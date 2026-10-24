@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -50,6 +51,7 @@ import com.anitec.platform.core.designsystem.component.LoadingState
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.PanelHeader
 import com.anitec.platform.core.designsystem.component.PrimaryButton
+import com.anitec.platform.core.designsystem.component.ServerMessages
 import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
@@ -116,6 +118,7 @@ fun DeviceListScreen(
     onBack: () -> Unit,
     onNew: () -> Unit,
     onEdit: (Int) -> Unit,
+    onOpenHistory: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DeviceListViewModel = hiltViewModel(),
 ) {
@@ -184,8 +187,13 @@ fun DeviceListScreen(
                                 stringResource(R.string.iot_latest) to
                                     (device.latest?.let { readingLabel(it) } ?: stringResource(R.string.iot_no_readings)),
                             ),
-                            footer = if (state.canManage) {
-                                {
+                            footer = {
+                                SecondaryButton(
+                                    text = stringResource(R.string.iot_history),
+                                    onClick = { onOpenHistory(device.id) },
+                                    icon = Icons.Filled.History,
+                                )
+                                if (state.canManage) {
                                     SecondaryButton(
                                         text = stringResource(R.string.common_edit),
                                         onClick = { onEdit(device.id) },
@@ -197,8 +205,6 @@ fun DeviceListScreen(
                                         icon = Icons.Filled.Delete,
                                     )
                                 }
-                            } else {
-                                null
                             },
                         )
                     }
@@ -297,6 +303,7 @@ fun DeviceFormScreen(
                 placeholder = stringResource(R.string.animal_select),
             )
         }
+        ServerMessages(state.serverMessages)
         PrimaryButton(text = stringResource(R.string.common_save), onClick = viewModel::save, modifier = Modifier.fillMaxWidth(), loading = state.saving)
         SecondaryButton(text = stringResource(R.string.common_cancel), onClick = onBack, modifier = Modifier.fillMaxWidth())
     }

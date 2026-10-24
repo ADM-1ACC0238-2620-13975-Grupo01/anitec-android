@@ -18,6 +18,7 @@
     <string name="common_loading">Loading…</string>
     <string name="common_choose_date">Choose date</string>
     <string name="common_clear_date">Clear date</string>
+    <string name="common_date_placeholder">yyyy-mm-dd</string>
     <string name="common_coming_soon">This section is coming soon.</string>
 
     <!-- Errors -->
@@ -29,6 +30,7 @@
     <string name="error_conflict">This item already exists.</string>
     <string name="error_server">The server had a problem. Please try again later.</string>
     <string name="error_unknown">Something went wrong. Please try again.</string>
+    <string name="error_validation">The server did not accept the data. Check the fields and try again.</string>
     <string name="error_field_required">This field is required</string>
 
     <!-- Language -->

@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.anitec.platform.app.HealthFormRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
+import com.anitec.platform.core.common.serverHints
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
@@ -125,6 +126,7 @@ data class HealthFormUiState(
     val saving: Boolean = false,
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
+    val serverMessages: List<String> = emptyList(),
 ) {
     val animalMissing get() = showErrors && animalId == null
     val dateMissing get() = showErrors && date.isBlank()
@@ -202,7 +204,7 @@ class HealthFormViewModel @Inject constructor(
             _state.update { it.copy(showErrors = true) }
             return
         }
-        _state.update { it.copy(saving = true, messageRes = null) }
+        _state.update { it.copy(saving = true, messageRes = null, serverMessages = emptyList()) }
         viewModelScope.launch {
             val draft = HealthEventDraft(
                 animalId = current.animalId!!,
@@ -219,7 +221,7 @@ class HealthFormViewModel @Inject constructor(
             _state.update {
                 when (val result = saveEvent(eventId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes())
+                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
                 }
             }
         }

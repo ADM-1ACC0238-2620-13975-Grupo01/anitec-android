@@ -12,6 +12,10 @@
     <string name="iot_readings_count">%1$d registradas</string>
     <string name="iot_latest">Última</string>
     <string name="iot_no_readings">Sin lecturas</string>
+    <string name="iot_latest_reading">Última lectura</string>
+    <string name="iot_history">Historial</string>
+    <string name="iot_history_title">Historial de lecturas</string>
+    <string name="iot_history_empty">Este dispositivo aún no ha reportado lecturas.</string>
     <string name="iot_confirm_delete">¿Eliminar el dispositivo "%1$s"? Esta acción no se puede deshacer.</string>
     <string name="iot_form_new">Agregar dispositivo IoT</string>
     <string name="iot_form_edit">Editar dispositivo IoT</string>

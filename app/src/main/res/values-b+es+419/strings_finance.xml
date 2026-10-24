@@ -9,6 +9,7 @@
     <string name="finance_type">Tipo</string>
     <string name="finance_category">Categoría</string>
     <string name="finance_amount">Monto</string>
+    <string name="finance_currency_amount">S/ %1$s</string>
     <string name="finance_date">Fecha</string>
     <string name="finance_description">Descripción</string>
     <string name="finance_description_placeholder">Detalle, comprobante o motivo del movimiento</string>

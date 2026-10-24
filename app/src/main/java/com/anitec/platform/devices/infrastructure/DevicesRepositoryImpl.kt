@@ -1,5 +1,6 @@
 package com.anitec.platform.devices.infrastructure
 
+import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
@@ -12,6 +13,7 @@ import com.anitec.platform.devices.domain.DevicesRepository
 import com.anitec.platform.devices.infrastructure.local.DeviceEntity
 import com.anitec.platform.devices.infrastructure.local.DevicesDao
 import com.anitec.platform.devices.infrastructure.remote.DeviceDto
+import com.anitec.platform.devices.infrastructure.remote.DeviceMetricDto
 import com.anitec.platform.devices.infrastructure.remote.DevicesApi
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import dagger.Binds
@@ -42,6 +44,8 @@ fun DeviceEntity.toDomain() = Device(
     },
     readingCount = readingCount,
 )
+
+fun DeviceMetricDto.toReading() = DeviceReading(type, value, unit, recordedAt)
 
 fun DeviceDraft.toDto() = DeviceDto(
     name = name, type = type, serialNumber = serialNumber, status = status, herdId = herdId, animalId = animalId,
@@ -83,6 +87,16 @@ class DevicesRepositoryImpl @Inject constructor(
 
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }
+
+    override suspend fun history(deviceId: Int): AppResult<List<DeviceReading>> =
+        safeApiCall { api.getDeviceMetrics(deviceId).sortedByDescending { it.recordedAt }.map { it.toReading() } }
+
+    // The endpoint answers 404 both for a missing device and for one without readings; only the latter is not a failure.
+    override suspend fun latestReading(deviceId: Int): AppResult<DeviceReading?> =
+        when (val result = safeApiCall { api.getLatestMetric(deviceId).toReading() }) {
+            is AppResult.Success -> AppResult.Success(result.value)
+            is AppResult.Failure -> if (result.error == AppError.NotFound) AppResult.Success(null) else result
+        }
 }
 
 @Module

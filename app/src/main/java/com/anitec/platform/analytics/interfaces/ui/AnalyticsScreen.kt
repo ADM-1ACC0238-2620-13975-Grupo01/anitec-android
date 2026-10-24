@@ -49,6 +49,7 @@ import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.MetricCard
 import com.anitec.platform.core.designsystem.component.PanelHeader
 import com.anitec.platform.core.designsystem.component.SectionChip
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.financial.interfaces.ui.formatSoles
 import com.anitec.platform.sanitary.interfaces.ui.healthTypeLabel
@@ -62,7 +63,7 @@ private fun ChartPanel(chip: String, title: String, content: @Composable () -> U
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionChip(chip)
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(title, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleMedium)
             content()
         }
     }

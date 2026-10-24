@@ -84,6 +84,15 @@ fun MessageEffect(@StringRes messageRes: Int?, snackbarHostState: SnackbarHostSt
     }
 }
 
+/** Lists the server's validation hints under a form, one bullet each; nothing when [messages] is empty. */
+@Composable
+fun ServerMessages(messages: List<String>, modifier: Modifier = Modifier) {
+    if (messages.isEmpty()) return
+    Column(modifier = modifier.fillMaxWidth().liveStatus(assertive = true)) {
+        messages.forEach { Text("• $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
+    }
+}
+
 /** Card for one record: kicker, title, optional trailing content, key/value rows and a footer of actions. */
 @Composable
 fun RecordCard(
@@ -105,14 +114,14 @@ fun RecordCard(
                     if (kicker != null) {
                         Text(kicker, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
                     }
-                    Text(title, style = MaterialTheme.typography.titleMedium)
+                    Text(title, modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.titleMedium)
                 }
                 if (trailing != null) trailing()
             }
             if (details.isNotEmpty()) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 details.forEach { (label, value) ->
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth().mergedSemantics()) {
                         Text(
                             label,
                             modifier = Modifier.weight(0.4f),

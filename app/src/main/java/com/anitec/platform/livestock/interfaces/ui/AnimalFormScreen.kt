@@ -60,6 +60,7 @@ import com.anitec.platform.core.designsystem.component.FormScreenScaffold
 import com.anitec.platform.core.designsystem.component.MessageEffect
 import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.designsystem.component.SecondaryButton
+import com.anitec.platform.core.designsystem.component.ServerMessages
 import com.anitec.platform.core.network.resolveMediaUrl
 import com.anitec.platform.livestock.domain.AnimalStatus
 import com.anitec.platform.livestock.interfaces.viewmodel.AnimalFormUiState
@@ -197,11 +198,7 @@ fun AnimalFormScreen(
             Text(stringResource(R.string.animal_bulk_photo_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
-        if (state.serverMessages.isNotEmpty()) {
-            Column {
-                state.serverMessages.forEach { Text("• $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
-            }
-        }
+        ServerMessages(state.serverMessages)
 
         PrimaryButton(
             text = stringResource(R.string.common_save),

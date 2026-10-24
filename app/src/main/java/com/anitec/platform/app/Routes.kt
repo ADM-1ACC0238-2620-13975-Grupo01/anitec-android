@@ -38,6 +38,7 @@ import kotlinx.serialization.Serializable
 // Devices
 @Serializable data object DevicesRoute
 @Serializable data class DeviceFormRoute(val deviceId: Int? = null)
+@Serializable data class DeviceHistoryRoute(val deviceId: Int)
 
 // Veterinary
 @Serializable data object ClientsRoute

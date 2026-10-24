@@ -38,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +55,7 @@ import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.SectionChip
 import com.anitec.platform.core.designsystem.component.StatusTag
+import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
@@ -60,8 +63,8 @@ import com.anitec.platform.sanitary.interfaces.ui.HealthRecordCard
 import com.anitec.platform.veterinary.interfaces.ui.VetHome
 
 /**
- * Role-aware home entry: ranchers get the full dashboard ([RancherHome]);
- * veterinarians see a greeting plus a "coming soon" placeholder until the veterinary module lands.
+ * Role-aware home entry: ranchers get the farm dashboard ([RancherHome]);
+ * veterinarians get their client and patient overview ([VetHome]).
  */
 @Composable
 fun HomeScreen(
@@ -94,7 +97,7 @@ private fun GreetingPanel(session: UserSession, subtitle: String? = null) {
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             SectionChip(stringResource(R.string.app_name))
-            Text(stringResource(R.string.home_greeting, session.fullName), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.home_greeting, session.fullName), modifier = Modifier.sectionHeading(), style = MaterialTheme.typography.headlineMedium)
             if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             StatusTag(stringResource(session.role.labelRes()), Severity.Success)
         }
@@ -118,6 +121,7 @@ private fun RancherHome(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
+    val viewAll = stringResource(R.string.home_view_all)
 
     Box(modifier = modifier.fillMaxSize()) {
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.fillMaxSize()) {
@@ -191,8 +195,12 @@ private fun RancherHome(
                 )
 
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.home_upcoming_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    TextButton(onClick = onViewAllActivities) { Text(stringResource(R.string.home_view_all), color = MaterialTheme.colorScheme.primary) }
+                    val upcomingTitle = stringResource(R.string.home_upcoming_title)
+                    Text(upcomingTitle, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).sectionHeading())
+                    TextButton(
+                        onClick = onViewAllActivities,
+                        modifier = Modifier.semantics { contentDescription = "${viewAll}, $upcomingTitle" },
+                    ) { Text(viewAll, color = MaterialTheme.colorScheme.primary) }
                 }
                 if (state.upcoming.isEmpty()) {
                     EmptyState(stringResource(R.string.home_upcoming_empty))
@@ -201,8 +209,12 @@ private fun RancherHome(
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.home_recent_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    TextButton(onClick = onViewAllHealth) { Text(stringResource(R.string.home_view_all), color = MaterialTheme.colorScheme.primary) }
+                    val recentTitle = stringResource(R.string.home_recent_title)
+                    Text(recentTitle, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).sectionHeading())
+                    TextButton(
+                        onClick = onViewAllHealth,
+                        modifier = Modifier.semantics { contentDescription = "${viewAll}, $recentTitle" },
+                    ) { Text(viewAll, color = MaterialTheme.colorScheme.primary) }
                 }
                 if (state.recent.isEmpty()) {
                     EmptyState(stringResource(R.string.home_recent_empty))
@@ -214,12 +226,6 @@ private fun RancherHome(
         }
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
-}
-
-/** Full-screen empty state used for unfinished sections. */
-@Composable
-fun ComingSoonScreen(modifier: Modifier = Modifier) {
-    EmptyState(stringResource(R.string.common_coming_soon), modifier = modifier.fillMaxSize().padding(top = 48.dp))
 }
 
 /**

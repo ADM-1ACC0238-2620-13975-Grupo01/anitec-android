@@ -6,17 +6,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.anitec.platform.app.DeviceFormRoute
+import com.anitec.platform.app.DeviceHistoryRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
+import com.anitec.platform.core.common.serverHints
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.devices.application.DeleteDeviceUseCase
+import com.anitec.platform.devices.application.GetDeviceHistoryUseCase
+import com.anitec.platform.devices.application.GetLatestDeviceReadingUseCase
 import com.anitec.platform.devices.application.ObserveDevicesUseCase
 import com.anitec.platform.devices.application.RefreshDevicesUseCase
 import com.anitec.platform.devices.application.SaveDeviceUseCase
 import com.anitec.platform.devices.domain.Device
 import com.anitec.platform.devices.domain.DeviceDraft
+import com.anitec.platform.devices.domain.DeviceReading
 import com.anitec.platform.devices.domain.DeviceStatuses
 import com.anitec.platform.devices.domain.DeviceTypes
 import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
@@ -116,6 +121,70 @@ class DeviceListViewModel @Inject constructor(
     }
 }
 
+data class DeviceHistoryUiState(
+    val device: Device? = null,
+    val latest: DeviceReading? = null,
+    val readings: List<DeviceReading> = emptyList(),
+    val loading: Boolean = true,
+    val refreshing: Boolean = false,
+    @StringRes val messageRes: Int? = null,
+)
+
+private data class DeviceHistoryLocal(
+    val latest: DeviceReading? = null,
+    val readings: List<DeviceReading> = emptyList(),
+    val loading: Boolean = true,
+    val refreshing: Boolean = false,
+    val messageRes: Int? = null,
+)
+
+/** Latest reading and full reading history of one device; both come from the server on every refresh. */
+@HiltViewModel
+class DeviceHistoryViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    observeDevices: ObserveDevicesUseCase,
+    private val getHistory: GetDeviceHistoryUseCase,
+    private val getLatest: GetLatestDeviceReadingUseCase,
+) : ViewModel() {
+
+    private val deviceId: Int = savedStateHandle.toRoute<DeviceHistoryRoute>().deviceId
+    private val local = MutableStateFlow(DeviceHistoryLocal())
+
+    val state: StateFlow<DeviceHistoryUiState> = combine(observeDevices(), local) { devices, local ->
+        DeviceHistoryUiState(
+            device = devices.firstOrNull { it.id == deviceId },
+            latest = local.latest,
+            readings = local.readings,
+            loading = local.loading,
+            refreshing = local.refreshing,
+            messageRes = local.messageRes,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DeviceHistoryUiState())
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            local.update { it.copy(refreshing = true) }
+            val history = getHistory(deviceId)
+            val latest = getLatest(deviceId)
+            local.update {
+                it.copy(
+                    latest = (latest as? AppResult.Success)?.value ?: it.latest,
+                    readings = (history as? AppResult.Success)?.value ?: it.readings,
+                    loading = false,
+                    refreshing = false,
+                    messageRes = ((history as? AppResult.Failure) ?: (latest as? AppResult.Failure))?.error?.messageRes(),
+                )
+            }
+        }
+    }
+
+    fun onMessageShown() = local.update { it.copy(messageRes = null) }
+}
+
 enum class DeviceTarget { Herd, Animal }
 
 data class DeviceFormUiState(
@@ -133,6 +202,7 @@ data class DeviceFormUiState(
     val saving: Boolean = false,
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
+    val serverMessages: List<String> = emptyList(),
 ) {
     val nameMissing get() = showErrors && name.isBlank()
     val serialMissing get() = showErrors && serialNumber.isBlank()
@@ -202,7 +272,7 @@ class DeviceFormViewModel @Inject constructor(
             _state.update { it.copy(showErrors = true) }
             return
         }
-        _state.update { it.copy(saving = true, messageRes = null) }
+        _state.update { it.copy(saving = true, messageRes = null, serverMessages = emptyList()) }
         viewModelScope.launch {
             // A device belongs to a herd or to an animal, never both.
             val draft = DeviceDraft(
@@ -216,7 +286,7 @@ class DeviceFormViewModel @Inject constructor(
             _state.update {
                 when (val result = saveDevice(deviceId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes())
+                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
                 }
             }
         }
