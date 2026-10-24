@@ -19,7 +19,9 @@ Open the `anitec-android` folder in Android Studio, let Gradle sync, then run th
 | Build type | Backend |
 |---|---|
 | `debug` | `http://10.0.2.2:5191` (your machine as seen from the emulator) |
-| `release` | `https://anitec-backend.onrender.com` (free tier: the first request can take about a minute) |
+| `release` | `https://anitec-backend-android.onrender.com` (free tier: the first request can take about a minute) |
+
+The first time a `debug` build opens on Android 17 or later, it asks to allow access to devices on the local network. Tap **Allow**: without it the connection to your computer hangs and sign-in ends with "Could not reach the server". Release builds do not ask, because the hosted backend is a public address.
 
 To use a physical device with a backend on your computer, add this line to `local.properties` (never committed) and the same host to `app/src/debug/res/xml/network_security_config.xml`:
 

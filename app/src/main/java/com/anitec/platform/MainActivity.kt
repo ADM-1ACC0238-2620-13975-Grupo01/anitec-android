@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.anitec.platform.app.AniTecApp
+import com.anitec.platform.core.devtools.LocalNetworkAccess
 import com.anitec.platform.core.designsystem.AniTecTheme
 import com.anitec.platform.subscriptions.application.CheckoutReturns
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Debug builds ask to reach the backend on this computer; release builds do nothing here.
+        LocalNetworkAccess.requestIfNeeded(this)
         // After a rotation the same intent is delivered again; the link was already handled the first time.
         if (savedInstanceState == null) checkoutReturns.onLink(intent?.dataString)
         setContent {
