@@ -9,7 +9,7 @@ import com.anitec.platform.R
 import com.anitec.platform.app.AnimalFormRoute
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
-import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
+import com.anitec.platform.livestock.application.ObserveAllAnimalsUseCase
 import com.anitec.platform.livestock.application.ObserveCorralsUseCase
 import com.anitec.platform.livestock.application.ObserveHerdsUseCase
 import com.anitec.platform.livestock.application.RegisterAnimalBatchUseCase
@@ -87,7 +87,7 @@ class AnimalFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     observeHerds: ObserveHerdsUseCase,
     observeCorrals: ObserveCorralsUseCase,
-    private val observeAnimals: ObserveAnimalsUseCase,
+    private val observeAnimals: ObserveAllAnimalsUseCase,
     private val saveAnimal: SaveAnimalUseCase,
     private val registerBatch: RegisterAnimalBatchUseCase,
     private val uploadImage: UploadAnimalImageUseCase,

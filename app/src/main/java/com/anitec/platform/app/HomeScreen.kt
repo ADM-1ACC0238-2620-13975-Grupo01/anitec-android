@@ -227,31 +227,3 @@ private fun RancherHome(
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
-
-/**
- * Temporary screen with a top bar and back navigation for routes that are not built yet.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PlaceholderScreen(@StringRes titleRes: Int, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    Scaffold(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(titleRes)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-            )
-        },
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            Spacer(Modifier.height(32.dp))
-            EmptyState(stringResource(R.string.common_coming_soon))
-        }
-    }
-}

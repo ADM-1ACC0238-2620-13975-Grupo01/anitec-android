@@ -25,6 +25,9 @@ interface LivestockRepository {
     suspend fun deleteAnimal(id: Int): AppResult<Unit>
     suspend fun createAnimalBatch(draft: AnimalBatchDraft): AppResult<List<Animal>>
     suspend fun updateAnimalsStatus(ids: List<Int>, status: String): AppResult<List<Animal>>
+
+    /** Changes the status of one animal; sending the archived status archives it. */
+    suspend fun updateAnimalStatus(id: Int, status: String): AppResult<Animal>
     suspend fun deleteAnimals(ids: List<Int>): AppResult<Unit>
 }
 

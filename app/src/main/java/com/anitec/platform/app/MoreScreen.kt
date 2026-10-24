@@ -60,14 +60,14 @@ private fun moreItems(role: UserRole): List<MoreItem> = when (role) {
         MoreItem(R.string.nav_finance, Icons.Filled.AccountBalanceWallet, FinancialRoute),
         MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, AnalyticsRoute),
         MoreItem(R.string.nav_iot, Icons.Filled.Sensors, DevicesRoute),
-        MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, PlaceholderRoute(R.string.nav_subscriptions)),
+        MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, SubscriptionsRoute),
         MoreItem(R.string.nav_terms, Icons.Filled.Description, TermsRoute),
     )
     UserRole.Veterinarian -> listOf(
         MoreItem(R.string.nav_clients, Icons.Filled.People, ClientsRoute),
         MoreItem(R.string.nav_analytics, Icons.AutoMirrored.Filled.ShowChart, AnalyticsRoute),
         MoreItem(R.string.nav_iot, Icons.Filled.Sensors, DevicesRoute),
-        MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, PlaceholderRoute(R.string.nav_subscriptions)),
+        MoreItem(R.string.nav_subscriptions, Icons.Filled.CreditCard, SubscriptionsRoute),
         MoreItem(R.string.nav_terms, Icons.Filled.Description, TermsRoute),
     )
 }

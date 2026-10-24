@@ -41,6 +41,9 @@ data class Animal(
     val imageUrl: String?,
 ) {
     val healthStatus: AnimalStatus get() = AnimalStatus.fromApi(status)
+
+    /** Archived animals are kept but left out of the herd counts and of the working lists. */
+    val isArchived: Boolean get() = healthStatus == AnimalStatus.Archived
 }
 
 /** Data needed to create or update a herd; the server assigns the id. */

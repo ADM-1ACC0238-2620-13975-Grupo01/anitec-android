@@ -20,6 +20,17 @@
     <string name="animals_confirm_delete_many">Delete %1$d animals? This cannot be undone.</string>
     <string name="animals_confirm_status">Mark %1$d animals as %2$s?</string>
     <string name="animals_saved">Changes saved.</string>
+    <string name="animals_tab_active">Active</string>
+    <string name="animals_tab_archived">Archived (%1$d)</string>
+    <string name="animals_archive">Archive</string>
+    <string name="animals_restore">Restore to the herd</string>
+    <string name="animals_archive_selected">Archive selected</string>
+    <string name="animals_restore_selected">Restore selected (change status)</string>
+    <string name="animals_confirm_archive_one">Archive %1$s? The record and its history are kept, but it leaves the herd counts. You can restore it later.</string>
+    <string name="animals_confirm_archive_many">Archive %1$d animals? Their records and history are kept, but they leave the herd counts. You can restore them later.</string>
+    <string name="animals_archived">Archived. You can find it under Archived.</string>
+    <string name="animals_restored">Restored to the herd as healthy.</string>
+    <string name="animals_archived_empty">There are no archived animals.</string>
     <string name="animals_detail_title">Animal record</string>
     <string name="animals_no_photo">No photo</string>
     <string name="animals_edit">Edit</string>
@@ -75,6 +86,7 @@
     <string name="status_observation">Under observation</string>
     <string name="status_in_treatment">In treatment</string>
     <string name="status_sold">Sold</string>
+    <string name="status_archived">Archived</string>
 
     <!-- Option values -->
     <string name="species_cattle">Cattle</string>

@@ -9,6 +9,9 @@ enum class AnimalStatus(val apiValue: String, private val aliases: Set<String> =
     Observation("Observacion", setOf("observation")),
     InTreatment("En tratamiento", setOf("in treatment", "treatment", "sick")),
     Sold("Vendido", setOf("sold")),
+
+    /** Left the active herd but its record and history are kept. Not offered in the status picker. */
+    Archived("Archivado", setOf("archived")),
     Unknown("");
 
     /** True for animals that need attention (not healthy and not sold). */

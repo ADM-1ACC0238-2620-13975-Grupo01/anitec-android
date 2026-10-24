@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+      Debug builds reach a backend on the developer's computer (10.0.2.2 from the emulator, or a LAN address),
+      which Android 17 treats as the local network: an app targeting it is blocked from those addresses, with
+      connections that just hang, unless it holds this permission. Release builds only use the hosted backend.
+      On a device it is asked at run time; on the emulator grant it with:
+        adb shell pm grant com.anitec.platform android.permission.ACCESS_LOCAL_NETWORK
+    -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <!-- Debug builds talk to a local backend over plain HTTP; release builds never do. -->
     <application android:networkSecurityConfig="@xml/network_security_config" />
 

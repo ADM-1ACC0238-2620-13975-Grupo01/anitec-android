@@ -29,6 +29,12 @@ import kotlinx.serialization.Serializable
 @Serializable data object FinancialRoute
 @Serializable data class FinancialFormRoute(val recordId: Int? = null)
 
+// Subscriptions
+@Serializable data object SubscriptionsRoute
+
+/** The screen after Stripe: [sessionId] is the checkout to confirm, or [cancelled] when the user left without paying. */
+@Serializable data class SubscriptionResultRoute(val sessionId: String? = null, val cancelled: Boolean = false)
+
 // Scanner
 @Serializable data object ScannerRoute
 
@@ -47,6 +53,3 @@ import kotlinx.serialization.Serializable
 
 // Sanitary
 @Serializable data class HealthFormRoute(val eventId: Int? = null, val animalId: Int? = null)
-
-/** Stand-in for sections that are not built yet; replaced by real routes as each phase lands. */
-@Serializable data class PlaceholderRoute(val titleRes: Int)

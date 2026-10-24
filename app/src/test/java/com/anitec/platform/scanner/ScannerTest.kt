@@ -1,6 +1,6 @@
 package com.anitec.platform.scanner
 
-import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
+import com.anitec.platform.livestock.application.ObserveAllAnimalsUseCase
 import com.anitec.platform.livestock.application.RefreshLivestockUseCase
 import com.anitec.platform.livestock.domain.Animal
 import com.anitec.platform.livestock.domain.LivestockRepository
@@ -64,7 +64,7 @@ class ScannerViewModelTest {
         val repository = mockk<LivestockRepository>()
         every { repository.observeAnimals() } returns flowOf(listOf(animal(1, "AN-001")))
         coEvery { repository.refresh() } returns AppResult.Success(Unit)
-        return ScannerViewModel(ObserveAnimalsUseCase(repository), RefreshLivestockUseCase(repository))
+        return ScannerViewModel(ObserveAllAnimalsUseCase(repository), RefreshLivestockUseCase(repository))
     }
 
     @Test
