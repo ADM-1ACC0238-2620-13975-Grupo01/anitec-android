@@ -74,7 +74,10 @@ data class AnimalDraft(
     val imageUrl: String?,
 )
 
-/** Register [quantity] identical animals inside one corral; the server generates their codes. */
+/**
+ * Register [quantity] identical animals inside one corral; the server generates their codes.
+ * With a [name] each animal is called "name-001", "name-002"...; without it they take their code as name.
+ */
 data class AnimalBatchDraft(
     val species: String,
     val breed: String,
@@ -88,4 +91,5 @@ data class AnimalBatchDraft(
     val source: String?,
     val ageRange: String?,
     val imageUrl: String?,
+    val name: String? = null,
 )

@@ -70,6 +70,6 @@ fun AnimalDraft.toDto() = AnimalDto(
 fun AnimalBatchDraft.toDto() = AnimalBatchDto(
     species = species, breed = breed, gender = gender, birthDate = birthDate, weight = weight,
     status = status, herdId = herdId, corralId = corralId, quantity = quantity, source = source,
-    ageRange = ageRange, imageUrl = imageUrl,
+    ageRange = ageRange, imageUrl = imageUrl, name = name,
 )
 

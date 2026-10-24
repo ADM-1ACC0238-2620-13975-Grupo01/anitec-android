@@ -62,6 +62,11 @@
     <string name="animal_mode_bulk">Several (corral)</string>
     <string name="animal_quantity">Number of animals</string>
     <string name="animal_bulk_hint">One record is created per animal, with a code generated from the corral name.</string>
+    <string name="animal_batch_name">Base name (optional)</string>
+    <string name="animal_batch_name_placeholder">e.g. polloComercio</string>
+    <string name="animal_batch_name_hint">Each animal gets this name followed by a number (polloComercio-001, polloComercio-002…). Leave it empty to use the generated code.</string>
+    <string name="animal_batch_name_preview">Names: %1$s … %2$s. The numbering continues after the last one already used.</string>
+    <string name="animal_batch_name_preview_one">Name: %1$s</string>
     <string name="animal_bulk_photo_hint">We recommend a photo of the corral with all the animals, not of a single one.</string>
     <string name="animal_no_corrals_for_herd">This farm has no corrals yet.</string>
     <string name="animal_create_corral">Create a corral</string>
