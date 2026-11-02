@@ -34,8 +34,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** A health event with the name of its animal. */
 data class HealthItem(val event: HealthEvent, val animalName: String)
 
+/** Health records list state. */
 data class HealthListUiState(
     val items: List<HealthItem> = emptyList(),
     val pendingDelete: HealthItem? = null,
@@ -51,6 +53,7 @@ private data class HealthListLocal(
     val messageRes: Int? = null,
 )
 
+/** Lists the cached health events and handles refresh and delete with confirmation. */
 @HiltViewModel
 class HealthListViewModel @Inject constructor(
     observeEvents: ObserveHealthEventsUseCase,
@@ -77,6 +80,7 @@ class HealthListViewModel @Inject constructor(
         refresh()
     }
 
+    /** Refreshes livestock first, because health events are scoped by the visible animals. */
     fun refresh() {
         viewModelScope.launch {
             local.update { it.copy(refreshing = true) }
@@ -109,6 +113,7 @@ class HealthListViewModel @Inject constructor(
     }
 }
 
+/** Create or edit health event form state. */
 data class HealthFormUiState(
     val isEdit: Boolean = false,
     val animalId: Int? = null,
@@ -135,6 +140,11 @@ data class HealthFormUiState(
     val isValid get() = animalId != null && date.isNotBlank() && veterinarian.isNotBlank() && description.isNotBlank()
 }
 
+/**
+ * Loads the health event to edit, if any, and saves the form through [SaveHealthEventUseCase].
+ *
+ * A veterinarian's name is filled in for them; a rancher types the professional's name.
+ */
 @HiltViewModel
 class HealthFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
