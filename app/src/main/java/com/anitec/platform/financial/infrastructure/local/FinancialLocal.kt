@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
+/** Cached income or expense. A negative [id] means it was created offline and is not sent yet. */
 @Entity(tableName = "financial_records")
 data class FinancialRecordEntity(
     @PrimaryKey val id: Int,
@@ -19,6 +20,7 @@ data class FinancialRecordEntity(
     val description: String,
 )
 
+/** Room access to the cached financial records, newest first. */
 @Dao
 interface FinancialDao {
     @Query("SELECT * FROM financial_records ORDER BY date DESC, id DESC")
@@ -30,6 +32,7 @@ interface FinancialDao {
     // Records created offline have a negative id and stay until they are sent.
     @Query("DELETE FROM financial_records WHERE id >= 0") suspend fun clear()
 
+    /** Replaces the synced records in one transaction, keeping the pending ones. */
     @Transaction
     suspend fun replaceAll(records: List<FinancialRecordEntity>) {
         clear()
