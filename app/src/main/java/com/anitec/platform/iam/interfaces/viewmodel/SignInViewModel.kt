@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** Sign-in form state. Field errors show only after a submit attempt. */
 data class SignInUiState(
     val username: String = "",
     val password: String = "",
@@ -27,6 +28,7 @@ data class SignInUiState(
     val passwordMissing get() = showFieldErrors && password.isBlank()
 }
 
+/** Holds the sign-in form and calls [SignInUseCase]. */
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val signIn: SignInUseCase,
@@ -39,6 +41,7 @@ class SignInViewModel @Inject constructor(
 
     fun onPasswordChange(value: String) = _state.update { it.copy(password = value, errorRes = null) }
 
+    /** Validates the fields and signs in; failures are shown through [SignInUiState.errorRes]. */
     fun submit() {
         val current = _state.value
         if (current.loading) return
