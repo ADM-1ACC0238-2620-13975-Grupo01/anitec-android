@@ -30,6 +30,7 @@ import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.iam.interfaces.viewmodel.SignUpViewModel
 
+/** Sign-up screen with role selection and terms acceptance; [onOpenTerms] shows the terms. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
