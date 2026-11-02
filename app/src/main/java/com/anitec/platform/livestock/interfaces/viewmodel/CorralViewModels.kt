@@ -32,8 +32,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** A corral with the name of its herd and how many animals it holds. */
 data class CorralItem(val corral: Corral, val herdName: String, val animalCount: Int)
 
+/** Corral list state; [canEdit] is true only for ranchers. */
 data class CorralListUiState(
     val items: List<CorralItem> = emptyList(),
     val pendingDelete: CorralItem? = null,
@@ -48,6 +50,7 @@ private data class CorralListLocal(
     val messageRes: Int? = null,
 )
 
+/** Lists the cached corrals and handles refresh and delete with confirmation. */
 @HiltViewModel
 class CorralListViewModel @Inject constructor(
     observeHerds: ObserveHerdsUseCase,
@@ -100,6 +103,7 @@ class CorralListViewModel @Inject constructor(
     }
 }
 
+/** Create or edit corral form state. */
 data class CorralFormUiState(
     val isEdit: Boolean = false,
     val name: String = "",
@@ -115,6 +119,7 @@ data class CorralFormUiState(
     val isValid get() = name.isNotBlank() && herdId != null
 }
 
+/** Loads the corral to edit, if any, and saves the form through [SaveCorralUseCase]. */
 @HiltViewModel
 class CorralFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
