@@ -29,6 +29,26 @@ To use a physical device with a backend on your computer, add this line to `loca
 anitec.debugServerUrl=http://192.168.1.50:5191
 ```
 
+### Local backend or hosted backend
+
+Which backend the app talks to depends on the build variant, so the same project runs against your own database or against the deployed one:
+
+1. Open **View > Tool Windows > Build Variants**.
+2. In the row of the `app` module, pick `debug` (local backend) or `release` (hosted backend, Render) in **Active Build Variant**.
+3. Press Run.
+
+Things to keep in mind:
+
+- **Local backend (`debug`).** Start the backend on your computer first (`dotnet run --project Anitec.Platform` in `anitec-backend`). The data comes from the local database. To try Stripe payments, start it with the test key as explained in the section *Pagos De Prueba Con Stripe* of the backend README.
+- **Hosted backend (`release`).** It needs no local setup and uses the deployed database. The first request can take about a minute (free tier cold start). A `release` build is minified with R8 and signed with the key of `keystore.properties`.
+- **Same package, different signature.** Both variants install as `com.anitec.platform`, but `debug` is signed with the debug key and `release` with your own key. Installing one over the other fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`. Uninstall the app from the device first (long press on the icon, then Uninstall), or run:
+
+```
+adb uninstall com.anitec.platform
+```
+
+- **Another server for `release`.** To point a `release` build at a different server, set `anitec.releaseServerUrl` in `local.properties`. Never set it when building the APK to distribute.
+
 Command line:
 
 ```
@@ -84,7 +104,10 @@ Install it on a physical device and check that sign-in works before distributing
 
 To let people join without typing their emails, open **Vínculos de invitación → Crear vínculo de invitación**, choose the group and leave the domain restriction empty. Anyone with a Google account who opens the link joins the group; add that group as a recipient of the release so that they receive the build. The link can be disabled at any time.
 
-Public invite link of this app: <https://appdistribution.firebase.dev/i/417dc4e6d8ae3e32>
+Public invite links of the group `Equipo AniTec`. They belong to the group, not to one app: Firebase lists the same links from both apps, and the group has access to the builds distributed to it in both:
+
+- <https://appdistribution.firebase.dev/i/417dc4e6d8ae3e32>
+- <https://appdistribution.firebase.dev/i/862507cca1d4abc6>
 
 ### 6. Install it on a device
 
