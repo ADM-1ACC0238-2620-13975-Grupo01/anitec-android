@@ -27,6 +27,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Mappers between the API DTO, the Room entity and the domain [FinancialRecord]. */
 fun FinancialRecordDto.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description)
 fun FinancialRecord.toEntity() = FinancialRecordEntity(id, ownerId, type, category, amount, date, description)
 fun FinancialRecordEntity.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description)
@@ -34,6 +35,11 @@ fun FinancialRecordDraft.toDto() = FinancialRecordDto(
     ownerId = ownerId, type = type, category = category, amount = amount, date = date, description = description,
 )
 
+/**
+ * Income and expense repository backed by the REST API and cached in Room.
+ *
+ * Only the signed-in rancher's records are cached; new ones are queued in the outbox when offline.
+ */
 @Singleton
 class FinancialRepositoryImpl @Inject constructor(
     private val api: FinancialApi,
@@ -53,6 +59,7 @@ class FinancialRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Creates a record; offline, it is stored locally and sent later by the outbox. */
     override suspend fun create(draft: FinancialRecordDraft): AppResult<FinancialRecord> {
         val body = draft.toDto()
         val result = safeApiCall { api.create(body).toDomain() }
@@ -73,6 +80,7 @@ class FinancialRepositoryImpl @Inject constructor(
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }
 }
 
+/** Binds [FinancialRepositoryImpl] as the [FinancialRepository] used by the app. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class FinancialBindingsModule {
@@ -80,6 +88,7 @@ abstract class FinancialBindingsModule {
     abstract fun bindFinancialRepository(impl: FinancialRepositoryImpl): FinancialRepository
 }
 
+/** Provides the Retrofit client of the financial API. */
 @Module
 @InstallIn(SingletonComponent::class)
 object FinancialApiModule {
