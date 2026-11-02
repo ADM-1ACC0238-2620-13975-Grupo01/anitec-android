@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.sp
 // The web uses Inter with a system fallback. Inter is not bundled yet, so the system sans-serif is used.
 private val AniTecFont = FontFamily.SansSerif
 
+/** Material 3 type scale of AniTec, matching the sizes and weights of the web app. */
 val AniTecTypography = Typography(
     displayMedium = TextStyle(fontFamily = AniTecFont, fontWeight = FontWeight.ExtraBold, fontSize = 38.sp, lineHeight = 40.sp),
     headlineMedium = TextStyle(fontFamily = AniTecFont, fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 34.sp),
