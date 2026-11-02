@@ -58,6 +58,7 @@ import com.anitec.platform.sanitary.interfaces.ui.healthTypeLabel
 private fun recordKindLabel(kind: String): String =
     if (kind == RecordKinds.OTHER) stringResource(R.string.analytics_kind_other) else healthTypeLabel(kind)
 
+/** Panel with a chip and a title that hosts one chart. */
 @Composable
 private fun ChartPanel(chip: String, title: String, content: @Composable () -> Unit) {
     AniTecPanel(modifier = Modifier.fillMaxWidth()) {
@@ -69,6 +70,7 @@ private fun ChartPanel(chip: String, title: String, content: @Composable () -> U
     }
 }
 
+/** Donut chart of the animals by health status. */
 @Composable
 private fun StatusDonut(snapshot: AnalyticsSnapshot) {
     val points = listOf(
@@ -79,11 +81,16 @@ private fun StatusDonut(snapshot: AnalyticsSnapshot) {
     DonutChart(points, centerText = snapshot.animalCount.toString())
 }
 
+/** Bar chart of the health records by type. */
 @Composable
 private fun RecordsByKindBars(snapshot: AnalyticsSnapshot) {
     BarChart(snapshot.recordsByKind.map { (kind, count) -> ChartPoint(recordKindLabel(kind), count) })
 }
 
+/**
+ * Analytics dashboard. Ranchers see their animals, alerts and balance with herd status and record charts;
+ * veterinarians see their clients, patients and follow-ups with records by type and visits by herd.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
