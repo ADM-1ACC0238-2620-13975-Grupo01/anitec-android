@@ -33,6 +33,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
+/**
+ * Herds, corrals and animals repository backed by the REST API and cached in Room.
+ *
+ * The API returns every tenant's data, so [refresh] keeps only what the signed-in user may see.
+ * Animals created offline are queued in the outbox under a negative local id.
+ */
 @Singleton
 class LivestockRepositoryImpl @Inject constructor(
     private val api: LivestockApi,
@@ -46,6 +52,7 @@ class LivestockRepositoryImpl @Inject constructor(
     override fun observeCorrals(): Flow<List<Corral>> = dao.observeCorrals().map { list -> list.map { it.toDomain() } }
     override fun observeAnimals(): Flow<List<Animal>> = dao.observeAnimals().map { list -> list.map { it.toDomain() } }
 
+    /** Downloads herds, corrals and animals in parallel and caches the visible subset. */
     override suspend fun refresh(): AppResult<Unit> {
         val session = (sessionStore.state.value as? SessionState.SignedIn)?.session
             ?: return AppResult.Failure(AppError.Unauthorized)
@@ -95,6 +102,7 @@ class LivestockRepositoryImpl @Inject constructor(
     override suspend fun updateCorral(id: Int, draft: CorralDraft): AppResult<Corral> =
         safeApiCall { api.updateCorral(id, draft.toDto()).toDomain() }.onSuccess { dao.upsertCorral(it.toEntity()) }
 
+    /** Deletes a corral and leaves its cached animals without a corral. */
     override suspend fun deleteCorral(id: Int): AppResult<Unit> =
         safeApiCall { api.deleteCorral(id) }.onSuccess {
             dao.deleteCorral(id)
@@ -103,6 +111,7 @@ class LivestockRepositoryImpl @Inject constructor(
 
     // --- animals ---
 
+    /** Creates an animal; offline, it is stored locally and sent later by the outbox. */
     override suspend fun createAnimal(draft: AnimalDraft): AppResult<Animal> {
         val body = draft.toDto()
         val result = safeApiCall { api.createAnimal(body).toDomain() }
@@ -122,6 +131,7 @@ class LivestockRepositoryImpl @Inject constructor(
     override suspend fun deleteAnimal(id: Int): AppResult<Unit> =
         safeApiCall { api.deleteAnimal(id) }.onSuccess { dao.deleteAnimal(id) }
 
+    /** Creates several animals in one request and caches them. */
     override suspend fun createAnimalBatch(draft: AnimalBatchDraft): AppResult<List<Animal>> =
         safeApiCall { api.createAnimalBatch(draft.toDto()).map { it.toDomain() } }
             .onSuccess { created -> dao.upsertAnimals(created.map { it.toEntity() }) }
