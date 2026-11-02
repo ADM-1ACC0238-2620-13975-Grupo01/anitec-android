@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Mappers between the API DTO, the Room entity and the domain [Activity]. */
 fun FarmActivityDto.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status)
 fun Activity.toEntity() = ActivityEntity(id, ownerId, veterinarianId, title, type, date, priority, status)
 fun ActivityEntity.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status)
@@ -29,6 +30,11 @@ fun ActivityDraft.toDto() = FarmActivityDto(
     ownerId = ownerId, veterinarianId = veterinarianId, title = title, type = type, date = date, priority = priority, status = status,
 )
 
+/**
+ * Farm activities repository backed by the REST API and cached in Room.
+ *
+ * Activities created without a connection are kept under a negative local id and queued in the outbox.
+ */
 @Singleton
 class ActivitiesRepositoryImpl @Inject constructor(
     private val api: ActivitiesApi,
@@ -40,6 +46,7 @@ class ActivitiesRepositoryImpl @Inject constructor(
 
     override fun observeActivities(): Flow<List<Activity>> = dao.observeActivities().map { list -> list.map { it.toDomain() } }
 
+    /** Downloads the activities and caches only the ones visible to the signed-in user. */
     override suspend fun refresh(): AppResult<Unit> {
         val session = (sessionStore.state.value as? SessionState.SignedIn)?.session
             ?: return AppResult.Failure(AppError.Unauthorized)
@@ -51,6 +58,7 @@ class ActivitiesRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Creates an activity; offline, it is stored locally and sent later by the outbox. */
     override suspend fun create(draft: ActivityDraft): AppResult<Activity> {
         val body = draft.toDto()
         val result = safeApiCall { api.create(body).toDomain() }
