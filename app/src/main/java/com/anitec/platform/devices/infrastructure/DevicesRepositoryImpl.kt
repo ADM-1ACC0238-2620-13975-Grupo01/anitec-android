@@ -27,6 +27,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Maps a device from the API, optionally with its latest reading and reading count. */
 fun DeviceDto.toDomain(latest: DeviceReading? = null, count: Int = 0) =
     Device(id, name, type, serialNumber, status, herdId, animalId, latest, count)
 
@@ -35,6 +36,7 @@ fun Device.toEntity() = DeviceEntity(
     latest?.type, latest?.value, latest?.unit, latest?.recordedAt, readingCount,
 )
 
+/** Rebuilds the domain device from the cache; the latest reading exists only if it was stored. */
 fun DeviceEntity.toDomain() = Device(
     id, name, type, serialNumber, status, herdId, animalId,
     latest = if (readingType != null && readingValue != null) {
@@ -51,6 +53,7 @@ fun DeviceDraft.toDto() = DeviceDto(
     name = name, type = type, serialNumber = serialNumber, status = status, herdId = herdId, animalId = animalId,
 )
 
+/** IoT devices repository backed by the REST API, with each device's latest reading cached in Room. */
 @Singleton
 class DevicesRepositoryImpl @Inject constructor(
     private val api: DevicesApi,
@@ -60,6 +63,7 @@ class DevicesRepositoryImpl @Inject constructor(
 
     override fun observeDevices(): Flow<List<Device>> = dao.observeDevices().map { list -> list.map { it.toDomain() } }
 
+    /** Downloads devices and metrics and caches the user's devices with a summary of their readings. */
     override suspend fun refresh(): AppResult<Unit> = safeApiCall {
         // Herds and animals are cached first, so they decide which devices are the user's.
         val devices = DeviceScope.visible(
@@ -88,6 +92,7 @@ class DevicesRepositoryImpl @Inject constructor(
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }
 
+    /** Returns every reading of a device, newest first. */
     override suspend fun history(deviceId: Int): AppResult<List<DeviceReading>> =
         safeApiCall { api.getDeviceMetrics(deviceId).sortedByDescending { it.recordedAt }.map { it.toReading() } }
 
@@ -99,6 +104,7 @@ class DevicesRepositoryImpl @Inject constructor(
         }
 }
 
+/** Binds [DevicesRepositoryImpl] as the [DevicesRepository] used by the app. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DevicesBindingsModule {
@@ -106,6 +112,7 @@ abstract class DevicesBindingsModule {
     abstract fun bindDevicesRepository(impl: DevicesRepositoryImpl): DevicesRepository
 }
 
+/** Provides the Retrofit client of the devices API. */
 @Module
 @InstallIn(SingletonComponent::class)
 object DevicesApiModule {
