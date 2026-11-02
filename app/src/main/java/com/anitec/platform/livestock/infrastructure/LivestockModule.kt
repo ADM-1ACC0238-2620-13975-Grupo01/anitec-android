@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/** Binds the livestock repository and the animal image uploader implementations. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class LivestockBindingsModule {
@@ -22,6 +23,7 @@ abstract class LivestockBindingsModule {
     abstract fun bindAnimalImageUploader(impl: AnimalImageUploaderImpl): AnimalImageUploader
 }
 
+/** Provides the Retrofit clients of the livestock and veterinary APIs. */
 @Module
 @InstallIn(SingletonComponent::class)
 object LivestockApiModule {
