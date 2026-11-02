@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Repository of the signed-in veterinarian's rancher clients, cached in Room. */
 @Singleton
 class VeterinaryRepositoryImpl @Inject constructor(
     private val api: VeterinaryApi,
@@ -37,11 +38,13 @@ class VeterinaryRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Lists the ranchers the veterinarian can still add as clients. */
     override suspend fun availableRanchers(): AppResult<List<AvailableRancher>> {
         val id = veterinarianId() ?: return AppResult.Failure(AppError.Unauthorized)
         return safeApiCall { api.getAvailableRanchers(id).map { AvailableRancher(it.id, it.username, it.fullName, it.herds, it.animals) } }
     }
 
+    /** Adds a rancher as a client and refreshes the cached client list. */
     override suspend fun addClient(rancherId: Int): AppResult<Unit> {
         val id = veterinarianId() ?: return AppResult.Failure(AppError.Unauthorized)
         val result = safeApiCall { api.addClient(id, rancherId) }
@@ -50,6 +53,7 @@ class VeterinaryRepositoryImpl @Inject constructor(
         return AppResult.Success(Unit)
     }
 
+    /** Removes a rancher from the clients and from the cache. */
     override suspend fun removeClient(rancherId: Int): AppResult<Unit> {
         val id = veterinarianId() ?: return AppResult.Failure(AppError.Unauthorized)
         return safeApiCall { api.removeClient(id, rancherId) }.onSuccess { dao.delete(rancherId) }
