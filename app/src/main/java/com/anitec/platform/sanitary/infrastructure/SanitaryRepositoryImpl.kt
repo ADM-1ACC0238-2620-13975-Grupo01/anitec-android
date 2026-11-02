@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Mappers between the API DTO, the Room entity and the domain [HealthEvent]. */
 fun HealthEventDto.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
 fun HealthEvent.toEntity() = HealthEventEntity(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
 fun HealthEventEntity.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
@@ -28,6 +29,7 @@ fun HealthEventDraft.toDto() = HealthEventDto(
     diagnosis = diagnosis, treatment = treatment, prescription = prescription, followUp = followUp, nextDueDate = nextDueDate,
 )
 
+/** Health events repository backed by the REST API and cached in Room. */
 @Singleton
 class SanitaryRepositoryImpl @Inject constructor(
     private val api: SanitaryApi,
@@ -38,12 +40,14 @@ class SanitaryRepositoryImpl @Inject constructor(
 
     override fun observeEvents(): Flow<List<HealthEvent>> = dao.observeEvents().map { list -> list.map { it.toDomain() } }
 
+    /** Downloads the health events and caches those of the animals the user can see. */
     override suspend fun refresh(): AppResult<Unit> = safeApiCall {
         val events = api.getEvents().map { it.toDomain() }
         val visible = SanitaryScope.visibleEvents(events, livestockDao.animalIds().toSet())
         dao.replaceAll(visible.map { it.toEntity() })
     }
 
+    /** Creates a health event; offline, it is stored locally and sent later by the outbox. */
     override suspend fun create(draft: HealthEventDraft): AppResult<HealthEvent> {
         val body = draft.toDto()
         val result = safeApiCall { api.createEvent(body).toDomain() }
