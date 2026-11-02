@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
+/** Cached farm activity. A negative [id] means it was created offline and is not sent yet. */
 @Entity(tableName = "activities")
 data class ActivityEntity(
     @PrimaryKey val id: Int,
@@ -20,6 +21,7 @@ data class ActivityEntity(
     val status: String,
 )
 
+/** Room access to the cached activities, ordered by date. */
 @Dao
 interface ActivitiesDao {
     @Query("SELECT * FROM activities ORDER BY date ASC, id ASC")
@@ -31,6 +33,7 @@ interface ActivitiesDao {
     // Activities created offline have negative ids and must survive a refresh until they are sent.
     @Query("DELETE FROM activities WHERE id >= 0") suspend fun clear()
 
+    /** Replaces the synced activities in one transaction, keeping the pending ones. */
     @Transaction
     suspend fun replaceAll(activities: List<ActivityEntity>) {
         clear()
