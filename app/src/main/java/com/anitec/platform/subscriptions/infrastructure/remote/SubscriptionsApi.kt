@@ -35,9 +35,12 @@ data class PaymentDto(
     val paidAt: String = "",
 )
 
-/** `platform = "android"` makes Stripe return to the API page that reopens the app. */
+/**
+ * `platform = "android"` makes Stripe return to the API page that reopens the app. It has no default value on
+ * purpose: the app's Json omits properties equal to their default, and the field would never reach the server.
+ */
 @Serializable
-data class StripeCheckoutRequestDto(val planId: Int, val platform: String = "android")
+data class StripeCheckoutRequestDto(val planId: Int, val platform: String)
 
 @Serializable
 data class CheckoutSessionDto(val sessionId: String = "", val checkoutUrl: String = "")

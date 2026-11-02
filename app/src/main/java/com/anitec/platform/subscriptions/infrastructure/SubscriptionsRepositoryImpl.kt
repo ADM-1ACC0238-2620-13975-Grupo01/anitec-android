@@ -51,7 +51,7 @@ class SubscriptionsRepositoryImpl @Inject constructor(
         safeApiCall { api.getPayments(userId).map { it.toDomain() } }.map { list -> list.sortedByDescending { it.paidAt } }
 
     override suspend fun startCheckout(planId: Int): AppResult<CheckoutSession> =
-        safeApiCall { api.startCheckout(StripeCheckoutRequestDto(planId)).toDomain() }
+        safeApiCall { api.startCheckout(StripeCheckoutRequestDto(planId, platform = "android")).toDomain() }
 
     override suspend fun confirmCheckout(sessionId: String): AppResult<CheckoutResult> =
         safeApiCall { api.confirm(sessionId).toDomain() }

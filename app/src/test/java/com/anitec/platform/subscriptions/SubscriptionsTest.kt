@@ -40,6 +40,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -221,6 +223,19 @@ class SubscriptionsRepositoryTest {
         assertEquals(2, body.captured.planId)
         assertEquals("android", body.captured.platform)
         assertEquals(CheckoutSession("cs_test_1", "https://checkout.stripe.com/c/pay/cs_test_1"), result.value)
+    }
+
+    @Test
+    fun `the platform reaches the server in the serialized checkout body`() {
+        // Same settings as NetworkModule.provideJson: properties equal to their default are not written.
+        val json = Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
+        }
+
+        val body = json.encodeToString(StripeCheckoutRequestDto(2, platform = "android"))
+
+        assertEquals("""{"planId":2,"platform":"android"}""", body)
     }
 
     @Test
