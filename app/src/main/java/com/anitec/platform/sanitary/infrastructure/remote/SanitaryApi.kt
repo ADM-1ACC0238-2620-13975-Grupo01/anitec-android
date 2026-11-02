@@ -8,6 +8,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+/** Health event as sent and received by the `health-events` endpoints. */
 @Serializable
 data class HealthEventDto(
     val id: Int = 0,
@@ -23,6 +24,7 @@ data class HealthEventDto(
     val nextDueDate: String? = null,
 )
 
+/** Retrofit contract of the health events REST endpoints. */
 interface SanitaryApi {
     @GET("health-events") suspend fun getEvents(): List<HealthEventDto>
     @POST("health-events") suspend fun createEvent(@Body body: HealthEventDto): HealthEventDto
