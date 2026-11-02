@@ -25,6 +25,7 @@ import com.anitec.platform.core.designsystem.component.PasswordField
 import com.anitec.platform.core.designsystem.component.PrimaryButton
 import com.anitec.platform.iam.interfaces.viewmodel.SignInViewModel
 
+/** Sign-in screen. Shows a notice when [sessionExpired] is true. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SignInScreen(
