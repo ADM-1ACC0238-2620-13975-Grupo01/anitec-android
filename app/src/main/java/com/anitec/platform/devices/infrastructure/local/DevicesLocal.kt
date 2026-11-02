@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
+/** Cached device with its latest reading flattened into nullable columns. */
 @Entity(tableName = "devices")
 data class DeviceEntity(
     @PrimaryKey val id: Int,
@@ -24,6 +25,7 @@ data class DeviceEntity(
     val readingCount: Int,
 )
 
+/** Room access to the cached devices, ordered by name. */
 @Dao
 interface DevicesDao {
     @Query("SELECT * FROM devices ORDER BY name COLLATE NOCASE")
@@ -37,6 +39,7 @@ interface DevicesDao {
     @Query("DELETE FROM devices WHERE id = :id") suspend fun delete(id: Int)
     @Query("DELETE FROM devices") suspend fun clear()
 
+    /** Replaces every cached device in one transaction. */
     @Transaction
     suspend fun replaceAll(devices: List<DeviceEntity>) {
         clear()
