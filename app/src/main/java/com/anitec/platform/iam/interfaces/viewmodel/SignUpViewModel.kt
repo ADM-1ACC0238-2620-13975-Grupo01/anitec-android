@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** Sign-up form state. Field errors show only after a submit attempt. */
 data class SignUpUiState(
     val fullName: String = "",
     val username: String = "",
@@ -38,6 +39,7 @@ data class SignUpUiState(
     val termsMissing get() = showFieldErrors && !acceptedTerms
 }
 
+/** Holds the sign-up form and calls [SignUpUseCase]. */
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val signUp: SignUpUseCase,
@@ -54,6 +56,7 @@ class SignUpViewModel @Inject constructor(
     fun onRoleChange(value: UserRole) = _state.update { it.copy(role = value) }
     fun onTermsChange(value: Boolean) = _state.update { it.copy(acceptedTerms = value) }
 
+    /** Checks the required fields, e-mail, password match and terms, then creates the account. */
     fun submit() {
         val current = _state.value
         if (current.loading) return
