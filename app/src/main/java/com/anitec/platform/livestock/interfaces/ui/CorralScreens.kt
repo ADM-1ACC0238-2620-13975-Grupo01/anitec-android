@@ -51,6 +51,7 @@ import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.livestock.interfaces.viewmodel.CorralFormViewModel
 import com.anitec.platform.livestock.interfaces.viewmodel.CorralListViewModel
 
+/** List of corrals with pull to refresh; only ranchers can add, edit or delete. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CorralListScreen(
@@ -150,6 +151,7 @@ fun CorralListScreen(
     }
 }
 
+/** Form to create or edit a corral; goes back once it is saved. */
 @Composable
 fun CorralFormScreen(
     onBack: () -> Unit,
