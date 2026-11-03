@@ -95,7 +95,9 @@ fun activityStatusRes(status: String): Int? = when (status) {
     ActivityStatuses.COMPLETED -> R.string.activity_status_completed
     else -> null
 }
-
+/**
+ * Resolves an activity type string to its localized UI label.
+ */
 @Composable
 fun activityTypeLabel(type: String): String = activityTypeRes(type)?.let { stringResource(it) } ?: type
 
