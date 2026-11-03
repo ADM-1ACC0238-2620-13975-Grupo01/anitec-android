@@ -53,7 +53,9 @@ import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.financial.interfaces.ui.formatSoles
 import com.anitec.platform.sanitary.interfaces.ui.healthTypeLabel
-
+/**
+ * Resolves a record kind string to its localized UI label.
+ */
 @Composable
 private fun recordKindLabel(kind: String): String =
     if (kind == RecordKinds.OTHER) stringResource(R.string.analytics_kind_other) else healthTypeLabel(kind)
