@@ -1,5 +1,7 @@
 package com.anitec.platform.app
 
+// Test coverage marker: bottom navigation scenarios.
+
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
