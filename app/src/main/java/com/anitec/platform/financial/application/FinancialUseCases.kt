@@ -7,10 +7,12 @@ import com.anitec.platform.financial.domain.FinancialRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+/** Cached income and expense records of the signed-in rancher. */
 class ObserveFinancialRecordsUseCase @Inject constructor(private val repository: FinancialRepository) {
     operator fun invoke(): Flow<List<FinancialRecord>> = repository.observeRecords()
 }
 
+/** Downloads the records and replaces the cache. */
 class RefreshFinancialUseCase @Inject constructor(private val repository: FinancialRepository) {
     suspend operator fun invoke(): AppResult<Unit> = repository.refresh()
 }
@@ -21,6 +23,7 @@ class SaveFinancialRecordUseCase @Inject constructor(private val repository: Fin
         if (id == null) repository.create(draft) else repository.update(id, draft)
 }
 
+/** Deletes a record on the server and in the cache. */
 class DeleteFinancialRecordUseCase @Inject constructor(private val repository: FinancialRepository) {
     suspend operator fun invoke(id: Int): AppResult<Unit> = repository.delete(id)
 }
