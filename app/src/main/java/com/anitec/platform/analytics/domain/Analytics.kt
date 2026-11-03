@@ -34,7 +34,9 @@ data class AnalyticsSnapshot(
     val hasAnimals get() = animalCount > 0
     val hasRecords get() = recordCount > 0
 }
-
+/**
+ * Object responsible for computing analytical summaries and snapshots based on herds, animals, and health events.
+ */
 object AnalyticsCalculator {
     fun compute(herds: List<Herd>, animals: List<Animal>, events: List<HealthEvent>): AnalyticsSnapshot {
         val herdIds = herds.map { it.id }.toSet()
