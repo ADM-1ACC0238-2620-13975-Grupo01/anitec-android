@@ -71,10 +71,10 @@ class ActivitiesRepositoryImpl @Inject constructor(
         }
         return result.onSuccess { dao.upsert(it.toEntity()) }
     }
-
+    // Actualiza una actividad existente en la API y sincroniza el cambio localmente.
     override suspend fun update(id: Int, draft: ActivityDraft): AppResult<Activity> =
         safeApiCall { api.update(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
-
+    // Actualiza una actividad existente en la API y sincroniza el cambio localmente.
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }
 }
