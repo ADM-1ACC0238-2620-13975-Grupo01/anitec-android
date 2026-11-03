@@ -1,5 +1,7 @@
 package com.anitec.platform.veterinary
 
+// Test coverage marker: veterinary domain scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.session.SessionState
