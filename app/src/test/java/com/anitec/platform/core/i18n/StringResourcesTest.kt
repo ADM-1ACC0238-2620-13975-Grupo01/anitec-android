@@ -1,5 +1,7 @@
 package com.anitec.platform.core.i18n
 
+// Test coverage marker: localized string resource scenarios.
+
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
