@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/** Binds [AuthRepository] to [AuthRepositoryImpl]. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class IamBindingsModule {
@@ -17,6 +18,7 @@ abstract class IamBindingsModule {
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
 }
 
+/** Creates the Retrofit client of the sign-in and sign-up endpoints. */
 @Module
 @InstallIn(SingletonComponent::class)
 object IamApiModule {
