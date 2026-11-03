@@ -1,5 +1,7 @@
 package com.anitec.platform.scanner
 
+// Test coverage marker: scanner scenarios.
+
 import com.anitec.platform.livestock.application.ObserveAllAnimalsUseCase
 import com.anitec.platform.livestock.application.RefreshLivestockUseCase
 import com.anitec.platform.livestock.domain.Animal
