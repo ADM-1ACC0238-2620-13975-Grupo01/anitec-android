@@ -85,7 +85,9 @@ fun activityPriorityRes(priority: String): Int? = when (priority) {
     ActivityPriorities.LOW -> R.string.activity_priority_low
     else -> null
 }
-
+/**
+ * Maps a given activity status string to its corresponding string resource identifier.
+ */
 @StringRes
 fun activityStatusRes(status: String): Int? = when (status) {
     ActivityStatuses.PENDING -> R.string.activity_status_pending
