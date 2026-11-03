@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock
 
+// Test coverage marker: animal image upload scenarios.
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
