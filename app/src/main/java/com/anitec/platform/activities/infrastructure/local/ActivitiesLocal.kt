@@ -29,6 +29,11 @@ data class ActivityEntity(
  */
 @Dao
 interface ActivitiesDao {
+    /**
+     * Observes all stored activities ordered chronologically by date and identifier.
+     *
+     * @return A [Flow] emitting the updated list of [ActivityEntity] whenever data changes.
+     */
     @Query("SELECT * FROM activities ORDER BY date ASC, id ASC")
     fun observeActivities(): Flow<List<ActivityEntity>>
 
