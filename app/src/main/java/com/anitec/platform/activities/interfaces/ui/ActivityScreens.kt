@@ -105,7 +105,9 @@ fun activityTypeLabel(type: String): String = activityTypeRes(type)?.let { strin
  */
 @Composable
 fun activityPriorityLabel(priority: String): String = activityPriorityRes(priority)?.let { stringResource(it) } ?: priority
-
+/**
+ * Resolves an activity status string to its localized UI label.
+ */
 @Composable
 fun activityStatusLabel(status: String): String = activityStatusRes(status)?.let { stringResource(it) } ?: status
 
