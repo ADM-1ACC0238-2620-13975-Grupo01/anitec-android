@@ -13,6 +13,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
+/** Herd as the API sends and receives it; [id] is 0 when creating. */
 @Serializable
 data class HerdDto(
     val id: Int = 0,
@@ -27,6 +28,7 @@ data class HerdDto(
 @Serializable
 data class CorralDto(val id: Int = 0, val name: String, val herdId: Int)
 
+/** Animal as the API sends and receives it; [birthDate] is ISO (yyyy-MM-dd). */
 @Serializable
 data class AnimalDto(
     val id: Int = 0,
@@ -45,6 +47,7 @@ data class AnimalDto(
     val imageUrl: String? = null,
 )
 
+/** Body of a batch registration: [quantity] animals share these values; [name] is the base name. */
 @Serializable
 data class AnimalBatchDto(
     val species: String,
@@ -71,6 +74,7 @@ data class AnimalsStatusDto(val animalIds: List<Int>, val status: String)
 @Serializable
 data class AnimalStatusDto(val status: String)
 
+/** Path of an uploaded image, relative to the server root. */
 @Serializable
 data class UploadedImageDto(val url: String)
 
