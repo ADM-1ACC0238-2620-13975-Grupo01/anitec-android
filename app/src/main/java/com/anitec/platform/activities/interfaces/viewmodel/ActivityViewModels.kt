@@ -43,7 +43,9 @@ fun List<Activity>.sortedForDisplay(today: LocalDate): List<Activity> {
     val (upcoming, others) = partition { it.isUpcoming(today) }
     return upcoming.sortedBy { it.date } + others.sortedByDescending { it.date }
 }
-
+/**
+ * Immutable UI state data class representing the state of the activity list screen.
+ */
 data class ActivityListUiState(
     val items: List<Activity> = emptyList(),
     val today: LocalDate = LocalDate.now(),
