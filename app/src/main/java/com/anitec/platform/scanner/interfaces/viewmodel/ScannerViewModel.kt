@@ -14,11 +14,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** Outcome of looking up a code: the matching animal, or the code that matched nothing. */
 sealed interface ScanResult {
     data class Found(val animal: Animal) : ScanResult
     data class NotFound(val code: String) : ScanResult
 }
 
+/** Text typed in the manual code field and the result on screen, if any. */
 data class ScannerUiState(
     val manualCode: String = "",
     val result: ScanResult? = null,
@@ -44,6 +46,7 @@ class ScannerViewModel @Inject constructor(
         viewModelScope.launch { refreshLivestock() }
     }
 
+    /** Called by the camera for every code it reads; ignored while a result is shown. */
     fun onCodeDetected(raw: String) {
         if (_state.value.result != null || raw.isBlank()) return
         val animal = TagResolver.resolve(raw, animals)
@@ -52,6 +55,7 @@ class ScannerViewModel @Inject constructor(
 
     fun onManualCodeChange(value: String) = _state.update { it.copy(manualCode = value) }
 
+    /** Looks up the typed code, replacing any result on screen. */
     fun lookUpManualCode() {
         val code = _state.value.manualCode
         if (code.isBlank()) return
@@ -59,5 +63,6 @@ class ScannerViewModel @Inject constructor(
         onCodeDetected(code)
     }
 
+    /** Clears the result and the typed code so the camera can scan again. */
     fun scanAgain() = _state.update { it.copy(result = null, manualCode = "") }
 }
