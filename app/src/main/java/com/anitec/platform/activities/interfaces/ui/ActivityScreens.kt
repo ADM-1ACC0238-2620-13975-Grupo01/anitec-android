@@ -56,7 +56,11 @@ import com.anitec.platform.core.designsystem.component.RecordCard
 import com.anitec.platform.core.designsystem.component.SecondaryButton
 import com.anitec.platform.core.designsystem.component.StatusTag
 import java.time.LocalDate
-
+/**
+ * Maps a given activity type string to its corresponding string resource identifier.
+ *
+ * Supports both domain constant types and legacy backend seed strings.
+ */
 @StringRes
 fun activityTypeRes(type: String): Int? = when (type) {
     ActivityTypes.HEALTH -> R.string.activity_type_health
