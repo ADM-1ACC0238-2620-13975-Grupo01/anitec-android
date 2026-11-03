@@ -1,5 +1,7 @@
 package com.anitec.platform.devices
 
+// Test coverage marker: device management scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.devices.domain.Device
