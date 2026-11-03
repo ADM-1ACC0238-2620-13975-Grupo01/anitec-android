@@ -18,6 +18,7 @@ import javax.inject.Singleton
  */
 val Int.isPendingSync: Boolean get() = this < 0
 
+/** Types of offline change the outbox knows how to send. */
 object OutboxKinds {
     const val CREATE_ANIMAL = "create_animal"
     const val CREATE_HEALTH_EVENT = "create_health_event"
@@ -49,6 +50,7 @@ data class PendingOperationEntity(
     val lastError: String? = null,
 )
 
+/** Room access to the queue of offline changes, always read in the order they were made. */
 @Dao
 interface OutboxDao {
     @Query("SELECT * FROM pending_operations ORDER BY seq")
@@ -58,9 +60,11 @@ interface OutboxDao {
     suspend fun all(): List<PendingOperationEntity>
 
     @Query("SELECT * FROM pending_operations WHERE failed = 0 ORDER BY seq")
+    /** Changes still to be sent. */
     suspend fun pending(): List<PendingOperationEntity>
 
     @Query("SELECT * FROM pending_operations WHERE failed = 1 ORDER BY seq")
+    /** Changes the server refused; kept so the user can retry them. */
     suspend fun failed(): List<PendingOperationEntity>
 
     @Query("SELECT COUNT(*) FROM pending_operations")
@@ -82,6 +86,7 @@ interface OutboxDao {
     suspend fun markFailed(seq: Long, error: String)
 
     @Query("UPDATE pending_operations SET failed = 0, attempts = 0, lastError = NULL WHERE failed = 1")
+    /** Puts every failed change back in the queue for another try. */
     suspend fun resetFailed()
 
     @Query("UPDATE pending_operations SET payload = :payload WHERE seq = :seq")
