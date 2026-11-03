@@ -26,6 +26,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// API -> domain
 fun PlanDto.toDomain() = Plan(id, name, price, maxAnimals, isActive)
 fun SubscriptionDto.toDomain() = Subscription(id, userId, planId, status, startedAt, endsAt)
 fun PaymentDto.toDomain() = Payment(id, amount, currency, provider, status, paidAt)
@@ -47,9 +48,11 @@ class SubscriptionsRepositoryImpl @Inject constructor(
             is AppResult.Failure -> if (result.error == AppError.NotFound) AppResult.Success(null) else result
         }
 
+    /** Payments of the user, newest first. */
     override suspend fun payments(userId: Int): AppResult<List<Payment>> =
         safeApiCall { api.getPayments(userId).map { it.toDomain() } }.map { list -> list.sortedByDescending { it.paidAt } }
 
+    /** Asks for a checkout session that returns to the Android app when Stripe finishes. */
     override suspend fun startCheckout(planId: Int): AppResult<CheckoutSession> =
         safeApiCall { api.startCheckout(StripeCheckoutRequestDto(planId, platform = "android")).toDomain() }
 
@@ -57,6 +60,7 @@ class SubscriptionsRepositoryImpl @Inject constructor(
         safeApiCall { api.confirm(sessionId).toDomain() }
 }
 
+/** Binds [SubscriptionsRepository] to [SubscriptionsRepositoryImpl]. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SubscriptionsBindingsModule {
@@ -64,6 +68,7 @@ abstract class SubscriptionsBindingsModule {
     abstract fun bindSubscriptionsRepository(impl: SubscriptionsRepositoryImpl): SubscriptionsRepository
 }
 
+/** Creates the Retrofit client of the subscription endpoints. */
 @Module
 @InstallIn(SingletonComponent::class)
 object SubscriptionsApiModule {
