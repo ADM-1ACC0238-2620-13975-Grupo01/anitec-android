@@ -5,9 +5,11 @@ import kotlinx.serialization.json.JsonElement
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+/** Body of the sign-in request. */
 @Serializable
 data class SignInRequestDto(val username: String, val password: String)
 
+/** Body of the sign-up request. */
 @Serializable
 data class SignUpRequestDto(
     val username: String,
@@ -19,6 +21,7 @@ data class SignUpRequestDto(
     val email: String? = null,
 )
 
+/** Signed-in user returned by sign-in; [token] is sent as Bearer on later requests. */
 @Serializable
 data class AuthenticatedUserDto(
     val id: Int,
@@ -36,6 +39,7 @@ data class AuthenticatedUserDto(
 @Serializable
 data class MessageDto(val message: JsonElement? = null)
 
+/** Retrofit contract of the authentication endpoints. */
 interface AuthApi {
     @POST("authentication/sign-in")
     suspend fun signIn(@Body body: SignInRequestDto): AuthenticatedUserDto
