@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/** Binds the activities repository interface to its offline-first implementation. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ActivitiesBindingsModule {
@@ -17,6 +18,7 @@ abstract class ActivitiesBindingsModule {
     abstract fun bindActivitiesRepository(impl: ActivitiesRepositoryImpl): ActivitiesRepository
 }
 
+/** Creates the Retrofit client of the activities endpoints, shared app-wide. */
 @Module
 @InstallIn(SingletonComponent::class)
 object ActivitiesApiModule {
