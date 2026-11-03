@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock
 
+// Test coverage marker: animal archiving scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.session.SessionState
