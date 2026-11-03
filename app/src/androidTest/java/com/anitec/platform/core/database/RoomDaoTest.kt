@@ -1,5 +1,7 @@
 package com.anitec.platform.core.database
 
+// Test coverage marker: Room DAO scenarios.
+
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
