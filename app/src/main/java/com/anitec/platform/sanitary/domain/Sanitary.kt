@@ -52,6 +52,7 @@ object HealthTypes {
 }
 
 
+/** Client-side visibility rule for health records. */
 object SanitaryScope {
     /** The API returns every record; a user only sees the ones of animals they can see. */
     
@@ -60,6 +61,7 @@ object SanitaryScope {
 }
 
 interface SanitaryRepository {
+    /** Cached health records, updated after every refresh or change. */
     fun observeEvents(): Flow<List<HealthEvent>>
 
     /** Replaces the cached records with the ones the signed-in user may see. Run after the livestock refresh. */
@@ -67,6 +69,7 @@ interface SanitaryRepository {
 
     suspend fun create(draft: HealthEventDraft): AppResult<HealthEvent>
     suspend fun update(id: Int, draft: HealthEventDraft): AppResult<HealthEvent>
+    /** Deletes a record on the server and in the cache. */
     suspend fun delete(id: Int): AppResult<Unit>
 }
 
