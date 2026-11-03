@@ -19,6 +19,7 @@ data class FinancialRecord(
     val isExpense get() = type.equals(RecordTypes.EXPENSE, ignoreCase = true)
 }
 
+/** Values of a record before it is saved; the server assigns the id. */
 data class FinancialRecordDraft(
     val ownerId: Int,
     val type: String,
@@ -28,12 +29,14 @@ data class FinancialRecordDraft(
     val description: String,
 )
 
+/** Record types, in the Spanish text the API stores. */
 object RecordTypes {
     const val INCOME = "Ingreso"
     const val EXPENSE = "Egreso"
     val all = listOf(INCOME, EXPENSE)
 }
 
+/** Categories a record can have, in the Spanish text the API stores. */
 object RecordCategories {
     const val MILK_SALES = "Venta de leche"
     const val LIVESTOCK_SALES = "Venta de ganado"
@@ -44,6 +47,7 @@ object RecordCategories {
     val all = listOf(MILK_SALES, LIVESTOCK_SALES, FEED, VETERINARY, TRANSPORT, OTHER)
 }
 
+/** Income and expense totals; [balance] is rounded to cents. */
 data class FinancialSummary(val income: Double, val expenses: Double) {
     val balance get() = round2(income - expenses)
 
@@ -73,6 +77,7 @@ object FinancialScope {
         amount.isFinite() && amount > 0 && BigDecimal.valueOf(amount).stripTrailingZeros().scale() <= 2
 }
 
+/** Cached records plus the operations that keep them in sync with the API. */
 interface FinancialRepository {
     fun observeRecords(): Flow<List<FinancialRecord>>
     suspend fun refresh(): AppResult<Unit>
