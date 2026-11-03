@@ -1,5 +1,7 @@
 package com.anitec.platform.sync
 
+// Test coverage marker: outbox synchronization scenarios.
+
 import com.anitec.platform.activities.infrastructure.ActivitiesRepositoryImpl
 import com.anitec.platform.activities.infrastructure.local.ActivitiesDao
 import com.anitec.platform.financial.infrastructure.local.FinancialDao
