@@ -206,7 +206,9 @@ fun ActivityListScreen(
         )
     }
 }
-
+/**
+ * Composable screen for creating or editing a farm activity form with navigation and ViewModel support.
+ */
 @Composable
 fun ActivityFormScreen(
     onBack: () -> Unit,
