@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock
 
+// Test coverage marker: batch naming scenarios.
+
 import com.anitec.platform.livestock.domain.AnimalBatchDraft
 import com.anitec.platform.livestock.domain.BatchNaming
 import com.anitec.platform.livestock.infrastructure.toDto
