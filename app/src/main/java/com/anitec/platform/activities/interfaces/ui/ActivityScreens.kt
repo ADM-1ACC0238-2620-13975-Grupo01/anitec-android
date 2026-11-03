@@ -75,7 +75,9 @@ fun activityTypeRes(type: String): Int? = when (type) {
     "FinancialTask" -> R.string.activity_type_financial
     else -> null
 }
-
+/**
+ * Maps a given activity priority string to its corresponding string resource identifier.
+ */
 @StringRes
 fun activityPriorityRes(priority: String): Int? = when (priority) {
     ActivityPriorities.HIGH -> R.string.activity_priority_high
