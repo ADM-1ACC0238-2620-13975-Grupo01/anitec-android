@@ -1,5 +1,7 @@
 package com.anitec.platform.activities
 
+// Test coverage marker: activity management scenarios.
+
 import com.anitec.platform.activities.domain.Activity
 import com.anitec.platform.activities.domain.ActivityDraft
 import com.anitec.platform.activities.domain.ActivityScope
