@@ -1,5 +1,7 @@
 package com.anitec.platform.iam
 
+// Test coverage marker: sign-up request scenarios.
+
 import com.anitec.platform.core.network.NetworkModule
 import com.anitec.platform.iam.infrastructure.remote.AuthApi
 import com.anitec.platform.iam.infrastructure.remote.SignUpRequestDto
