@@ -1,5 +1,7 @@
 package com.anitec.platform.core.devtools
 
+// Test coverage marker: local network access scenarios.
+
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
