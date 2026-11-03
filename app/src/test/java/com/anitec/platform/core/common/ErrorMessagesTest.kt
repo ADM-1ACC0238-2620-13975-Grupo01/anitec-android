@@ -1,5 +1,7 @@
 package com.anitec.platform.core.common
 
+// Test coverage marker: error message scenarios.
+
 import com.anitec.platform.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
