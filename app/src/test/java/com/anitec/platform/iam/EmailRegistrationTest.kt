@@ -1,5 +1,7 @@
 package com.anitec.platform.iam
 
+// Test coverage marker: email registration scenarios.
+
 import com.anitec.platform.R
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
