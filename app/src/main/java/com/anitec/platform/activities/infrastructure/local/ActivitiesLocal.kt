@@ -21,7 +21,12 @@ data class ActivityEntity(
     val status: String,
 )
 
-/** Room access to the cached activities, ordered by date. */
+/**
+ * Data Access Object (DAO) for the [ActivityEntity] table.
+ *
+ * Provides local database access methods for managing offline-first farm activities
+ * using Room persistence library.
+ */
 @Dao
 interface ActivitiesDao {
     @Query("SELECT * FROM activities ORDER BY date ASC, id ASC")
