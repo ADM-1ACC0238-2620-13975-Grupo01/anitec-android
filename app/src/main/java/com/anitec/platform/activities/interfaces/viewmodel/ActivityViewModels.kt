@@ -54,7 +54,9 @@ data class ActivityListUiState(
     val refreshing: Boolean = false,
     @StringRes val messageRes: Int? = null,
 )
-
+/**
+ * Internal UI state holder representing local UI flags and transient data for the activity list.
+ */
 private data class ActivityListLocal(
     val pendingDelete: Activity? = null,
     val loading: Boolean = true,
