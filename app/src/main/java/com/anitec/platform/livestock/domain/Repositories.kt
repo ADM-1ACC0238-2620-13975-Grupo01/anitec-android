@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 /** Read side of the local cache plus the sync that fills it. Writes go to the API and then update the cache. */
 interface LivestockRepository {
+    /** Cached herds, corrals and animals; each flow emits again after a refresh or a change. */
     fun observeHerds(): Flow<List<Herd>>
     fun observeCorrals(): Flow<List<Corral>>
     fun observeAnimals(): Flow<List<Animal>>
@@ -23,11 +24,14 @@ interface LivestockRepository {
     suspend fun createAnimal(draft: AnimalDraft): AppResult<Animal>
     suspend fun updateAnimal(id: Int, draft: AnimalDraft): AppResult<Animal>
     suspend fun deleteAnimal(id: Int): AppResult<Unit>
+    /** Registers several animals with the same data in one request. */
     suspend fun createAnimalBatch(draft: AnimalBatchDraft): AppResult<List<Animal>>
+    /** Sets the same status on every animal in [ids]. */
     suspend fun updateAnimalsStatus(ids: List<Int>, status: String): AppResult<List<Animal>>
 
     /** Changes the status of one animal; sending the archived status archives it. */
     suspend fun updateAnimalStatus(id: Int, status: String): AppResult<Animal>
+    /** Deletes every animal in [ids] in one request. */
     suspend fun deleteAnimals(ids: List<Int>): AppResult<Unit>
 }
 
