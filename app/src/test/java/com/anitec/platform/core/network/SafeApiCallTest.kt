@@ -1,5 +1,7 @@
 package com.anitec.platform.core.network
 
+// Test coverage marker: safe API call scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import kotlinx.coroutines.test.runTest
