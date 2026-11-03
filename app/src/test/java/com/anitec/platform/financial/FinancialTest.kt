@@ -1,5 +1,7 @@
 package com.anitec.platform.financial
 
+// Test coverage marker: financial domain scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.outbox.OutboxKinds
