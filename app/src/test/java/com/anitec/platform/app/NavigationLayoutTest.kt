@@ -1,5 +1,7 @@
 package com.anitec.platform.app
 
+// Test coverage marker: navigation layout scenarios.
+
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
