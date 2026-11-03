@@ -36,7 +36,11 @@ interface ActivitiesDao {
      */
     @Query("SELECT * FROM activities ORDER BY date ASC, id ASC")
     fun observeActivities(): Flow<List<ActivityEntity>>
-
+    /**
+     * Inserts or updates a single activity entity in the local database.
+     *
+     * @param activity The [ActivityEntity] instance to insert or modify.
+     */
     @Upsert suspend fun upsert(activity: ActivityEntity)
     @Upsert suspend fun upsertAll(activities: List<ActivityEntity>)
     @Query("DELETE FROM activities WHERE id = :id") suspend fun delete(id: Int)
