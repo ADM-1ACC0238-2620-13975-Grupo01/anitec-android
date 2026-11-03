@@ -1,5 +1,7 @@
 package com.anitec.platform.core.network
 
+// Test coverage marker: authentication interceptor scenarios.
+
 import com.anitec.platform.core.session.SessionStore
 import io.mockk.every
 import io.mockk.mockk
