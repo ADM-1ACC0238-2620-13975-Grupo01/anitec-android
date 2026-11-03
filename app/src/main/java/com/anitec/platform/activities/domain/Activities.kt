@@ -27,6 +27,7 @@ data class Activity(
     }
 }
 
+/** Values of an activity before it is saved. */
 data class ActivityDraft(
     val ownerId: Int?,
     val veterinarianId: Int?,
@@ -37,6 +38,7 @@ data class ActivityDraft(
     val status: String,
 )
 
+/** Activity types, in the Spanish text the API stores. */
 object ActivityTypes {
     const val HEALTH = "Sanitario"
     const val VET_VISIT = "Visita veterinaria"
@@ -46,6 +48,7 @@ object ActivityTypes {
     val all = listOf(HEALTH, VET_VISIT, PRODUCTION, FINANCIAL, REPRODUCTIVE)
 }
 
+/** Priorities, from most to least urgent. */
 object ActivityPriorities {
     const val HIGH = "Alta"
     const val MEDIUM = "Media"
@@ -53,6 +56,7 @@ object ActivityPriorities {
     val all = listOf(HIGH, MEDIUM, LOW)
 }
 
+/** Statuses; a [COMPLETED] activity is never shown as upcoming. */
 object ActivityStatuses {
     const val PENDING = "Pendiente"
     const val SCHEDULED = "Programado"
@@ -79,6 +83,7 @@ object ActivityScope {
     }
 }
 
+/** Cached activities plus the operations that keep them in sync with the API. */
 interface ActivitiesRepository {
     fun observeActivities(): Flow<List<Activity>>
     suspend fun refresh(): AppResult<Unit>
