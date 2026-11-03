@@ -150,7 +150,11 @@ data class ActivityFormUiState(
     val clientMissing get() = showErrors && isVeterinarian && !isEdit && clientId == null
     val isValid get() = title.isNotBlank() && date.isNotBlank() && !(isVeterinarian && !isEdit && clientId == null)
 }
-
+/**
+ * ViewModel responsible for managing the state and business logic of the activity form screen.
+ *
+ * Handles navigation arguments, observation of activities and clients, saving logic, and session context via Hilt.
+ */
 @HiltViewModel
 class ActivityFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
