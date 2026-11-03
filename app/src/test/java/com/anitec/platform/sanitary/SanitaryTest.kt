@@ -1,5 +1,7 @@
 package com.anitec.platform.sanitary
 
+// Test coverage marker: sanitary domain scenarios.
+
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
