@@ -63,7 +63,11 @@ private data class ActivityListLocal(
     val refreshing: Boolean = false,
     val messageRes: Int? = null,
 )
-
+/**
+ * ViewModel responsible for managing the state and business logic of the activity list screen.
+ *
+ * Injects required use cases and session management dependencies using Hilt.
+ */
 @HiltViewModel
 class ActivityListViewModel @Inject constructor(
     observeActivities: ObserveActivitiesUseCase,
