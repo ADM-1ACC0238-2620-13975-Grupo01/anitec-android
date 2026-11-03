@@ -1,5 +1,7 @@
 package com.anitec.platform.app
 
+// Test coverage marker: home view model scenarios.
+
 import com.anitec.platform.activities.application.ObserveActivitiesUseCase
 import com.anitec.platform.activities.application.RefreshActivitiesUseCase
 import com.anitec.platform.activities.domain.ActivitiesRepository
