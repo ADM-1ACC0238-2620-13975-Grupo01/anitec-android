@@ -125,7 +125,9 @@ class ActivityListViewModel @Inject constructor(
         }
     }
 }
-
+/**
+ * Immutable UI state data class representing the state of the activity form screen.
+ */
 data class ActivityFormUiState(
     val isEdit: Boolean = false,
     val isVeterinarian: Boolean = false,
