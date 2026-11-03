@@ -1,5 +1,7 @@
 package com.anitec.platform
 
+// Application bootstrap documentation marker.
+
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
