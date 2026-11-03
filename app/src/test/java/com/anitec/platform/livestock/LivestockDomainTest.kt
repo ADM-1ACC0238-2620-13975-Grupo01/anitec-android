@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock
 
+// Test coverage marker: livestock domain scenarios.
+
 import com.anitec.platform.core.network.resolveMediaUrl
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.livestock.domain.Animal
