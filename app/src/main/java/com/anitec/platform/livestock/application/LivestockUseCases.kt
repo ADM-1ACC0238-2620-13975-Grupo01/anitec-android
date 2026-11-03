@@ -87,6 +87,7 @@ class SaveAnimalUseCase @Inject constructor(private val repository: LivestockRep
 }
 
 
+/** Registers a batch after checking its size and that the corral belongs to the herd. */
 class RegisterAnimalBatchUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(draft: AnimalBatchDraft, corrals: List<Corral>): AppResult<List<Animal>> {
         if (!AnimalPlacementPolicy.isValidBatchSize(draft.quantity)) return invalid(LivestockValidation.INVALID_BATCH_SIZE)
@@ -101,6 +102,7 @@ class DeleteAnimalUseCase @Inject constructor(private val repository: LivestockR
     suspend operator fun invoke(id: Int): AppResult<Unit> = repository.deleteAnimal(id)
 }
 
+/** Changes the status of the selected animals; fails when nothing is selected. */
 class ChangeAnimalsStatusUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(ids: Collection<Int>, status: String): AppResult<List<Animal>> {
         if (ids.isEmpty()) return invalid(LivestockValidation.NOTHING_SELECTED)
@@ -108,10 +110,12 @@ class ChangeAnimalsStatusUseCase @Inject constructor(private val repository: Liv
     }
 }
 
+/** Archives one animal so it leaves counts and working lists without being deleted. */
 class ArchiveAnimalUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(id: Int): AppResult<Animal> = repository.updateAnimalStatus(id, AnimalStatus.Archived.apiValue)
 }
 
+/** Archives the selected animals; fails when nothing is selected. */
 class ArchiveAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(ids: Collection<Int>): AppResult<List<Animal>> {
         if (ids.isEmpty()) return invalid(LivestockValidation.NOTHING_SELECTED)
@@ -124,6 +128,7 @@ class RestoreAnimalUseCase @Inject constructor(private val repository: Livestock
     suspend operator fun invoke(id: Int): AppResult<Animal> = repository.updateAnimalStatus(id, AnimalStatus.Healthy.apiValue)
 }
 
+/** Deletes the selected animals; fails when nothing is selected. */
 class DeleteAnimalsUseCase @Inject constructor(private val repository: LivestockRepository) {
     suspend operator fun invoke(ids: Collection<Int>): AppResult<Unit> {
         if (ids.isEmpty()) return invalid(LivestockValidation.NOTHING_SELECTED)
