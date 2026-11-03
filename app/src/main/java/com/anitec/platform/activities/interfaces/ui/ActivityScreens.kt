@@ -153,7 +153,7 @@ fun ActivityListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
-
+// Botón flotante extendido para crear una nueva actividad y contenedor de notificaciones Snackbar.
     Box(modifier = modifier.fillMaxSize()) {
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.fillMaxSize()) {
             when {
