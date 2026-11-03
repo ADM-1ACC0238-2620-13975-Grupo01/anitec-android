@@ -22,6 +22,7 @@ data class Device(
     val readingCount: Int = 0,
 )
 
+/** Values of a device before it is saved. */
 data class DeviceDraft(
     val name: String,
     val type: String,
@@ -54,6 +55,7 @@ object DeviceTypes {
         all.firstOrNull { it.equals(value, ignoreCase = true) } ?: aliases[value.trim().lowercase()] ?: value
 }
 
+/** Canonical device statuses; [normalize] maps older Spanish or English labels back to them. */
 object DeviceStatuses {
     const val ONLINE = "Online"
     const val MAINTENANCE = "Maintenance"
@@ -68,6 +70,7 @@ object DeviceStatuses {
         all.firstOrNull { it.equals(value, ignoreCase = true) } ?: aliases[value.trim().lowercase()] ?: value
 }
 
+/** A reading together with the id of the device that sent it. */
 data class DeviceReadingRecord(val deviceId: Int, val reading: DeviceReading)
 
 object DeviceScope {
@@ -82,6 +85,7 @@ object DeviceScope {
         }
 }
 
+/** Cached devices plus the operations that keep them in sync with the API. */
 interface DevicesRepository {
     fun observeDevices(): Flow<List<Device>>
     suspend fun refresh(): AppResult<Unit>
