@@ -1,5 +1,7 @@
 package com.anitec.platform.analytics
 
+// Test coverage marker: analytics scenarios.
+
 import com.anitec.platform.analytics.domain.AnalyticsCalculator
 import com.anitec.platform.analytics.domain.RecordKinds
 import com.anitec.platform.core.designsystem.component.ChartPoint
