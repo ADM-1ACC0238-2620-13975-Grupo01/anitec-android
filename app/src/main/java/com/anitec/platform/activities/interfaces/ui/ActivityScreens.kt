@@ -140,7 +140,9 @@ fun ActivityCard(
         modifier = modifier,
     )
 }
-
+/**
+ * Composable screen that displays the list of farm activities with navigation actions.
+ */
 @Composable
 fun ActivityListScreen(
     onNew: () -> Unit,
