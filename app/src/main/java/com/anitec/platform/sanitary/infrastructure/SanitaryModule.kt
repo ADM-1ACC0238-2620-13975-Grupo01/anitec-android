@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/** Binds [SanitaryRepository] to [SanitaryRepositoryImpl]. */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SanitaryBindingsModule {
@@ -17,6 +18,7 @@ abstract class SanitaryBindingsModule {
     abstract fun bindSanitaryRepository(impl: SanitaryRepositoryImpl): SanitaryRepository
 }
 
+/** Creates the Retrofit client of the health record endpoints. */
 @Module
 @InstallIn(SingletonComponent::class)
 object SanitaryApiModule {
