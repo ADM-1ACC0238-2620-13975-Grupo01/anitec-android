@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -179,6 +180,10 @@ fun ActivityListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
+    // The list keeps the item that was first on screen in place, so an activity that arrives above it would be
+    // left out of sight; when the first item changes, go back to the top to show it.
+    val listState = rememberLazyListState()
+    LaunchedEffect(state.items.firstOrNull()?.id) { listState.animateScrollToItem(0) }
 // Botón flotante extendido para crear una nueva actividad y contenedor de notificaciones Snackbar.
     Box(modifier = modifier.fillMaxSize()) {
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.fillMaxSize()) {
@@ -186,6 +191,7 @@ fun ActivityListScreen(
                 state.loading -> LoadingState()
                 state.items.isEmpty() -> EmptyState(stringResource(R.string.activities_empty))
                 else -> LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
