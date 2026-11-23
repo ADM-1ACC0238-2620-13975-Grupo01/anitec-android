@@ -93,6 +93,10 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    sourceSets {
+        // The exported schemas let the migration tests open the database as it was in an older version.
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
+    }
 }
 
 ksp {

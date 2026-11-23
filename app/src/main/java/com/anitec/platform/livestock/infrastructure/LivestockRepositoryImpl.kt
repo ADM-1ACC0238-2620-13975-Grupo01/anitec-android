@@ -6,6 +6,7 @@ import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
 import com.anitec.platform.core.outbox.OutboxQueue
+import com.anitec.platform.core.outbox.newIdempotencyKey
 import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
@@ -114,10 +115,12 @@ class LivestockRepositoryImpl @Inject constructor(
     /** Creates an animal; offline, it is stored locally and sent later by the outbox. */
     override suspend fun createAnimal(draft: AnimalDraft): AppResult<Animal> {
         val body = draft.toDto()
-        val result = safeApiCall { api.createAnimal(body).toDomain() }
+        // One key for this operation: if the try below reaches the server but the answer is lost, the queued retry reuses it.
+        val key = newIdempotencyKey()
+        val result = safeApiCall { api.createAnimal(body, key).toDomain() }
         if (result is AppResult.Failure && result.error == AppError.Network) {
             // No connection: keep the animal locally under a temporary id and send it later.
-            val localId = outbox.enqueue(OutboxKinds.CREATE_ANIMAL, AnimalDto.serializer(), body)
+            val localId = outbox.enqueue(OutboxKinds.CREATE_ANIMAL, AnimalDto.serializer(), body, key)
             val pending = body.toDomain().copy(id = localId)
             dao.upsertAnimal(pending.toEntity())
             return AppResult.Success(pending)

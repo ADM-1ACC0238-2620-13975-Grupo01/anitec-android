@@ -6,6 +6,7 @@ import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
 import com.anitec.platform.core.outbox.OutboxQueue
+import com.anitec.platform.core.outbox.newIdempotencyKey
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.sanitary.domain.HealthEvent
 import com.anitec.platform.sanitary.domain.HealthEventDraft
@@ -50,10 +51,12 @@ class SanitaryRepositoryImpl @Inject constructor(
     /** Creates a health event; offline, it is stored locally and sent later by the outbox. */
     override suspend fun create(draft: HealthEventDraft): AppResult<HealthEvent> {
         val body = draft.toDto()
-        val result = safeApiCall { api.createEvent(body).toDomain() }
+        // One key for this operation: if the try below reaches the server but the answer is lost, the queued retry reuses it.
+        val key = newIdempotencyKey()
+        val result = safeApiCall { api.createEvent(body, key).toDomain() }
         if (result is AppResult.Failure && result.error == AppError.Network) {
             // No connection: keep the record locally under a temporary id and send it later.
-            val localId = outbox.enqueue(OutboxKinds.CREATE_HEALTH_EVENT, HealthEventDto.serializer(), body)
+            val localId = outbox.enqueue(OutboxKinds.CREATE_HEALTH_EVENT, HealthEventDto.serializer(), body, key)
             val pending = body.toDomain().copy(id = localId)
             dao.upsert(pending.toEntity())
             return AppResult.Success(pending)

@@ -131,9 +131,9 @@ class FinancialRepositoryTest {
 
     @Test
     fun `creating without a connection queues the record and keeps it locally under a negative id`() = runTest {
-        coEvery { api.create(any()) } throws IOException("offline")
+        coEvery { api.create(any(), any()) } throws IOException("offline")
         coEvery {
-            queue.enqueue(OutboxKinds.CREATE_FINANCIAL_RECORD, any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any())
+            queue.enqueue(OutboxKinds.CREATE_FINANCIAL_RECORD, any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any(), any())
         } returns -6
 
         val result = repository().create(FinancialRecordDraft(10, "Ingreso", "Venta de leche", 80.0, "2026-10-01", "Milk"))
@@ -147,12 +147,12 @@ class FinancialRepositoryTest {
 
     @Test
     fun `a refusal from the server is reported and nothing is queued`() = runTest {
-        coEvery { api.create(any()) } throws retrofit2.HttpException(retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, "")))
+        coEvery { api.create(any(), any()) } throws retrofit2.HttpException(retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, "")))
 
         val result = repository().create(FinancialRecordDraft(10, "Egreso", "Alimento", 5.0, "2026-10-01", "x"))
 
         assertTrue(result is AppResult.Failure)
-        coVerify(exactly = 0) { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any()) }
+        coVerify(exactly = 0) { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FinancialRecordDto>>(), any(), any()) }
     }
 
     @Test
@@ -166,7 +166,7 @@ class FinancialRepositoryTest {
     @Test
     fun `creating sends the owner and caches the answer`() = runTest {
         val sent = slot<FinancialRecordDto>()
-        coEvery { api.create(capture(sent)) } returns dto(9, 10)
+        coEvery { api.create(capture(sent), any()) } returns dto(9, 10)
 
         val result = repository().create(FinancialRecordDraft(10, "Egreso", "Alimento", 5.0, "2026-10-01", "x"))
 

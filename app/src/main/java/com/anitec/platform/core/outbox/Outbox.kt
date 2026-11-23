@@ -1,5 +1,6 @@
 package com.anitec.platform.core.outbox
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
@@ -9,6 +10,7 @@ import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +19,12 @@ import javax.inject.Singleton
  * "pending sync" needs no extra column: any cached record whose id is below zero is still waiting.
  */
 val Int.isPendingSync: Boolean get() = this < 0
+
+/**
+ * A new value for the `Idempotency-Key` header. It is created once for each operation, before its first try, and
+ * sent again unchanged on every retry, so the server can tell a repeated request from a new one (TS-007).
+ */
+fun newIdempotencyKey(): String = UUID.randomUUID().toString()
 
 /** Types of offline change the outbox knows how to send. */
 object OutboxKinds {
@@ -48,7 +56,15 @@ data class PendingOperationEntity(
     val attempts: Int = 0,
     val failed: Boolean = false,
     val lastError: String? = null,
-)
+    /**
+     * Sent as `Idempotency-Key` on every try of this change. It is blank only on changes queued before the key
+     * existed (see [sendKey]).
+     */
+    @ColumnInfo(defaultValue = "''") val idempotencyKey: String = "",
+) {
+    /** The key to send: the stored one, or a stable one made from the row for changes queued before keys existed. */
+    val sendKey: String get() = idempotencyKey.ifBlank { "legacy-$seq-$createdAt" }
+}
 
 /** Room access to the queue of offline changes, always read in the order they were made. */
 @Dao
@@ -94,9 +110,13 @@ interface OutboxDao {
 
     /** Stores the change and returns the negative id its local record must use. */
     @Transaction
-    suspend fun enqueue(kind: String, payload: String, now: Long): Int {
+    suspend fun enqueue(kind: String, payload: String, now: Long, idempotencyKey: String): Int {
         val localId = minOf(minLocalId() ?: 0, 0) - 1
-        insert(PendingOperationEntity(kind = kind, localId = localId, payload = payload, createdAt = now))
+        insert(
+            PendingOperationEntity(
+                kind = kind, localId = localId, payload = payload, createdAt = now, idempotencyKey = idempotencyKey,
+            ),
+        )
         return localId
     }
 }
@@ -113,9 +133,13 @@ class OutboxQueue @Inject constructor(
     private val json: Json,
     private val scheduler: OutboxScheduler,
 ) {
-    /** Stores [body] as a change of [kind], schedules the send and returns the negative id of the local record. */
-    suspend fun <T> enqueue(kind: String, serializer: KSerializer<T>, body: T): Int {
-        val localId = dao.enqueue(kind, json.encodeToString(serializer, body), System.currentTimeMillis())
+    /**
+     * Stores [body] as a change of [kind], schedules the send and returns the negative id of the local record.
+     * Pass the [idempotencyKey] already used by the first, online try so the server can recognise it if that try
+     * did reach it; without one a new key is made.
+     */
+    suspend fun <T> enqueue(kind: String, serializer: KSerializer<T>, body: T, idempotencyKey: String = newIdempotencyKey()): Int {
+        val localId = dao.enqueue(kind, json.encodeToString(serializer, body), System.currentTimeMillis(), idempotencyKey)
         scheduler.schedule()
         return localId
     }

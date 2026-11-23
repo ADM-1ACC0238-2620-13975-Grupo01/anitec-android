@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Header
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.Multipart
@@ -91,7 +92,7 @@ interface LivestockApi {
     @DELETE("corrals/{id}") suspend fun deleteCorral(@Path("id") id: Int)
 
     @GET("animals") suspend fun getAnimals(): List<AnimalDto>
-    @POST("animals") suspend fun createAnimal(@Body body: AnimalDto): AnimalDto
+    @POST("animals") suspend fun createAnimal(@Body body: AnimalDto, @Header("Idempotency-Key") idempotencyKey: String? = null): AnimalDto
     @PUT("animals/{id}") suspend fun updateAnimal(@Path("id") id: Int, @Body body: AnimalDto): AnimalDto
     @DELETE("animals/{id}") suspend fun deleteAnimal(@Path("id") id: Int)
 
