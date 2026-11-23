@@ -3,14 +3,23 @@ package com.anitec.platform.veterinary.domain
 import com.anitec.platform.core.common.AppResult
 import kotlinx.coroutines.flow.Flow
 
-/** A rancher linked to the signed-in veterinarian. [herds] and [animals] are the server's totals. */
+/**
+ * A rancher the signed-in veterinarian asked for access, or has it from. [status] is the server's state of the link
+ * (Pending, Accepted, Rejected or Revoked); only an accepted one gives access. [herds] and [animals] are the server's totals.
+ */
 data class Client(
     val rancherId: Int,
     val rancherName: String,
     val status: String,
     val herds: Int,
     val animals: Int,
-)
+) {
+    /** True when the rancher accepted: only then are their farms, animals and records visible. */
+    val isActive: Boolean get() = status.equals("Accepted", ignoreCase = true)
+
+    /** True while the rancher has not answered the request. */
+    val isPending: Boolean get() = status.equals("Pending", ignoreCase = true)
+}
 
 /** A rancher the veterinarian could still add as a client. */
 data class AvailableRancher(
@@ -33,7 +42,7 @@ interface VeterinaryRepository {
     suspend fun refreshClients(): AppResult<Unit>
     suspend fun availableRanchers(): AppResult<List<AvailableRancher>>
 
-    /** Links the rancher to the signed-in veterinarian. Their herds and animals appear after the next livestock refresh. */
+    /** Asks the rancher for access. It starts as pending; their herds and animals appear once the rancher accepts. */
     suspend fun addClient(rancherId: Int): AppResult<Unit>
     suspend fun removeClient(rancherId: Int): AppResult<Unit>
 }

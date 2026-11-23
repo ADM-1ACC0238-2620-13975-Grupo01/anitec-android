@@ -3,6 +3,7 @@ package com.anitec.platform.veterinary.interfaces.viewmodel
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anitec.platform.R
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
 import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
@@ -12,7 +13,7 @@ import com.anitec.platform.sanitary.application.ObserveHealthEventsUseCase
 import com.anitec.platform.sanitary.application.RefreshSanitaryUseCase
 import com.anitec.platform.veterinary.application.AddClientUseCase
 import com.anitec.platform.veterinary.application.ListAvailableRanchersUseCase
-import com.anitec.platform.veterinary.application.ObserveClientsUseCase
+import com.anitec.platform.veterinary.application.ObserveClientLinksUseCase
 import com.anitec.platform.veterinary.application.RefreshClientsUseCase
 import com.anitec.platform.veterinary.application.RemoveClientUseCase
 import com.anitec.platform.veterinary.application.search
@@ -78,7 +79,7 @@ fun summarize(
 
 @HiltViewModel
 class ClientListViewModel @Inject constructor(
-    observeClients: ObserveClientsUseCase,
+    observeClients: ObserveClientLinksUseCase,
     observeHerds: ObserveHerdsUseCase,
     observeAnimals: ObserveAnimalsUseCase,
     observeEvents: ObserveHealthEventsUseCase,
@@ -153,8 +154,6 @@ data class AddClientUiState(
 class AddClientViewModel @Inject constructor(
     private val listAvailable: ListAvailableRanchersUseCase,
     private val addClient: AddClientUseCase,
-    private val refreshLivestock: RefreshLivestockUseCase,
-    private val refreshSanitary: RefreshSanitaryUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddClientUiState())
@@ -184,10 +183,15 @@ class AddClientViewModel @Inject constructor(
             when (val result = addClient(rancher.id)) {
                 is AppResult.Failure -> _state.update { it.copy(addingId = null, messageRes = result.error.messageRes()) }
                 is AppResult.Success -> {
-                    // Bring in the new client's herds, animals and records, then drop them from the "available" list.
-                    refreshLivestock()
-                    refreshSanitary()
-                    _state.update { it.copy(addingId = null, ranchers = it.ranchers.filterNot { r -> r.id == rancher.id }) }
+                    // The request is pending until the rancher accepts, so there is nothing to bring in yet; the rancher
+                    // leaves the "available" list and the veterinarian is told what to expect.
+                    _state.update {
+                        it.copy(
+                            addingId = null,
+                            ranchers = it.ranchers.filterNot { r -> r.id == rancher.id },
+                            messageRes = R.string.vet_request_sent,
+                        )
+                    }
                 }
             }
         }

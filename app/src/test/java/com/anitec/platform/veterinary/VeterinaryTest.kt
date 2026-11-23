@@ -18,7 +18,12 @@ import com.anitec.platform.sanitary.application.ObserveHealthEventsUseCase
 import com.anitec.platform.sanitary.application.RefreshSanitaryUseCase
 import com.anitec.platform.sanitary.domain.HealthEvent
 import com.anitec.platform.sanitary.domain.SanitaryRepository
+import com.anitec.platform.R
+import com.anitec.platform.veterinary.application.AddClientUseCase
+import com.anitec.platform.veterinary.application.ListAvailableRanchersUseCase
+import com.anitec.platform.veterinary.application.ObserveClientLinksUseCase
 import com.anitec.platform.veterinary.application.ObserveClientsUseCase
+import com.anitec.platform.veterinary.interfaces.viewmodel.AddClientViewModel
 import com.anitec.platform.veterinary.application.RefreshClientsUseCase
 import com.anitec.platform.veterinary.application.search
 import com.anitec.platform.veterinary.domain.AvailableRancher
@@ -236,5 +241,81 @@ class VetHomeViewModelTest {
         assertEquals(1, state.activePatients)
         assertEquals(1, state.recordCount)
         assertEquals(1, state.followUpCount)
+    }
+}
+
+class ConsentOnTheVeterinarianSideTest {
+    private val links = listOf(
+        Client(10, "Carlos", "Accepted", 2, 9),
+        Client(11, "Maria", "Pending", 0, 0),
+        Client(12, "Rosa", "Rejected", 0, 0),
+        Client(13, "Pablo", "Revoked", 0, 0),
+    )
+
+    private fun repository() = mockk<VeterinaryRepository>().also { every { it.observeClients() } returns flowOf(links) }
+
+    @Test
+    fun `only an accepted rancher is a client whose data can be seen`() = runTest {
+        val active = ObserveClientsUseCase(repository())().first()
+
+        assertEquals(listOf(10), active.map { it.rancherId })
+    }
+
+    @Test
+    fun `the list of requests keeps every state`() = runTest {
+        val all = ObserveClientLinksUseCase(repository())().first()
+
+        assertEquals(listOf(10, 11, 12, 13), all.map { it.rancherId })
+    }
+
+    @Test
+    fun `a status is read ignoring case`() {
+        assertEquals(true, Client(1, "A", "accepted", 0, 0).isActive)
+        assertEquals(true, Client(1, "A", "PENDING", 0, 0).isPending)
+        assertEquals(false, Client(1, "A", "Revoked", 0, 0).isActive)
+        assertEquals(false, Client(1, "A", "", 0, 0).isActive)
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class AskForAccessViewModelTest {
+    @Before
+    fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
+
+    @After
+    fun tearDown() = Dispatchers.resetMain()
+
+    private val repository = mockk<VeterinaryRepository>()
+
+    private fun viewModel(): AddClientViewModel {
+        coEvery { repository.availableRanchers() } returns AppResult.Success(
+            listOf(AvailableRancher(1, "ganadero", "Carlos Mendoza", 2, 10), AvailableRancher(2, "maria", "Maria Gonzales", 1, 4)),
+        )
+        return AddClientViewModel(ListAvailableRanchersUseCase(repository), AddClientUseCase(repository))
+    }
+
+    @Test
+    fun `asking a rancher removes them from the list and explains that they must accept`() {
+        coEvery { repository.addClient(1) } returns AppResult.Success(Unit)
+        val viewModel = viewModel()
+
+        viewModel.add(viewModel.state.value.ranchers.first())
+
+        val state = viewModel.state.value
+        assertEquals(listOf(2), state.ranchers.map { it.id })
+        assertEquals(R.string.vet_request_sent, state.messageRes)
+        assertEquals(null, state.addingId)
+    }
+
+    @Test
+    fun `a request that fails keeps the rancher in the list and reports the error`() {
+        coEvery { repository.addClient(1) } returns AppResult.Failure(AppError.Conflict())
+        val viewModel = viewModel()
+
+        viewModel.add(viewModel.state.value.ranchers.first())
+
+        val state = viewModel.state.value
+        assertEquals(listOf(1, 2), state.ranchers.map { it.id })
+        assertEquals(R.string.error_conflict, state.messageRes)
     }
 }

@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.R
+import com.anitec.platform.consent.domain.LinkStatus
+import com.anitec.platform.consent.interfaces.ui.severity
+import com.anitec.platform.consent.interfaces.ui.tagText
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.AniTecTextField
@@ -83,13 +86,22 @@ fun ClientCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                if (summary.attentionCount > 0) {
+                if (!summary.client.isActive) {
+                    StatusTag(LinkStatus.parse(summary.client.status).tagText(), LinkStatus.parse(summary.client.status).severity())
+                } else if (summary.attentionCount > 0) {
                     StatusTag(pluralCount(R.plurals.count_alerts, summary.attentionCount), Severity.Warn)
                 } else {
                     StatusTag(stringResource(R.string.vet_no_alerts), Severity.Success)
                 }
             }
-            if (summary.farmNames.isEmpty()) {
+            if (!summary.client.isActive) {
+                // No access yet (or any more): there are no farms, animals or records to show.
+                Text(
+                    stringResource(if (summary.client.isPending) R.string.vet_waiting_acceptance else R.string.vet_request_closed),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else if (summary.farmNames.isEmpty()) {
                 Text(stringResource(R.string.vet_no_farms), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -105,7 +117,7 @@ fun ClientCard(
                     }
                 }
             }
-            Text(
+            if (summary.client.isActive) Text(
                 listOf(
                     pluralCount(R.plurals.count_species, summary.speciesCount),
                     pluralCount(R.plurals.count_records, summary.recordCount),
@@ -115,13 +127,19 @@ fun ClientCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton(
-                    text = stringResource(R.string.vet_view_patients),
-                    onClick = onViewPatients,
-                    icon = Icons.Filled.Badge,
-                )
+                if (summary.client.isActive) {
+                    SecondaryButton(
+                        text = stringResource(R.string.vet_view_patients),
+                        onClick = onViewPatients,
+                        icon = Icons.Filled.Badge,
+                    )
+                }
                 if (onRemove != null) {
-                    DangerTextButton(text = stringResource(R.string.vet_remove_client), onClick = onRemove, icon = Icons.Filled.PersonRemove)
+                    DangerTextButton(
+                        text = stringResource(if (summary.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
+                        onClick = onRemove,
+                        icon = Icons.Filled.PersonRemove,
+                    )
                 }
             }
         }
@@ -195,9 +213,9 @@ fun ClientListScreen(
 
     state.pendingRemove?.let { item ->
         ConfirmDialog(
-            title = stringResource(R.string.vet_remove_client),
-            message = stringResource(R.string.vet_confirm_remove, item.client.rancherName),
-            confirmLabel = stringResource(R.string.vet_remove_client),
+            title = stringResource(if (item.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
+            message = stringResource(if (item.client.isPending) R.string.vet_confirm_withdraw else R.string.vet_confirm_remove, item.client.rancherName),
+            confirmLabel = stringResource(if (item.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
             dismissLabel = stringResource(R.string.common_cancel),
             onConfirm = viewModel::confirmRemove,
             onDismiss = viewModel::dismissRemove,

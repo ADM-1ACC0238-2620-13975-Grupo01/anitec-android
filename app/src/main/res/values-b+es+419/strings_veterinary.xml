@@ -1,11 +1,11 @@
 <resources>
     <!-- Clients -->
     <string name="vet_clients_subtitle">Ganaderos cuyos animales atiendes.</string>
-    <string name="vet_clients_empty">Aún no tienes clientes. Agrega un ganadero para comenzar.</string>
-    <string name="vet_add_client">Agregar cliente</string>
-    <string name="vet_add_client_subtitle">Vincula a un ganadero para ver sus fincas y animales.</string>
+    <string name="vet_clients_empty">Aún no tienes clientes. Pide acceso a un ganadero para comenzar.</string>
+    <string name="vet_add_client">Solicitar acceso</string>
+    <string name="vet_add_client_subtitle">Pide acceso a un ganadero para ver sus fincas y animales. Él decide si acepta.</string>
     <string name="vet_search_ranchers">Buscar por nombre o usuario</string>
-    <string name="vet_no_ranchers">No hay ganaderos disponibles para agregar.</string>
+    <string name="vet_no_ranchers">No hay ganaderos a quienes pedir acceso.</string>
     <string name="vet_client_added">Cliente agregado</string>
     <string name="vet_view_patients">Ver pacientes</string>
     <string name="vet_remove_client">Quitar cliente</string>

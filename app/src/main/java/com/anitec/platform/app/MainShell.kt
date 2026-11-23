@@ -17,6 +17,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.sync.SyncBanner
 import com.anitec.platform.sync.SyncStatusViewModel
@@ -75,6 +76,8 @@ import com.anitec.platform.devices.interfaces.ui.DeviceHistoryScreen
 import com.anitec.platform.devices.interfaces.ui.DeviceListScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialFormScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialListScreen
+import com.anitec.platform.consent.interfaces.ui.VeterinarianRequestsScreen
+import com.anitec.platform.consent.interfaces.viewmodel.PendingRequestsViewModel
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.TermsScreen
@@ -305,13 +308,22 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             composable<DeviceHistoryRoute> { DeviceHistoryScreen(onBack = { navController.popBackStack() }) }
             composable<DeviceFormRoute> { DeviceFormScreen(onBack = { navController.popBackStack() }) }
             composable<MoreRoute> {
+                val pendingViewModel: PendingRequestsViewModel = hiltViewModel()
+                val pendingRequests by pendingViewModel.count.collectAsStateWithLifecycle()
+                // The number comes from the server, so it is read again each time the menu is shown.
+                LifecycleResumeEffect(session.role) {
+                    if (session.role == UserRole.Rancher) pendingViewModel.refresh()
+                    onPauseOrDispose {}
+                }
                 MoreScreen(
                     session = session,
                     onOpen = { route -> navController.navigate(route) },
                     onSignOut = onSignOut,
                     unsyncedCount = syncStatus.total,
+                    pendingRequests = if (session.role == UserRole.Rancher) pendingRequests else 0,
                 )
             }
+            composable<VeterinariansRoute> { VeterinarianRequestsScreen(onBack = { navController.popBackStack() }) }
             composable<TermsRoute> { TermsScreen(onBack = { navController.popBackStack() }) }
             composable<AnimalFormRoute> {
                 AnimalFormScreen(

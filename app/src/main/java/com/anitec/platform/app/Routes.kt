@@ -48,6 +48,7 @@ import kotlinx.serialization.Serializable
 
 // Veterinary
 @Serializable data object ClientsRoute
+@Serializable data object VeterinariansRoute
 @Serializable data object AddClientRoute
 @Serializable data class ClinicalHistoryRoute(val animalId: Int)
 

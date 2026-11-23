@@ -22,8 +22,8 @@ interface VeterinaryDao {
     @Query("SELECT * FROM clients ORDER BY rancherName COLLATE NOCASE")
     fun observeClients(): Flow<List<ClientEntity>>
 
-    /** Ids of the ranchers currently linked; other contexts use them to scope what a veterinarian sees. */
-    @Query("SELECT rancherId FROM clients")
+    /** Ids of the ranchers who accepted the veterinarian; other contexts use them to scope what a veterinarian sees. */
+    @Query("SELECT rancherId FROM clients WHERE LOWER(status) = 'accepted'")
     suspend fun rancherIds(): List<Int>
 
     @Upsert suspend fun upsertAll(clients: List<ClientEntity>)
