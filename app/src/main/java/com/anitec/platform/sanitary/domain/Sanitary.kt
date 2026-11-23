@@ -56,6 +56,20 @@ object HealthTypes {
 }
 
 
+/** Rules of the check that follows a health record (US-019). */
+object FollowUpRules {
+    /**
+     * The next check is optional. When it is given it must be a real day after the day of the record, so a
+     * follow-up is never scheduled for the day of the visit itself or before it (US-019 scenario 2).
+     */
+    fun isValidNextCheck(recordDate: String, nextCheck: String): Boolean {
+        if (nextCheck.isBlank()) return true
+        val next = runCatching { java.time.LocalDate.parse(nextCheck) }.getOrNull() ?: return false
+        val record = runCatching { java.time.LocalDate.parse(recordDate) }.getOrNull() ?: return true
+        return next.isAfter(record)
+    }
+}
+
 /** Client-side visibility rule for health records. */
 object SanitaryScope {
     /** The API returns every record; a user only sees the ones of animals they can see. */

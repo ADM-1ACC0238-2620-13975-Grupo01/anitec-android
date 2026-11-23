@@ -43,4 +43,8 @@
     <string name="home_recent_title">Registros sanitarios recientes</string>
     <string name="home_recent_empty">Aún no hay registros sanitarios.</string>
     <string name="home_view_all">Ver todos</string>
+
+    <!-- Próximo control (US-019) -->
+    <string name="health_next_due_invalid">El próximo control debe ser un día posterior a la fecha del registro.</string>
+    <string name="health_follow_up_activity_title">Control de seguimiento: %1$s</string>
 </resources>

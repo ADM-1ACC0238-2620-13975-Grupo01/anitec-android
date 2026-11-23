@@ -213,6 +213,7 @@ fun HealthFormScreen(
             onChange = viewModel::onNextDueDateChange,
             label = stringResource(R.string.health_next_due),
             clearable = true,
+            error = if (state.nextDueInvalid) stringResource(R.string.health_next_due_invalid) else null,
         )
         AniTecTextField(
             value = state.veterinarian, onValueChange = viewModel::onVeterinarianChange, label = stringResource(R.string.health_veterinarian),

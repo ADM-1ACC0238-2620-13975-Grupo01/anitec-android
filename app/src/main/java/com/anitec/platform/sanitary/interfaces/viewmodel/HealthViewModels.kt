@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import android.content.Context
+import com.anitec.platform.R
 import com.anitec.platform.app.HealthFormRoute
 import com.anitec.platform.core.common.AppResult
 import com.anitec.platform.core.common.messageRes
@@ -15,16 +17,20 @@ import com.anitec.platform.core.session.SessionState
 import com.anitec.platform.core.session.SessionStore
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.livestock.application.ObserveAnimalsUseCase
+import com.anitec.platform.livestock.application.ObserveHerdsUseCase
 import com.anitec.platform.livestock.application.RefreshLivestockUseCase
 import com.anitec.platform.livestock.domain.Animal
 import com.anitec.platform.sanitary.application.DeleteHealthEventUseCase
 import com.anitec.platform.sanitary.application.ObserveHealthEventsUseCase
 import com.anitec.platform.sanitary.application.RefreshSanitaryUseCase
 import com.anitec.platform.sanitary.application.SaveHealthEventUseCase
+import com.anitec.platform.sanitary.application.ScheduleFollowUpUseCase
+import com.anitec.platform.sanitary.domain.FollowUpRules
 import com.anitec.platform.sanitary.domain.HealthEvent
 import com.anitec.platform.sanitary.domain.HealthEventDraft
 import com.anitec.platform.sanitary.domain.HealthTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -137,11 +143,13 @@ data class HealthFormUiState(
     /** Set when the server refused the save because the record changed after the form was opened. */
     val conflict: SaveConflict? = null,
 ) {
+    /** The next check is not a day after the date of the record (US-019 scenario 2). */
+    val nextDueInvalid get() = !FollowUpRules.isValidNextCheck(date, nextDueDate)
     val animalMissing get() = showErrors && animalId == null
     val dateMissing get() = showErrors && date.isBlank()
     val veterinarianMissing get() = showErrors && veterinarian.isBlank()
     val descriptionMissing get() = showErrors && description.isBlank()
-    val isValid get() = animalId != null && date.isNotBlank() && veterinarian.isNotBlank() && description.isNotBlank()
+    val isValid get() = animalId != null && date.isNotBlank() && veterinarian.isNotBlank() && description.isNotBlank() && !nextDueInvalid
 }
 
 /**
@@ -153,8 +161,11 @@ data class HealthFormUiState(
 class HealthFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     observeAnimals: ObserveAnimalsUseCase,
+    private val observeHerds: ObserveHerdsUseCase,
     private val observeEvents: ObserveHealthEventsUseCase,
     private val saveEvent: SaveHealthEventUseCase,
+    private val scheduleFollowUp: ScheduleFollowUpUseCase,
+    @ApplicationContext private val context: Context,
     sessionStore: SessionStore,
 ) : ViewModel() {
 
@@ -163,6 +174,9 @@ class HealthFormViewModel @Inject constructor(
 
     // Version of the record when the form opened; an edit is sent against it.
     private var baseVersion: Int? = null
+
+    // Next check the record had when the form opened; a follow-up is only scheduled when it changes.
+    private var originalNextDue: String? = null
 
     private val session = (sessionStore.state.value as? SessionState.SignedIn)?.session
 
@@ -190,6 +204,7 @@ class HealthFormViewModel @Inject constructor(
                     _state.update { it.copy(done = true) }
                 } else {
                     baseVersion = event.version
+                    originalNextDue = event.nextDueDate
                     _state.update {
                         it.copy(
                             animalId = event.animalId, type = event.type, date = event.date,
@@ -229,6 +244,20 @@ class HealthFormViewModel @Inject constructor(
     /** The user goes back to the form with their change and the conflict forgotten. */
     fun dismissConflict() = _state.update { it.copy(conflict = null) }
 
+    /**
+     * A veterinarian who sets a new date for the next check gets an activity for it, for the rancher the patient
+     * belongs to (US-019). The record is already saved at this point, so if the activity cannot be created the
+     * record is not lost; offline the activity waits in the queue like any other.
+     */
+    private suspend fun scheduleNextCheckIfNeeded(draft: HealthEventDraft) {
+        val user = session?.takeIf { it.role == UserRole.Veterinarian } ?: return
+        val date = draft.nextDueDate?.takeIf { it != originalNextDue } ?: return
+        val animal = _state.value.animals.firstOrNull { it.id == draft.animalId } ?: return
+        val owner = observeHerds().first().firstOrNull { it.id == animal.herdId }?.ownerId ?: return
+        val title = context.getString(R.string.health_follow_up_activity_title, animal.name.ifBlank { animal.tag })
+        scheduleFollowUp(owner, user.userId, title, date)
+    }
+
     fun save() {
         val current = _state.value
         if (current.saving) return
@@ -251,8 +280,10 @@ class HealthFormViewModel @Inject constructor(
                 nextDueDate = current.nextDueDate.ifBlank { null },
                 baseVersion = baseVersion,
             )
+            val result = saveEvent(eventId, draft)
+            if (result is AppResult.Success) scheduleNextCheckIfNeeded(draft)
             _state.update {
-                when (val result = saveEvent(eventId, draft)) {
+                when (result) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
                     is AppResult.Failure -> {
                         val conflict = result.error.asConflict()
