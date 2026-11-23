@@ -80,11 +80,14 @@ fun ClientCard(
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(summary.client.rancherName, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "${pluralCount(R.plurals.count_farms, summary.client.herds)} · ${pluralCount(R.plurals.count_animals, summary.client.animals)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // The rancher's totals are shown only once they accepted; before that there is nothing to count.
+                    if (summary.client.isActive) {
+                        Text(
+                            "${pluralCount(R.plurals.count_farms, summary.client.herds)} · ${pluralCount(R.plurals.count_animals, summary.client.animals)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 if (!summary.client.isActive) {
                     StatusTag(LinkStatus.parse(summary.client.status).tagText(), LinkStatus.parse(summary.client.status).severity())

@@ -128,12 +128,14 @@ fun VeterinarianRequestsScreen(
                                     icon = Icons.Filled.Check,
                                     loading = state.actingId == link.id,
                                     enabled = state.actingId == null,
+                                    modifier = Modifier.weight(1f),
                                 )
                                 SecondaryButton(
                                     text = stringResource(R.string.consent_reject),
                                     onClick = { viewModel.reject(link) },
                                     icon = Icons.Filled.Close,
                                     enabled = state.actingId == null,
+                                    modifier = Modifier.weight(1f),
                                 )
                             }
                         }
