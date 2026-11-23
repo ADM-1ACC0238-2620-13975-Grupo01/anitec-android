@@ -100,6 +100,13 @@ fun AuthScaffold(
     }
 }
 
+/**
+ * Dark green veil over the hero photo. The text sits on it, so even over the lightest part of any photo the top of the
+ * veil must keep white text at 4.5:1 or more (checked by ContrastTest).
+ */
+internal val HeroOverlayTop = Color(0xBF163A12)
+internal val HeroOverlayBottom = Color(0xE62A4A22)
+
 @Composable
 private fun AuthHero() {
     Box(modifier = Modifier.fillMaxWidth().height(230.dp)) {
@@ -112,7 +119,7 @@ private fun AuthHero() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(Color(0x99163A12), Color(0xE62A4A22)))),
+                .background(Brush.verticalGradient(listOf(HeroOverlayTop, HeroOverlayBottom))),
         )
         LightStatusBarIcons()
         Surface(

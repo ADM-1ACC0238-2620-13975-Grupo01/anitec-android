@@ -31,7 +31,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
-import com.anitec.platform.core.designsystem.AniTecGreen
+import com.anitec.platform.core.designsystem.AniTecGreenButtonEnd
 import com.anitec.platform.core.designsystem.AniTecGreenDark
 
 /** Main call to action: 48 dp tall with the web's green gradient. */
@@ -47,7 +47,7 @@ fun PrimaryButton(
     val active = enabled && !loading
     val loadingDescription = stringResource(R.string.common_loading)
     val background = if (active) {
-        Brush.linearGradient(listOf(AniTecGreenDark, AniTecGreen))
+        Brush.linearGradient(listOf(AniTecGreenDark, AniTecGreenButtonEnd))
     } else {
         SolidColor(MaterialTheme.colorScheme.outlineVariant)
     }
