@@ -41,6 +41,7 @@ import com.anitec.platform.activities.interfaces.viewmodel.ActivityFormViewModel
 import com.anitec.platform.activities.interfaces.viewmodel.ActivityListViewModel
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.outbox.isPendingSync
+import com.anitec.platform.reminders.interfaces.ui.NotificationsOffBanner
 import com.anitec.platform.core.designsystem.component.AniTecTextField
 import com.anitec.platform.core.designsystem.component.ConfirmDialog
 import com.anitec.platform.core.designsystem.component.DangerTextButton
@@ -94,6 +95,7 @@ fun activityStatusRes(status: String): Int? = when (status) {
     ActivityStatuses.PENDING -> R.string.activity_status_pending
     ActivityStatuses.SCHEDULED -> R.string.activity_status_scheduled
     ActivityStatuses.COMPLETED -> R.string.activity_status_completed
+    ActivityStatuses.CANCELLED -> R.string.activity_status_cancelled
     else -> null
 }
 /**
@@ -127,7 +129,7 @@ fun ActivityCard(
     modifier: Modifier = Modifier,
     footer: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
 ) {
-    val overdue = activity.isUpcoming(today).not() && !activity.status.equals(ActivityStatuses.COMPLETED, ignoreCase = true)
+    val overdue = activity.isUpcoming(today).not() && activity.isOpen
     RecordCard(
         title = activity.title,
         kicker = if (overdue) "${activity.date} · ${stringResource(R.string.activity_overdue)}" else activity.date,
@@ -164,6 +166,9 @@ fun ActivityListScreen(
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    if (state.items.any { it.isUpcoming(state.today) }) {
+                        item(key = "notifications-off") { NotificationsOffBanner() }
+                    }
                     items(state.items, key = { it.id }) { activity ->
                         ActivityCard(
                             activity = activity,

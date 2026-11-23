@@ -27,8 +27,19 @@
     <string name="activity_status_pending">Pending</string>
     <string name="activity_status_scheduled">Scheduled</string>
     <string name="activity_status_completed">Completed</string>
+    <string name="activity_status_cancelled">Cancelled</string>
 
     <string name="home_metric_upcoming">Upcoming activities</string>
     <string name="home_upcoming_title">Upcoming activities</string>
     <string name="home_upcoming_empty">No upcoming activities.</string>
+
+    <!-- Activity reminders (TS-009, US-027) -->
+    <string name="reminders_title">Activity reminders</string>
+    <string name="reminders_subtitle">A notification at 8:00 on the day of each pending activity.</string>
+    <string name="reminders_blocked">Notifications are turned off for AniTec on this device, so reminders will not appear. Your activities are still saved.</string>
+    <string name="reminders_enable">Turn on notifications</string>
+    <string name="reminders_off_title">Reminders cannot be shown</string>
+    <string name="reminder_channel_name">Activity reminders</string>
+    <string name="reminder_channel_description">Reminders of the activities due today.</string>
+    <string name="reminder_text">Today · %1$s · %2$s priority</string>
 </resources>

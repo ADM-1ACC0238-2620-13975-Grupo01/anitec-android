@@ -21,9 +21,14 @@ data class Activity(
     /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
     val version: Int = 1,
 ) {
-    /** Still to be done: not completed and not in the past. */
+    /** Still to be attended: neither completed nor cancelled. */
+    val isOpen: Boolean
+        get() = !status.equals(ActivityStatuses.COMPLETED, ignoreCase = true) &&
+            !status.equals(ActivityStatuses.CANCELLED, ignoreCase = true)
+
+    /** Still to be done: open and not in the past. */
     fun isUpcoming(today: LocalDate): Boolean {
-        if (status.equals(ActivityStatuses.COMPLETED, ignoreCase = true)) return false
+        if (!isOpen) return false
         val day = runCatching { LocalDate.parse(date) }.getOrNull() ?: return false
         return !day.isBefore(today)
     }
@@ -60,12 +65,13 @@ object ActivityPriorities {
     val all = listOf(HIGH, MEDIUM, LOW)
 }
 
-/** Statuses; a [COMPLETED] activity is never shown as upcoming. */
+/** Statuses; a [COMPLETED] or [CANCELLED] activity is never shown as upcoming and gets no reminder. */
 object ActivityStatuses {
     const val PENDING = "Pendiente"
     const val SCHEDULED = "Programado"
     const val COMPLETED = "Completado"
-    val all = listOf(PENDING, SCHEDULED, COMPLETED)
+    const val CANCELLED = "Cancelado"
+    val all = listOf(PENDING, SCHEDULED, COMPLETED, CANCELLED)
 }
 
 object ActivityScope {

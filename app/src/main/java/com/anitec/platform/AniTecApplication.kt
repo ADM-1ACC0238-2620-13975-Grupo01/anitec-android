@@ -9,6 +9,7 @@ import com.anitec.platform.core.i18n.LanguageManager
 import com.anitec.platform.core.outbox.OutboxDao
 import com.anitec.platform.core.outbox.OutboxScheduler
 import com.anitec.platform.core.session.SessionCleanup
+import com.anitec.platform.reminders.infrastructure.ReminderCoordinator
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +53,10 @@ class AniTecApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var outboxScheduler: OutboxScheduler
 
+    /** Keeps the scheduled reminders of activities equal to the activities in the cache. */
+    @Inject
+    lateinit var reminderCoordinator: ReminderCoordinator
+
     /**
      * Long-lived scope tied to the process, not to a screen.
      * Default dispatcher keeps locale and cleanup work off the main thread.
@@ -65,6 +70,7 @@ class AniTecApplication : Application(), Configuration.Provider {
         super.onCreate()
         languageManager.applyDefaultIfNeeded()
         sessionCleanup.start(applicationScope)
+        reminderCoordinator.start(applicationScope)
         // Changes made offline in a previous run are sent as soon as there is a connection.
         applicationScope.launch { if (outboxDao.count() > 0) outboxScheduler.schedule() }
     }

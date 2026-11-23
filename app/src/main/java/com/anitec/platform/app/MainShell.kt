@@ -79,6 +79,7 @@ import com.anitec.platform.financial.interfaces.ui.FinancialListScreen
 import com.anitec.platform.consent.interfaces.ui.VeterinarianRequestsScreen
 import com.anitec.platform.consent.interfaces.viewmodel.PendingRequestsViewModel
 import com.anitec.platform.core.session.UserRole
+import com.anitec.platform.reminders.interfaces.ui.ReminderTapViewModel
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.TermsScreen
 import com.anitec.platform.livestock.interfaces.ui.AnimalFormScreen
@@ -132,6 +133,14 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
     val layout = navigationLayoutFor(activity?.let { calculateWindowSizeClass(it).widthSizeClass } ?: WindowWidthSizeClass.Compact)
     val syncViewModel: SyncStatusViewModel = hiltViewModel()
     val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
+    val reminderTapViewModel: ReminderTapViewModel = hiltViewModel()
+    val reminderTap by reminderTapViewModel.pending.collectAsStateWithLifecycle()
+    LaunchedEffect(reminderTap) {
+        val activityId = reminderTap ?: return@LaunchedEffect
+        navController.navigate(ActivityFormRoute(activityId))
+        reminderTapViewModel.consume()
+    }
+
     val checkoutReturnViewModel: CheckoutReturnViewModel = hiltViewModel()
     val checkoutReturn by checkoutReturnViewModel.pending.collectAsStateWithLifecycle()
     // The browser sends the user back with a link. Show the result once, then clear the link.

@@ -53,6 +53,7 @@ import com.anitec.platform.core.i18n.LanguageSwitcher
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
+import com.anitec.platform.reminders.interfaces.ui.ReminderSettingsCard
 
 private data class MoreItem(@StringRes val label: Int, val icon: ImageVector, val route: Any)
 
@@ -120,6 +121,8 @@ fun MoreScreen(
                 }
             }
         }
+        ReminderSettingsCard()
+
         /**
          * Renders a settings row with a language icon, label, and language switcher.
          */
