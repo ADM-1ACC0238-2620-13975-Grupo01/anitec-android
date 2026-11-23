@@ -1,5 +1,7 @@
 package com.anitec.platform.core.designsystem.component
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -188,6 +190,82 @@ fun LoadingState(modifier: Modifier = Modifier) {
 @Composable
 fun ErrorMessage(text: String, modifier: Modifier = Modifier) {
     Text(text, modifier = modifier.liveStatus(assertive = true), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+}
+
+/**
+ * Shown when the server refused a save because the record changed after the form was opened (US-032). It lists
+ * what differs and lets the user keep their change, use the current version, or go back to the form.
+ */
+@Composable
+fun ConflictDialog(
+    title: String,
+    message: String,
+    differences: List<com.anitec.platform.core.common.FieldDifference>,
+    keepMineLabel: String,
+    keepServerLabel: String,
+    cancelLabel: String,
+    onKeepMine: () -> Unit,
+    onKeepServer: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        modifier = modifier,
+        title = { Text(title) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(message)
+                differences.forEach { difference ->
+                    Column {
+                        Text(stringResource(difference.labelRes), style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            stringResource(R.string.conflict_mine, difference.mine),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            stringResource(R.string.conflict_server, difference.server),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Column(horizontalAlignment = Alignment.End) {
+                TextButton(onClick = onKeepMine) { Text(keepMineLabel) }
+                TextButton(onClick = onKeepServer) { Text(keepServerLabel) }
+                TextButton(onClick = onCancel) { Text(cancelLabel) }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+    )
+}
+
+/** The standard conflict dialog of the forms: what differs, and keep mine, use the current version or go back. */
+@Composable
+fun SaveConflictDialog(
+    conflict: com.anitec.platform.core.common.SaveConflict,
+    onKeepMine: () -> Unit,
+    onKeepServer: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    ConflictDialog(
+        title = stringResource(R.string.conflict_title),
+        message = stringResource(R.string.conflict_message),
+        differences = conflict.differences,
+        keepMineLabel = stringResource(R.string.conflict_keep_mine),
+        keepServerLabel = stringResource(R.string.conflict_keep_server),
+        cancelLabel = stringResource(R.string.common_cancel),
+        onKeepMine = onKeepMine,
+        onKeepServer = onKeepServer,
+        onCancel = onCancel,
+    )
 }
 
 /** Confirmation before destructive or bulk actions. */

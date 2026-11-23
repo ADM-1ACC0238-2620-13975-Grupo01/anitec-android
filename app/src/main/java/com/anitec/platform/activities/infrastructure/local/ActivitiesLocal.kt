@@ -19,6 +19,7 @@ data class ActivityEntity(
     val date: String,
     val priority: String,
     val status: String,
+    val version: Int = 1,
 )
 
 /**

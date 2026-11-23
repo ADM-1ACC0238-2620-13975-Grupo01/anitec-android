@@ -16,4 +16,36 @@
         <item quantity="one">%1$d cambio aún no se envió y se perderá si cierras sesión. ¿Cerrar sesión de todos modos?</item>
         <item quantity="other">%1$d cambios aún no se enviaron y se perderán si cierras sesión. ¿Cerrar sesión de todos modos?</item>
     </plurals>
+
+    <!-- Cambio en otro lugar (US-032) -->
+    <string name="error_out_of_date">Este registro cambió después de que lo abriste.</string>
+    <string name="conflict_title">Cambió en otro lugar</string>
+    <string name="conflict_message">Este registro cambió después de que lo abriste. Elige qué versión conservar.</string>
+    <string name="conflict_mine">Tu cambio: %1$s</string>
+    <string name="conflict_server">Actual: %1$s</string>
+    <string name="conflict_keep_mine">Conservar mis cambios</string>
+    <string name="conflict_keep_server">Usar la versión actual</string>
+    <string name="field_tag">Etiqueta</string>
+    <string name="field_name">Nombre</string>
+    <string name="field_species">Especie</string>
+    <string name="field_breed">Raza</string>
+    <string name="field_gender">Sexo</string>
+    <string name="field_birth_date">Fecha de nacimiento</string>
+    <string name="field_weight">Peso</string>
+    <string name="field_status">Estado</string>
+    <string name="field_source">Origen</string>
+    <string name="field_age_range">Rango de edad</string>
+    <string name="field_type">Tipo</string>
+    <string name="field_date">Fecha</string>
+    <string name="field_description">Descripción</string>
+    <string name="field_veterinarian">Veterinario</string>
+    <string name="field_diagnosis">Diagnóstico</string>
+    <string name="field_treatment">Tratamiento</string>
+    <string name="field_prescription">Receta</string>
+    <string name="field_follow_up">Seguimiento</string>
+    <string name="field_next_due_date">Próxima fecha</string>
+    <string name="field_title">Título</string>
+    <string name="field_priority">Prioridad</string>
+    <string name="field_category">Categoría</string>
+    <string name="field_amount">Monto</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.anitec.platform.sanitary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -168,6 +169,7 @@ fun HealthFormScreen(
     viewModel: HealthFormViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    state.conflict?.let { SaveConflictDialog(it, viewModel::keepMine, viewModel::keepServer, viewModel::dismissConflict) }
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
     LaunchedEffect(state.done) { if (state.done) onBack() }

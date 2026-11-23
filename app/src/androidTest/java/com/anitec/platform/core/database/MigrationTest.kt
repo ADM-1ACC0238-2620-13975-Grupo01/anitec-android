@@ -70,6 +70,40 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun migrate8To9_keepsTheCachedRecordsAtVersionOne() {
+        helper.createDatabase(DB, 8).apply {
+            execSQL(
+                "INSERT INTO health_events (id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate) " +
+                    "VALUES (5, 4, 'Vacuna', '2026-10-02', 'd', 'Dra. Ana', '', '', '', '', NULL)",
+            )
+            execSQL(
+                "INSERT INTO financial_records (id, ownerId, type, category, amount, date, description) VALUES (3, 10, 'Ingreso', 'Venta', 5.0, '2026-10-01', 'x')",
+            )
+            execSQL(
+                "INSERT INTO pending_operations (seq, kind, localId, payload, createdAt, attempts, failed, lastError, idempotencyKey) " +
+                    "VALUES (1, 'create_animal', -1, '{}', 1000, 0, 0, NULL, 'key-1')",
+            )
+            close()
+        }
+
+        val migrated = helper.runMigrationsAndValidate(DB, 9, true, MIGRATION_8_9)
+
+        migrated.query("SELECT version FROM health_events WHERE id = 5").use { cursor ->
+            cursor.moveToFirst()
+            assertEquals(1, cursor.getInt(0))
+        }
+        migrated.query("SELECT version FROM financial_records WHERE id = 3").use { cursor ->
+            cursor.moveToFirst()
+            assertEquals(1, cursor.getInt(0))
+        }
+        // The queue of changes made offline, with its keys, is untouched.
+        migrated.query("SELECT idempotencyKey FROM pending_operations").use { cursor ->
+            cursor.moveToFirst()
+            assertEquals("key-1", cursor.getString(0))
+        }
+    }
+
     private companion object {
         const val DB = "migration-test"
     }

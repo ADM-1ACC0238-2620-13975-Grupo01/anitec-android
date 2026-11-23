@@ -43,6 +43,7 @@ data class AnimalEntity(
     val source: String?,
     val ageRange: String?,
     val imageUrl: String?,
+    val version: Int = 1,
 )
 
 @Dao

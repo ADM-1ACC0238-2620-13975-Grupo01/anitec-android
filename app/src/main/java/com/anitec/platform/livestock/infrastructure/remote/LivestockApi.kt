@@ -46,6 +46,7 @@ data class AnimalDto(
     val source: String? = null,
     val ageRange: String? = null,
     val imageUrl: String? = null,
+    val version: Int = 1,
 )
 
 /** Body of a batch registration: [quantity] animals share these values; [name] is the base name. */
@@ -93,7 +94,7 @@ interface LivestockApi {
 
     @GET("animals") suspend fun getAnimals(): List<AnimalDto>
     @POST("animals") suspend fun createAnimal(@Body body: AnimalDto, @Header("Idempotency-Key") idempotencyKey: String? = null): AnimalDto
-    @PUT("animals/{id}") suspend fun updateAnimal(@Path("id") id: Int, @Body body: AnimalDto): AnimalDto
+    @PUT("animals/{id}") suspend fun updateAnimal(@Path("id") id: Int, @Body body: AnimalDto, @Header("If-Match") ifMatch: String? = null): AnimalDto
     @DELETE("animals/{id}") suspend fun deleteAnimal(@Path("id") id: Int)
 
     @POST("animals/bulk") suspend fun createAnimalBatch(@Body body: AnimalBatchDto): List<AnimalDto>

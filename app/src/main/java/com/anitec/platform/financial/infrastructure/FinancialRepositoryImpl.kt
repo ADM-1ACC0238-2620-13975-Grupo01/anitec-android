@@ -2,6 +2,8 @@ package com.anitec.platform.financial.infrastructure
 
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.common.explainingConflict
+import com.anitec.platform.core.common.ifMatchOf
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
@@ -29,9 +31,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Mappers between the API DTO, the Room entity and the domain [FinancialRecord]. */
-fun FinancialRecordDto.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description)
-fun FinancialRecord.toEntity() = FinancialRecordEntity(id, ownerId, type, category, amount, date, description)
-fun FinancialRecordEntity.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description)
+fun FinancialRecordDto.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description, version)
+fun FinancialRecord.toEntity() = FinancialRecordEntity(id, ownerId, type, category, amount, date, description, version)
+fun FinancialRecordEntity.toDomain() = FinancialRecord(id, ownerId, type, category, amount, date, description, version)
 fun FinancialRecordDraft.toDto() = FinancialRecordDto(
     ownerId = ownerId, type = type, category = category, amount = amount, date = date, description = description,
 )
@@ -76,8 +78,13 @@ class FinancialRepositoryImpl @Inject constructor(
         return result.onSuccess { dao.upsert(it.toEntity()) }
     }
 
-    override suspend fun update(id: Int, draft: FinancialRecordDraft): AppResult<FinancialRecord> =
-        safeApiCall { api.update(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
+    /** Updates a record against the version the edit started from; a change made elsewhere is not overwritten. */
+    override suspend fun update(id: Int, draft: FinancialRecordDraft): AppResult<FinancialRecord> {
+        val body = draft.toDto()
+        return safeApiCall { api.update(id, body, ifMatchOf(draft.baseVersion)).toDomain() }
+            .explainingConflict(FinancialRecordDto.serializer(), body) { server -> dao.upsert(server.toDomain().toEntity()) }
+            .onSuccess { dao.upsert(it.toEntity()) }
+    }
 
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }

@@ -16,4 +16,36 @@
         <item quantity="one">%1$d change has not been sent yet and will be lost if you sign out. Sign out anyway?</item>
         <item quantity="other">%1$d changes have not been sent yet and will be lost if you sign out. Sign out anyway?</item>
     </plurals>
+
+    <!-- Changed elsewhere (US-032) -->
+    <string name="error_out_of_date">This record was changed after you opened it.</string>
+    <string name="conflict_title">Changed elsewhere</string>
+    <string name="conflict_message">This record was changed after you opened it. Choose which version to keep.</string>
+    <string name="conflict_mine">Your change: %1$s</string>
+    <string name="conflict_server">Current: %1$s</string>
+    <string name="conflict_keep_mine">Keep my changes</string>
+    <string name="conflict_keep_server">Use the current version</string>
+    <string name="field_tag">Tag</string>
+    <string name="field_name">Name</string>
+    <string name="field_species">Species</string>
+    <string name="field_breed">Breed</string>
+    <string name="field_gender">Sex</string>
+    <string name="field_birth_date">Birth date</string>
+    <string name="field_weight">Weight</string>
+    <string name="field_status">Status</string>
+    <string name="field_source">Origin</string>
+    <string name="field_age_range">Age range</string>
+    <string name="field_type">Type</string>
+    <string name="field_date">Date</string>
+    <string name="field_description">Description</string>
+    <string name="field_veterinarian">Veterinarian</string>
+    <string name="field_diagnosis">Diagnosis</string>
+    <string name="field_treatment">Treatment</string>
+    <string name="field_prescription">Prescription</string>
+    <string name="field_follow_up">Follow-up</string>
+    <string name="field_next_due_date">Next due date</string>
+    <string name="field_title">Title</string>
+    <string name="field_priority">Priority</string>
+    <string name="field_category">Category</string>
+    <string name="field_amount">Amount</string>
 </resources>

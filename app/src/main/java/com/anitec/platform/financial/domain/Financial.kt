@@ -14,6 +14,8 @@ data class FinancialRecord(
     val amount: Double,
     val date: String,
     val description: String,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
     val isIncome get() = type.equals(RecordTypes.INCOME, ignoreCase = true)
     val isExpense get() = type.equals(RecordTypes.EXPENSE, ignoreCase = true)
@@ -27,6 +29,8 @@ data class FinancialRecordDraft(
     val amount: Double,
     val date: String,
     val description: String,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /** Record types, in the Spanish text the API stores. */

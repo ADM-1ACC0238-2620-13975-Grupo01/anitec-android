@@ -19,12 +19,13 @@ data class FarmActivityDto(
     val date: String,
     val priority: String = "",
     val status: String = "",
+    val version: Int = 1,
 )
 
 /** The route is `farm-events`, not `farm-activities`. */
 interface ActivitiesApi {
     @GET("farm-events") suspend fun getActivities(): List<FarmActivityDto>
     @POST("farm-events") suspend fun create(@Body body: FarmActivityDto, @Header("Idempotency-Key") idempotencyKey: String? = null): FarmActivityDto
-    @PUT("farm-events/{id}") suspend fun update(@Path("id") id: Int, @Body body: FarmActivityDto): FarmActivityDto
+    @PUT("farm-events/{id}") suspend fun update(@Path("id") id: Int, @Body body: FarmActivityDto, @Header("If-Match") ifMatch: String? = null): FarmActivityDto
     @DELETE("farm-events/{id}") suspend fun delete(@Path("id") id: Int)
 }

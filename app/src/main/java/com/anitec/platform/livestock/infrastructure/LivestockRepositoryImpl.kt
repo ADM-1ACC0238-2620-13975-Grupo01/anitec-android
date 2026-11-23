@@ -2,6 +2,8 @@ package com.anitec.platform.livestock.infrastructure
 
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.common.explainingConflict
+import com.anitec.platform.core.common.ifMatchOf
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
@@ -128,8 +130,13 @@ class LivestockRepositoryImpl @Inject constructor(
         return result.onSuccess { dao.upsertAnimal(it.toEntity()) }
     }
 
-    override suspend fun updateAnimal(id: Int, draft: AnimalDraft): AppResult<Animal> =
-        safeApiCall { api.updateAnimal(id, draft.toDto()).toDomain() }.onSuccess { dao.upsertAnimal(it.toEntity()) }
+    /** Updates an animal against the version the edit started from; a change made elsewhere is not overwritten. */
+    override suspend fun updateAnimal(id: Int, draft: AnimalDraft): AppResult<Animal> {
+        val body = draft.toDto()
+        return safeApiCall { api.updateAnimal(id, body, ifMatchOf(draft.baseVersion)).toDomain() }
+            .explainingConflict(AnimalDto.serializer(), body) { server -> dao.upsertAnimal(server.toDomain().toEntity()) }
+            .onSuccess { dao.upsertAnimal(it.toEntity()) }
+    }
 
     override suspend fun deleteAnimal(id: Int): AppResult<Unit> =
         safeApiCall { api.deleteAnimal(id) }.onSuccess { dao.deleteAnimal(id) }

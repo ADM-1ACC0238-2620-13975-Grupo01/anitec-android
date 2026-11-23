@@ -18,6 +18,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.NotFound -> R.string.error_not_found
     is AppError.Conflict -> R.string.error_conflict
     is AppError.Validation -> R.string.error_validation
+    is AppError.OutOfDate -> R.string.error_out_of_date
     is AppError.Server -> R.string.error_server
     is AppError.Unknown -> R.string.error_unknown
 }

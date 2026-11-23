@@ -1,5 +1,7 @@
 package com.anitec.platform.sanitary.interfaces.viewmodel
 
+import com.anitec.platform.core.common.asConflict
+import com.anitec.platform.core.common.SaveConflict
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -132,6 +134,8 @@ data class HealthFormUiState(
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
     val serverMessages: List<String> = emptyList(),
+    /** Set when the server refused the save because the record changed after the form was opened. */
+    val conflict: SaveConflict? = null,
 ) {
     val animalMissing get() = showErrors && animalId == null
     val dateMissing get() = showErrors && date.isBlank()
@@ -156,6 +160,9 @@ class HealthFormViewModel @Inject constructor(
 
     private val route = savedStateHandle.toRoute<HealthFormRoute>()
     private val eventId: Int? = route.eventId
+
+    // Version of the record when the form opened; an edit is sent against it.
+    private var baseVersion: Int? = null
 
     private val session = (sessionStore.state.value as? SessionState.SignedIn)?.session
 
@@ -182,6 +189,7 @@ class HealthFormViewModel @Inject constructor(
                 if (event == null) {
                     _state.update { it.copy(done = true) }
                 } else {
+                    baseVersion = event.version
                     _state.update {
                         it.copy(
                             animalId = event.animalId, type = event.type, date = event.date,
@@ -207,6 +215,20 @@ class HealthFormViewModel @Inject constructor(
     fun onFollowUpChange(value: String) = _state.update { it.copy(followUp = value) }
     fun onMessageShown() = _state.update { it.copy(messageRes = null) }
 
+    /** The user keeps their change over the version that appeared meanwhile: it is sent again against that version. */
+    fun keepMine() {
+        val conflict = _state.value.conflict ?: return
+        baseVersion = conflict.serverVersion
+        _state.update { it.copy(conflict = null) }
+        save()
+    }
+
+    /** The user takes the version on the server: the cache already holds it, so the form just closes. */
+    fun keepServer() = _state.update { it.copy(conflict = null, done = true) }
+
+    /** The user goes back to the form with their change and the conflict forgotten. */
+    fun dismissConflict() = _state.update { it.copy(conflict = null) }
+
     fun save() {
         val current = _state.value
         if (current.saving) return
@@ -227,11 +249,19 @@ class HealthFormViewModel @Inject constructor(
                 prescription = current.prescription.trim(),
                 followUp = current.followUp.trim(),
                 nextDueDate = current.nextDueDate.ifBlank { null },
+                baseVersion = baseVersion,
             )
             _state.update {
                 when (val result = saveEvent(eventId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
+                    is AppResult.Failure -> {
+                        val conflict = result.error.asConflict()
+                        it.copy(
+                            saving = false, conflict = conflict,
+                            messageRes = if (conflict == null) result.error.messageRes() else null,
+                            serverMessages = result.error.serverHints(),
+                        )
+                    }
                 }
             }
         }

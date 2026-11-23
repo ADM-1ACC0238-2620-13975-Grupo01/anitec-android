@@ -22,6 +22,7 @@ data class HealthEventEntity(
     val prescription: String,
     val followUp: String,
     val nextDueDate: String?,
+    val version: Int = 1,
 )
 
 

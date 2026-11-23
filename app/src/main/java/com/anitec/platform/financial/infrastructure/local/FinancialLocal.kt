@@ -18,6 +18,7 @@ data class FinancialRecordEntity(
     val amount: Double,
     val date: String,
     val description: String,
+    val version: Int = 1,
 )
 
 /** Room access to the cached financial records, newest first. */

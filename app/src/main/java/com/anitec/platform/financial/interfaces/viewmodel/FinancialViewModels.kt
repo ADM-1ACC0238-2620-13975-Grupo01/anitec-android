@@ -1,5 +1,7 @@
 package com.anitec.platform.financial.interfaces.viewmodel
 
+import com.anitec.platform.core.common.asConflict
+import com.anitec.platform.core.common.SaveConflict
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -116,6 +118,8 @@ data class FinancialFormUiState(
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
     val serverMessages: List<String> = emptyList(),
+    /** Set when the server refused the save because the record changed after the form was opened. */
+    val conflict: SaveConflict? = null,
 ) {
     private val parsedAmount get() = parseAmount(amount)
     val amountInvalid get() = showErrors && parsedAmount?.let { FinancialScope.isValidAmount(it) } != true
@@ -132,6 +136,9 @@ class FinancialFormViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val recordId: Int? = savedStateHandle.toRoute<FinancialFormRoute>().recordId
+
+    // Version of the record when the form opened; an edit is sent against it.
+    private var baseVersion: Int? = null
     private val session = (sessionStore.state.value as? SessionState.SignedIn)?.session
     private val records = observeRecords()
 
@@ -145,6 +152,7 @@ class FinancialFormViewModel @Inject constructor(
                 if (record == null) {
                     _state.update { it.copy(done = true) }
                 } else {
+                    baseVersion = record.version
                     _state.update {
                         it.copy(
                             type = record.type, category = record.category, date = record.date, description = record.description,
@@ -163,6 +171,20 @@ class FinancialFormViewModel @Inject constructor(
     fun onDescriptionChange(value: String) = _state.update { it.copy(description = value) }
     fun onMessageShown() = _state.update { it.copy(messageRes = null) }
 
+    /** The user keeps their change over the version that appeared meanwhile: it is sent again against that version. */
+    fun keepMine() {
+        val conflict = _state.value.conflict ?: return
+        baseVersion = conflict.serverVersion
+        _state.update { it.copy(conflict = null) }
+        save()
+    }
+
+    /** The user takes the version on the server: the cache already holds it, so the form just closes. */
+    fun keepServer() = _state.update { it.copy(conflict = null, done = true) }
+
+    /** The user goes back to the form with their change and the conflict forgotten. */
+    fun dismissConflict() = _state.update { it.copy(conflict = null) }
+
     fun save() {
         val current = _state.value
         val user = session ?: return
@@ -180,11 +202,19 @@ class FinancialFormViewModel @Inject constructor(
                 amount = parseAmount(current.amount) ?: 0.0,
                 date = current.date,
                 description = current.description.trim(),
+                baseVersion = baseVersion,
             )
             _state.update {
                 when (val result = saveRecord(recordId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
+                    is AppResult.Failure -> {
+                        val conflict = result.error.asConflict()
+                        it.copy(
+                            saving = false, conflict = conflict,
+                            messageRes = if (conflict == null) result.error.messageRes() else null,
+                            serverMessages = result.error.serverHints(),
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
 package com.anitec.platform.activities.interfaces.viewmodel
 
+import com.anitec.platform.core.common.asConflict
+import com.anitec.platform.core.common.SaveConflict
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -143,6 +145,8 @@ data class ActivityFormUiState(
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
     val serverMessages: List<String> = emptyList(),
+    /** Set when the server refused the save because the record changed after the form was opened. */
+    val conflict: SaveConflict? = null,
 ) {
     val titleMissing get() = showErrors && title.isBlank()
     val dateMissing get() = showErrors && date.isBlank()
@@ -171,6 +175,9 @@ class ActivityFormViewModel @Inject constructor(
     // Editing keeps who the activity belongs to and who created it.
     private var existing: Activity? = null
 
+    // Version of the record when the form opened; an edit is sent against it.
+    private var baseVersion: Int? = null
+
     private val _state = MutableStateFlow(
         ActivityFormUiState(isEdit = activityId != null, isVeterinarian = session?.role == UserRole.Veterinarian),
     )
@@ -189,6 +196,7 @@ class ActivityFormViewModel @Inject constructor(
                     _state.update { it.copy(done = true) }
                 } else {
                     existing = activity
+                    baseVersion = activity.version
                     _state.update {
                         it.copy(title = activity.title, type = activity.type, date = activity.date, priority = activity.priority, status = activity.status)
                     }
@@ -205,6 +213,20 @@ class ActivityFormViewModel @Inject constructor(
     fun onClientChange(value: Int) = _state.update { it.copy(clientId = value) }
     fun onMessageShown() = _state.update { it.copy(messageRes = null) }
 
+    /** The user keeps their change over the version that appeared meanwhile: it is sent again against that version. */
+    fun keepMine() {
+        val conflict = _state.value.conflict ?: return
+        baseVersion = conflict.serverVersion
+        _state.update { it.copy(conflict = null) }
+        save()
+    }
+
+    /** The user takes the version on the server: the cache already holds it, so the form just closes. */
+    fun keepServer() = _state.update { it.copy(conflict = null, done = true) }
+
+    /** The user goes back to the form with their change and the conflict forgotten. */
+    fun dismissConflict() = _state.update { it.copy(conflict = null) }
+
     fun save() {
         val current = _state.value
         val user = session ?: return
@@ -220,11 +242,19 @@ class ActivityFormViewModel @Inject constructor(
             val draft = ActivityDraft(
                 ownerId = ownerId, veterinarianId = veterinarianId, title = current.title.trim(),
                 type = current.type, date = current.date, priority = current.priority, status = current.status,
+                baseVersion = baseVersion,
             )
             _state.update {
                 when (val result = saveActivity(activityId, draft)) {
                     is AppResult.Success -> it.copy(saving = false, done = true)
-                    is AppResult.Failure -> it.copy(saving = false, messageRes = result.error.messageRes(), serverMessages = result.error.serverHints())
+                    is AppResult.Failure -> {
+                        val conflict = result.error.asConflict()
+                        it.copy(
+                            saving = false, conflict = conflict,
+                            messageRes = if (conflict == null) result.error.messageRes() else null,
+                            serverMessages = result.error.serverHints(),
+                        )
+                    }
                 }
             }
         }

@@ -30,7 +30,7 @@ fun HerdDto.toDomain() = Herd(id, name, location, owner, ownerId, veterinarianId
 fun CorralDto.toDomain() = Corral(id, name, herdId)
 
 /** Remote API DTO → domain model (read path after sync). */
-fun AnimalDto.toDomain() = Animal(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl)
+fun AnimalDto.toDomain() = Animal(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl, version)
 
 /** Domain model → Room entity (cache write). */
 fun Herd.toEntity() = HerdEntity(id, name, location, owner, ownerId, veterinarianId, mainType)
@@ -39,7 +39,7 @@ fun Herd.toEntity() = HerdEntity(id, name, location, owner, ownerId, veterinaria
 fun Corral.toEntity() = CorralEntity(id, name, herdId)
 
 /** Domain model → Room entity (cache write). */
-fun Animal.toEntity() = AnimalEntity(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl)
+fun Animal.toEntity() = AnimalEntity(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl, version)
 
 /** Room entity → domain model (cache read). */
 fun HerdEntity.toDomain() = Herd(id, name, location, owner, ownerId, veterinarianId, mainType)
@@ -48,7 +48,7 @@ fun HerdEntity.toDomain() = Herd(id, name, location, owner, ownerId, veterinaria
 fun CorralEntity.toDomain() = Corral(id, name, herdId)
 
 /** Room entity → domain model (cache read). */
-fun AnimalEntity.toDomain() = Animal(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl)
+fun AnimalEntity.toDomain() = Animal(id, tag, name, species, breed, gender, birthDate, weight, status, herdId, corralId, source, ageRange, imageUrl, version)
 
 /**
  * Create/update draft → remote write DTO.

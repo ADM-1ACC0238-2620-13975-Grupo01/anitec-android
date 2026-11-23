@@ -46,7 +46,7 @@ import javax.inject.Singleton
         ActivityEntity::class, FinancialRecordEntity::class, DeviceEntity::class,
         PendingOperationEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -89,6 +89,19 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
 }
 
 /**
+ * 8 to 9: the cached animals, health events, activities and financial records keep the version the server holds, so
+ * an edit can be sent against it. The tables stay (they may hold records created offline, with their queue); the
+ * existing rows start at version 1 and take the real one at the next refresh.
+ */
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        listOf("animals", "health_events", "activities", "financial_records").forEach { table ->
+            db.execSQL("ALTER TABLE `$table` ADD COLUMN `version` INTEGER NOT NULL DEFAULT 1")
+        }
+    }
+}
+
+/**
  * Provides the singleton [AppDatabase] (`anitec.db`) and its DAOs.
  * Destructive migration is intentional: the cache is disposable and refilled from the API.
  */
@@ -99,7 +112,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "anitec.db")
-            .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_7_8, MIGRATION_8_9)
             // The rest of the schema is cache: a change without a migration just rebuilds it from the API.
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()

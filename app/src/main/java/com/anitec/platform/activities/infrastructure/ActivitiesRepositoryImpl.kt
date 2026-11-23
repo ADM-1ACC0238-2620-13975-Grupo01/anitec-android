@@ -10,6 +10,8 @@ import com.anitec.platform.activities.infrastructure.remote.ActivitiesApi
 import com.anitec.platform.activities.infrastructure.remote.FarmActivityDto
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.common.explainingConflict
+import com.anitec.platform.core.common.ifMatchOf
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
@@ -24,9 +26,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Mappers between the API DTO, the Room entity and the domain [Activity]. */
-fun FarmActivityDto.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status)
-fun Activity.toEntity() = ActivityEntity(id, ownerId, veterinarianId, title, type, date, priority, status)
-fun ActivityEntity.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status)
+fun FarmActivityDto.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status, version)
+fun Activity.toEntity() = ActivityEntity(id, ownerId, veterinarianId, title, type, date, priority, status, version)
+fun ActivityEntity.toDomain() = Activity(id, ownerId, veterinarianId, title, type, date, priority, status, version)
 fun ActivityDraft.toDto() = FarmActivityDto(
     ownerId = ownerId, veterinarianId = veterinarianId, title = title, type = type, date = date, priority = priority, status = status,
 )
@@ -75,8 +77,13 @@ class ActivitiesRepositoryImpl @Inject constructor(
         return result.onSuccess { dao.upsert(it.toEntity()) }
     }
     // Actualiza una actividad existente en la API y sincroniza el cambio localmente.
-    override suspend fun update(id: Int, draft: ActivityDraft): AppResult<Activity> =
-        safeApiCall { api.update(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
+    /** Updates an activity against the version the edit started from; a change made elsewhere is not overwritten. */
+    override suspend fun update(id: Int, draft: ActivityDraft): AppResult<Activity> {
+        val body = draft.toDto()
+        return safeApiCall { api.update(id, body, ifMatchOf(draft.baseVersion)).toDomain() }
+            .explainingConflict(FarmActivityDto.serializer(), body) { server -> dao.upsert(server.toDomain().toEntity()) }
+            .onSuccess { dao.upsert(it.toEntity()) }
+    }
     // Actualiza una actividad existente en la API y sincroniza el cambio localmente.
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.delete(id) }.onSuccess { dao.delete(id) }

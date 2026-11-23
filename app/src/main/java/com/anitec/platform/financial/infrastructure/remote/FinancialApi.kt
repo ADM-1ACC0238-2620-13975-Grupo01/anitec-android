@@ -18,12 +18,13 @@ data class FinancialRecordDto(
     val amount: Double = 0.0,
     val date: String = "",
     val description: String = "",
+    val version: Int = 1,
 )
 
 /** Rancher-only endpoints. */
 interface FinancialApi {
     @GET("financial-records") suspend fun getRecords(): List<FinancialRecordDto>
     @POST("financial-records") suspend fun create(@Body body: FinancialRecordDto, @Header("Idempotency-Key") idempotencyKey: String? = null): FinancialRecordDto
-    @PUT("financial-records/{id}") suspend fun update(@Path("id") id: Int, @Body body: FinancialRecordDto): FinancialRecordDto
+    @PUT("financial-records/{id}") suspend fun update(@Path("id") id: Int, @Body body: FinancialRecordDto, @Header("If-Match") ifMatch: String? = null): FinancialRecordDto
     @DELETE("financial-records/{id}") suspend fun delete(@Path("id") id: Int)
 }

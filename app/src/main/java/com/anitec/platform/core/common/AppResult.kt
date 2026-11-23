@@ -25,6 +25,17 @@ sealed interface AppError {
     /** HTTP 400: the server rejected the input. Messages are server text, shown only as a hint. */
     data class Validation(val messages: List<String> = emptyList()) : AppError
 
+    /**
+     * HTTP 412: the record changed after the version the edit was based on, so the server kept its own copy.
+     * [currentVersion] is the version it holds now and [serverCopy] its JSON; [differences] is filled by the
+     * repository once it has compared that copy with the edit (see [explainingConflict]).
+     */
+    data class OutOfDate(
+        val currentVersion: Int,
+        val serverCopy: String? = null,
+        val differences: List<FieldDifference> = emptyList(),
+    ) : AppError
+
     /** HTTP 5xx. */
     data class Server(val code: Int) : AppError
 

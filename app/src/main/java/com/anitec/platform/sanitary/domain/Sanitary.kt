@@ -17,6 +17,8 @@ data class HealthEvent(
     val prescription: String,
     val followUp: String,
     val nextDueDate: String?,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
     /** Open events carry a next due date; the dashboard counts them as pending follow-ups. */
     
@@ -38,6 +40,8 @@ data class HealthEventDraft(
     val prescription: String,
     val followUp: String,
     val nextDueDate: String?,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /** Kinds of record the web offers; the API stores them as free text. */

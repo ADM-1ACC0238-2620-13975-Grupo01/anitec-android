@@ -2,6 +2,8 @@ package com.anitec.platform.sanitary.infrastructure
 
 import com.anitec.platform.core.common.AppError
 import com.anitec.platform.core.common.AppResult
+import com.anitec.platform.core.common.explainingConflict
+import com.anitec.platform.core.common.ifMatchOf
 import com.anitec.platform.core.common.onSuccess
 import com.anitec.platform.core.network.safeApiCall
 import com.anitec.platform.core.outbox.OutboxKinds
@@ -22,9 +24,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Mappers between the API DTO, the Room entity and the domain [HealthEvent]. */
-fun HealthEventDto.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
-fun HealthEvent.toEntity() = HealthEventEntity(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
-fun HealthEventEntity.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate)
+fun HealthEventDto.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate, version)
+fun HealthEvent.toEntity() = HealthEventEntity(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate, version)
+fun HealthEventEntity.toDomain() = HealthEvent(id, animalId, type, date, description, veterinarian, diagnosis, treatment, prescription, followUp, nextDueDate, version)
 fun HealthEventDraft.toDto() = HealthEventDto(
     animalId = animalId, type = type, date = date, description = description, veterinarian = veterinarian,
     diagnosis = diagnosis, treatment = treatment, prescription = prescription, followUp = followUp, nextDueDate = nextDueDate,
@@ -64,8 +66,13 @@ class SanitaryRepositoryImpl @Inject constructor(
         return result.onSuccess { dao.upsert(it.toEntity()) }
     }
 
-    override suspend fun update(id: Int, draft: HealthEventDraft): AppResult<HealthEvent> =
-        safeApiCall { api.updateEvent(id, draft.toDto()).toDomain() }.onSuccess { dao.upsert(it.toEntity()) }
+    /** Updates a health event against the version the edit started from; a change made elsewhere is not overwritten. */
+    override suspend fun update(id: Int, draft: HealthEventDraft): AppResult<HealthEvent> {
+        val body = draft.toDto()
+        return safeApiCall { api.updateEvent(id, body, ifMatchOf(draft.baseVersion)).toDomain() }
+            .explainingConflict(HealthEventDto.serializer(), body) { server -> dao.upsert(server.toDomain().toEntity()) }
+            .onSuccess { dao.upsert(it.toEntity()) }
+    }
 
     override suspend fun delete(id: Int): AppResult<Unit> =
         safeApiCall { api.deleteEvent(id) }.onSuccess { dao.delete(id) }

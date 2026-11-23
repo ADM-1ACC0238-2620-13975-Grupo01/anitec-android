@@ -18,6 +18,8 @@ data class Activity(
     val date: String,
     val priority: String,
     val status: String,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
     /** Still to be done: not completed and not in the past. */
     fun isUpcoming(today: LocalDate): Boolean {
@@ -36,6 +38,8 @@ data class ActivityDraft(
     val date: String,
     val priority: String,
     val status: String,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /** Activity types, in the Spanish text the API stores. */

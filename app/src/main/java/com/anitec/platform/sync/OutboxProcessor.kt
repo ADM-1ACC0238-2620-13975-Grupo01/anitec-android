@@ -184,7 +184,7 @@ class OutboxProcessor @Inject constructor(
                 Step.Retry
             }
         }
-        is AppError.Conflict -> fail(operation, OutboxFailures.CONFLICT)
+        is AppError.Conflict, is AppError.OutOfDate -> fail(operation, OutboxFailures.CONFLICT)
         AppError.Forbidden -> fail(operation, OutboxFailures.FORBIDDEN)
         AppError.NotFound -> fail(operation, OutboxFailures.NOT_FOUND)
         is AppError.Validation -> fail(operation, OutboxFailures.REJECTED)
