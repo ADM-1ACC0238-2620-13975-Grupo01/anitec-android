@@ -21,6 +21,15 @@ data class Activity(
     /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
     val version: Int = 1,
 ) {
+    /**
+     * The values of this activity as a draft, to save a change of [status] or [date] against the version the user
+     * is looking at: an edit made elsewhere in the meantime is reported as a conflict instead of overwritten.
+     */
+    fun toDraft(status: String = this.status, date: String = this.date) = ActivityDraft(
+        ownerId = ownerId, veterinarianId = veterinarianId, title = title, type = type, date = date,
+        priority = priority, status = status, baseVersion = version,
+    )
+
     /** Still to be attended: neither completed nor cancelled. */
     val isOpen: Boolean
         get() = !status.equals(ActivityStatuses.COMPLETED, ignoreCase = true) &&
@@ -72,6 +81,12 @@ object ActivityStatuses {
     const val COMPLETED = "Completado"
     const val CANCELLED = "Cancelado"
     val all = listOf(PENDING, SCHEDULED, COMPLETED, CANCELLED)
+}
+
+object ActivityRules {
+    /** A pending activity can only be moved to today or a later day (US-028 scenario 2). */
+    fun canScheduleOn(date: String, today: LocalDate): Boolean =
+        runCatching { !LocalDate.parse(date).isBefore(today) }.getOrDefault(false)
 }
 
 object ActivityScope {

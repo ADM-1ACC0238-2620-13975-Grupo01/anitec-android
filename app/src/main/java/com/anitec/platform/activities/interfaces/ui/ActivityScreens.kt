@@ -1,5 +1,12 @@
 package com.anitec.platform.activities.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.DatePickerPopup
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material.icons.filled.MoreVert
 import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -143,6 +150,22 @@ fun ActivityCard(
         modifier = modifier,
     )
 }
+/** The less common actions of an open activity, behind one button so the card keeps its two main ones in view. */
+@Composable
+private fun ActivityMenu(onEdit: () -> Unit, onCancel: () -> Unit, onDelete: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }) {
+            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.activity_more_actions))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(text = { Text(stringResource(R.string.common_edit)) }, onClick = { open = false; onEdit() })
+            DropdownMenuItem(text = { Text(stringResource(R.string.activity_cancel_action)) }, onClick = { open = false; onCancel() })
+            DropdownMenuItem(text = { Text(stringResource(R.string.common_delete)) }, onClick = { open = false; onDelete() })
+        }
+    }
+}
+
 /**
  * Composable screen that displays the list of farm activities with navigation actions.
  */
@@ -174,16 +197,34 @@ fun ActivityListScreen(
                             activity = activity,
                             today = state.today,
                             footer = {
-                                SecondaryButton(
-                                    text = stringResource(R.string.common_edit),
-                                    onClick = { onEdit(activity.id) },
-                                    icon = Icons.Filled.Edit,
-                                )
-                                DangerTextButton(
-                                    text = stringResource(R.string.common_delete),
-                                    onClick = { viewModel.requestDelete(activity) },
-                                    icon = Icons.Filled.Delete,
-                                )
+                                if (activity.isOpen) {
+                                    SecondaryButton(
+                                        text = stringResource(R.string.activity_attended),
+                                        onClick = { viewModel.markAttended(activity) },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    SecondaryButton(
+                                        text = stringResource(R.string.activity_reschedule),
+                                        onClick = { viewModel.requestReschedule(activity) },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    ActivityMenu(
+                                        onEdit = { onEdit(activity.id) },
+                                        onCancel = { viewModel.requestCancel(activity) },
+                                        onDelete = { viewModel.requestDelete(activity) },
+                                    )
+                                } else {
+                                    SecondaryButton(
+                                        text = stringResource(R.string.common_edit),
+                                        onClick = { onEdit(activity.id) },
+                                        icon = Icons.Filled.Edit,
+                                    )
+                                    DangerTextButton(
+                                        text = stringResource(R.string.common_delete),
+                                        onClick = { viewModel.requestDelete(activity) },
+                                        icon = Icons.Filled.Delete,
+                                    )
+                                }
                             },
                         )
                     }
@@ -201,6 +242,19 @@ fun ActivityListScreen(
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
+    state.pendingCancel?.let { activity ->
+        ConfirmDialog(
+            title = stringResource(R.string.activity_cancel_action),
+            message = stringResource(R.string.activity_cancel_confirm, activity.title),
+            confirmLabel = stringResource(R.string.activity_cancel_action),
+            dismissLabel = stringResource(R.string.activity_keep),
+            onConfirm = viewModel::confirmCancel,
+            onDismiss = viewModel::dismissCancel,
+        )
+    }
+    state.pendingReschedule?.let { activity ->
+        DatePickerPopup(value = activity.date, onPicked = viewModel::reschedule, onDismiss = viewModel::dismissReschedule)
+    }
     state.pendingDelete?.let { activity ->
         ConfirmDialog(
             title = stringResource(R.string.common_confirm_delete_title),
@@ -260,7 +314,11 @@ fun ActivityFormScreen(
         )
         DateField(
             value = state.date, onChange = viewModel::onDateChange, label = stringResource(R.string.activity_date),
-            error = if (state.dateMissing) required else null,
+            error = when {
+                state.dateMissing -> required
+                state.dateInPast -> stringResource(R.string.activity_date_past)
+                else -> null
+            },
         )
         DropdownField(
             label = stringResource(R.string.activity_priority),

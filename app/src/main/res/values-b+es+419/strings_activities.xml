@@ -42,4 +42,16 @@
     <string name="reminder_channel_name">Recordatorios de actividades</string>
     <string name="reminder_channel_description">Recordatorios de las actividades de hoy.</string>
     <string name="reminder_text">Hoy · %1$s · Prioridad %2$s</string>
+
+    <!-- Atender, reprogramar y cancelar una actividad (US-026, US-028) -->
+    <string name="activity_attended">Atendida</string>
+    <string name="activity_reschedule">Reprogramar</string>
+    <string name="activity_more_actions">Más acciones</string>
+    <string name="activity_cancel_action">Cancelar actividad</string>
+    <string name="activity_cancel_confirm">¿Cancelar %1$s? Queda en tu lista como cancelada y ya no recibirás recordatorios de ella.</string>
+    <string name="activity_keep">Mantenerla</string>
+    <string name="activity_attended_message">Actividad marcada como atendida</string>
+    <string name="activity_rescheduled_message">Actividad reprogramada</string>
+    <string name="activity_cancelled_message">Actividad cancelada</string>
+    <string name="activity_date_past">La fecha no puede estar en el pasado.</string>
 </resources>
