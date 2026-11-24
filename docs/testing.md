@@ -1,6 +1,6 @@
 # Pruebas automatizadas de Android
 
-Historia: TS-014 (automatizar pruebas de los flujos móviles críticos). Última ejecución completa: 24/11/2026.
+Historia: TS-014 (automatizar pruebas de los flujos móviles críticos). Última ejecución completa: 23/11/2026.
 
 ## Suites
 

@@ -1,7 +1,7 @@
 # Revisión de accesibilidad y contraste (Android)
 
 Historias: TS-012 (internacionalización y accesibilidad) y US-042 (usar la aplicación con necesidades de accesibilidad).
-Fecha de la revisión: 24/11/2026. Dispositivo: emulador Pixel (API 37, 1080×2400, 420 dpi), idioma español.
+Fecha de la revisión: 23/11/2026. Dispositivo: emulador Pixel (API 37, 1080×2400, 420 dpi), idioma español.
 
 ## Cómo se verificó
 
