@@ -41,7 +41,7 @@ android {
         versionCode = 3
         versionName = "0.2.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.anitec.platform.HiltTestRunner"
     }
 
     signingConfigs {
@@ -171,6 +171,8 @@ dependencies {
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.okhttp.mockwebserver)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

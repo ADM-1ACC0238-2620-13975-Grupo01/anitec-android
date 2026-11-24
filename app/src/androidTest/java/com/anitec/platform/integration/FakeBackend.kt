@@ -34,6 +34,11 @@ class FakeBackend : Dispatcher() {
     /** When set, every request answers with this status, as a server that is failing. */
     @Volatile var failWith: Int? = null
 
+    /** Puts a record on the server, as if it had been created earlier. */
+    fun seed(record: JsonObject) {
+        records[record.getValue("id").jsonPrimitive.int] = record
+    }
+
     /** Number of financial records the server holds. */
     val recordCount: Int get() = records.size
 
@@ -61,6 +66,12 @@ class FakeBackend : Dispatcher() {
             request.method == "PUT" && path.startsWith("financial-records/") -> update(path.substringAfter('/').toInt(), request.headers["If-Match"], body)
             request.method == "GET" && path.endsWith("/veterinarian-links") -> jsonArray(links.map { (id, status) -> link(id, status) })
             request.method == "POST" && path.contains("/veterinarian-links/") -> answer(path)
+            request.method == "POST" && path == "authentication/sign-in" -> json(200, buildJsonObject {
+                put("id", JsonPrimitive(10)); put("username", JsonPrimitive("rancher")); put("fullName", JsonPrimitive("Jose Quispe"))
+                put("role", JsonPrimitive("Rancher")); put("token", JsonPrimitive("test-token"))
+            })
+            // Every other list (herds, animals, events...) is empty: the screens under test do not need them.
+            request.method == "GET" -> jsonArray(emptyList())
             else -> MockResponse.Builder().code(404).build()
         }
     }
