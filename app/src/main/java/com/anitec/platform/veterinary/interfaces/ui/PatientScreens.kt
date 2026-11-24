@@ -1,5 +1,6 @@
 package com.anitec.platform.veterinary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -169,13 +169,7 @@ fun ClinicalHistoryScreen(
         },
         floatingActionButton = {
             if (state.animal != null) {
-                ExtendedFloatingActionButton(
-                    onClick = { onNewRecord(viewModel.animalId) },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    text = { Text(stringResource(R.string.vet_history_new)) },
-                )
+                AniTecExtendedFab(text = stringResource(R.string.vet_history_new), icon = Icons.Filled.Add, onClick = { onNewRecord(viewModel.animalId) })
             }
         },
     ) { padding ->

@@ -1,5 +1,6 @@
 package com.anitec.platform.activities.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import com.anitec.platform.core.designsystem.component.DatePickerPopup
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -237,14 +237,7 @@ fun ActivityListScreen(
                 }
             }
         }
-        ExtendedFloatingActionButton(
-            onClick = onNew,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.activities_new)) },
-        )
+        AniTecExtendedFab(text = stringResource(R.string.activities_new), icon = Icons.Filled.Add, onClick = onNew, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 

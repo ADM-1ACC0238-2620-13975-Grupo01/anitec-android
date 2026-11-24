@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -134,4 +136,28 @@ fun DangerTextButton(
         }
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
+}
+
+/**
+ * The floating button that creates something, with its label.
+ *
+ * Checked on a device with the semantics tree: the merged node of an [ExtendedFloatingActionButton] had the button role
+ * and no text, so TalkBack could not say what it does. The label is set as the content description of the node, and
+ * the icon stays decorative.
+ */
+@Composable
+fun AniTecExtendedFab(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ExtendedFloatingActionButton(
+        onClick = onClick,
+        modifier = modifier.semantics { contentDescription = text },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        icon = { Icon(icon, contentDescription = null) },
+        text = { Text(text) },
+    )
 }

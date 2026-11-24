@@ -1,5 +1,6 @@
 package com.anitec.platform.devices.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -143,13 +143,7 @@ fun DeviceListScreen(
         },
         floatingActionButton = {
             if (state.canManage) {
-                ExtendedFloatingActionButton(
-                    onClick = onNew,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    text = { Text(stringResource(R.string.iot_new)) },
-                )
+                AniTecExtendedFab(text = stringResource(R.string.iot_new), icon = Icons.Filled.Add, onClick = onNew)
             }
         },
     ) { padding ->

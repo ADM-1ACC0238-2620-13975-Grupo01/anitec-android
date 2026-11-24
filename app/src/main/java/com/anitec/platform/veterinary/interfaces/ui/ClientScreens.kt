@@ -1,5 +1,6 @@
 package com.anitec.platform.veterinary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -178,13 +178,7 @@ fun ClientListScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddClient,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Filled.PersonAdd, contentDescription = null) },
-                text = { Text(stringResource(R.string.vet_add_client)) },
-            )
+            AniTecExtendedFab(text = stringResource(R.string.vet_add_client), icon = Icons.Filled.PersonAdd, onClick = onAddClient)
         },
     ) { padding ->
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.padding(padding).fillMaxSize()) {

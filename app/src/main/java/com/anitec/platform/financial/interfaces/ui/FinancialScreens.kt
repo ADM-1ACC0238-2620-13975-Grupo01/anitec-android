@@ -1,5 +1,6 @@
 package com.anitec.platform.financial.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -135,13 +135,7 @@ fun FinancialListScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onNew,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.finance_new)) },
-            )
+            AniTecExtendedFab(text = stringResource(R.string.finance_new), icon = Icons.Filled.Add, onClick = onNew)
         },
     ) { padding ->
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.padding(padding).fillMaxSize()) {
