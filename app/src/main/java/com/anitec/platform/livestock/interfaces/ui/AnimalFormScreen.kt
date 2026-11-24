@@ -1,5 +1,6 @@
 package com.anitec.platform.livestock.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
 import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import android.Manifest
 import android.content.pm.PackageManager
@@ -319,7 +320,7 @@ private fun PhotoSection(
                 }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        ButtonRow {
             SecondaryButton(
                 text = stringResource(R.string.animal_photo_take),
                 icon = Icons.Filled.AddAPhoto,

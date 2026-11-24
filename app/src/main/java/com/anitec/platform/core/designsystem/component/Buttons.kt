@@ -1,5 +1,12 @@
 package com.anitec.platform.core.designsystem.component
 
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.layout.FlowRowScope
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -160,4 +167,31 @@ fun AniTecExtendedFab(
         icon = { Icon(icon, contentDescription = null) },
         text = { Text(text) },
     )
+}
+
+/**
+ * Buttons side by side that move to the next line when they no longer fit, which is what happens when the user makes the
+ * text larger. A plain [Row] squeezes each button until its label breaks in the middle of a word ("Atendid-a").
+ * The buttons can still use `Modifier.weight(1f)` to share the width of a line.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ButtonRow(modifier: Modifier = Modifier, content: @Composable FlowRowScope.() -> Unit) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
+        content = content,
+    )
+}
+
+/**
+ * Limits how much the system font size grows [content], for text in a bar of fixed size such as the bottom navigation,
+ * where larger text cannot wrap or push the rest of the screen away. The full name stays available to screen readers.
+ */
+@Composable
+fun CappedFontScale(maxScale: Float, content: @Composable () -> Unit) {
+    val density = LocalDensity.current
+    CompositionLocalProvider(LocalDensity provides Density(density.density, minOf(density.fontScale, maxScale))) { content() }
 }

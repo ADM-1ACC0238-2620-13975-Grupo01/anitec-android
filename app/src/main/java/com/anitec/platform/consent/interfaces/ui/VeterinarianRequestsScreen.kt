@@ -1,5 +1,6 @@
 package com.anitec.platform.consent.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -121,7 +122,7 @@ fun VeterinarianRequestsScreen(
                     }
                     section(R.string.consent_section_pending, state.pending) { link ->
                         LinkCard(link) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ButtonRow {
                                 PrimaryButton(
                                     text = stringResource(R.string.consent_accept),
                                     onClick = { viewModel.accept(link) },

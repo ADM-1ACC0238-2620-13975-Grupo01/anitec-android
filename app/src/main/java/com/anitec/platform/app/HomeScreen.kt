@@ -1,5 +1,6 @@
 package com.anitec.platform.app
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -131,7 +132,7 @@ private fun RancherHome(
             ) {
                 GreetingPanel(session, stringResource(R.string.home_subtitle))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                ButtonRow {
                     PrimaryButton(
                         text = stringResource(R.string.home_action_register_animal),
                         onClick = onRegisterAnimal,

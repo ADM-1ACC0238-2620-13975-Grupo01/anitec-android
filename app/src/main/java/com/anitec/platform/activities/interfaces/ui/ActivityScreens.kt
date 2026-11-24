@@ -135,7 +135,7 @@ fun ActivityCard(
     activity: Activity,
     today: LocalDate,
     modifier: Modifier = Modifier,
-    footer: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
+    footer: (@Composable androidx.compose.foundation.layout.FlowRowScope.() -> Unit)? = null,
 ) {
     val overdue = activity.isUpcoming(today).not() && activity.isOpen
     RecordCard(
@@ -207,12 +207,10 @@ fun ActivityListScreen(
                                     SecondaryButton(
                                         text = stringResource(R.string.activity_attended),
                                         onClick = { viewModel.markAttended(activity) },
-                                        modifier = Modifier.weight(1f),
                                     )
                                     SecondaryButton(
                                         text = stringResource(R.string.activity_reschedule),
                                         onClick = { viewModel.requestReschedule(activity) },
-                                        modifier = Modifier.weight(1f),
                                     )
                                     ActivityMenu(
                                         onEdit = { onEdit(activity.id) },

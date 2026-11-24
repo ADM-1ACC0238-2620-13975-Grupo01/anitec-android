@@ -1,5 +1,7 @@
 package com.anitec.platform.app
 
+import com.anitec.platform.core.designsystem.component.CappedFontScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -194,7 +196,7 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                             selected = selected,
                             onClick = { navController.navigateToTopLevel(item.route) },
                             icon = { Icon(item.icon, contentDescription = null) },
-                            label = { Text(stringResource(item.label)) },
+                            label = { CappedFontScale(NAV_LABEL_MAX_FONT_SCALE) { Text(stringResource(item.label), maxLines = 1, overflow = TextOverflow.Ellipsis) } },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -392,3 +394,10 @@ internal fun NavHostController.navigateToTopLevel(route: Any) {
         restoreState = true
     }
 }
+
+/**
+ * The labels of the bottom bar grow with the system font only up to this much: the bar has a fixed width for each
+ * destination, and at 200% a label such as "Actividades" broke in the middle of the word. Each item still reads out
+ * its full name.
+ */
+private const val NAV_LABEL_MAX_FONT_SCALE = 1.2f

@@ -76,7 +76,7 @@ fun FollowUpTag(hasFollowUp: Boolean) {
 
 /** Card of one health record, shared by the list and the dashboard. */
 @Composable
-fun HealthRecordCard(item: HealthItem, modifier: Modifier = Modifier, footer: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null) {
+fun HealthRecordCard(item: HealthItem, modifier: Modifier = Modifier, footer: (@Composable androidx.compose.foundation.layout.FlowRowScope.() -> Unit)? = null) {
     val event = item.event
     val details = buildList {
         add(stringResource(R.string.health_type) to healthTypeLabel(event.type))
