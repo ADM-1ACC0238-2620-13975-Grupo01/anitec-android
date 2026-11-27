@@ -1,5 +1,6 @@
 package com.anitec.platform.livestock.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -29,7 +30,6 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -142,14 +142,7 @@ fun AnimalListScreen(
         }
 
         if (state.canEdit && !state.selectionMode) {
-            ExtendedFloatingActionButton(
-                onClick = onNewAnimal,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.animals_new)) },
-            )
+            AniTecExtendedFab(text = stringResource(R.string.animals_new), icon = Icons.Filled.Add, onClick = onNewAnimal, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
         }
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }

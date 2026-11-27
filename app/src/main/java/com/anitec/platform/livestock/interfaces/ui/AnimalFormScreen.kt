@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
+import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -77,6 +79,7 @@ fun AnimalFormScreen(
     viewModel: AnimalFormViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    state.conflict?.let { SaveConflictDialog(it, viewModel::keepMine, viewModel::keepServer, viewModel::dismissConflict) }
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
     LaunchedEffect(state.done) { if (state.done) onBack() }
@@ -317,7 +320,7 @@ private fun PhotoSection(
                 }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        ButtonRow {
             SecondaryButton(
                 text = stringResource(R.string.animal_photo_take),
                 icon = Icons.Filled.AddAPhoto,

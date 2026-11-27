@@ -1,5 +1,6 @@
 package com.anitec.platform.livestock.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -114,7 +115,7 @@ fun AnimalDetailSheet(
             DetailRow(stringResource(R.string.animal_age_range)) { Text(animal.ageRange?.let { LivestockOptions.ageRange.labelFor(it) } ?: "-") }
 
             if (canEdit) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                ButtonRow {
                     SecondaryButton(
                         text = stringResource(R.string.animals_edit),
                         onClick = onEdit,

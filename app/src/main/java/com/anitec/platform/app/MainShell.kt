@@ -1,5 +1,7 @@
 package com.anitec.platform.app
 
+import com.anitec.platform.core.designsystem.component.CappedFontScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -17,6 +19,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.sync.SyncBanner
 import com.anitec.platform.sync.SyncStatusViewModel
@@ -75,7 +78,10 @@ import com.anitec.platform.devices.interfaces.ui.DeviceHistoryScreen
 import com.anitec.platform.devices.interfaces.ui.DeviceListScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialFormScreen
 import com.anitec.platform.financial.interfaces.ui.FinancialListScreen
+import com.anitec.platform.consent.interfaces.ui.VeterinarianRequestsScreen
+import com.anitec.platform.consent.interfaces.viewmodel.PendingRequestsViewModel
 import com.anitec.platform.core.session.UserRole
+import com.anitec.platform.reminders.interfaces.ui.ReminderTapViewModel
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.TermsScreen
 import com.anitec.platform.livestock.interfaces.ui.AnimalFormScreen
@@ -129,6 +135,14 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
     val layout = navigationLayoutFor(activity?.let { calculateWindowSizeClass(it).widthSizeClass } ?: WindowWidthSizeClass.Compact)
     val syncViewModel: SyncStatusViewModel = hiltViewModel()
     val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
+    val reminderTapViewModel: ReminderTapViewModel = hiltViewModel()
+    val reminderTap by reminderTapViewModel.pending.collectAsStateWithLifecycle()
+    LaunchedEffect(reminderTap) {
+        val activityId = reminderTap ?: return@LaunchedEffect
+        navController.navigate(ActivityFormRoute(activityId))
+        reminderTapViewModel.consume()
+    }
+
     val checkoutReturnViewModel: CheckoutReturnViewModel = hiltViewModel()
     val checkoutReturn by checkoutReturnViewModel.pending.collectAsStateWithLifecycle()
     // The browser sends the user back with a link. Show the result once, then clear the link.
@@ -182,7 +196,7 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
                             selected = selected,
                             onClick = { navController.navigateToTopLevel(item.route) },
                             icon = { Icon(item.icon, contentDescription = null) },
-                            label = { Text(stringResource(item.label)) },
+                            label = { CappedFontScale(NAV_LABEL_MAX_FONT_SCALE) { Text(stringResource(item.label), maxLines = 1, overflow = TextOverflow.Ellipsis) } },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -305,13 +319,22 @@ fun MainShell(session: UserSession, onSignOut: () -> Unit) {
             composable<DeviceHistoryRoute> { DeviceHistoryScreen(onBack = { navController.popBackStack() }) }
             composable<DeviceFormRoute> { DeviceFormScreen(onBack = { navController.popBackStack() }) }
             composable<MoreRoute> {
+                val pendingViewModel: PendingRequestsViewModel = hiltViewModel()
+                val pendingRequests by pendingViewModel.count.collectAsStateWithLifecycle()
+                // The number comes from the server, so it is read again each time the menu is shown.
+                LifecycleResumeEffect(session.role) {
+                    if (session.role == UserRole.Rancher) pendingViewModel.refresh()
+                    onPauseOrDispose {}
+                }
                 MoreScreen(
                     session = session,
                     onOpen = { route -> navController.navigate(route) },
                     onSignOut = onSignOut,
                     unsyncedCount = syncStatus.total,
+                    pendingRequests = if (session.role == UserRole.Rancher) pendingRequests else 0,
                 )
             }
+            composable<VeterinariansRoute> { VeterinarianRequestsScreen(onBack = { navController.popBackStack() }) }
             composable<TermsRoute> { TermsScreen(onBack = { navController.popBackStack() }) }
             composable<AnimalFormRoute> {
                 AnimalFormScreen(
@@ -371,3 +394,10 @@ internal fun NavHostController.navigateToTopLevel(route: Any) {
         restoreState = true
     }
 }
+
+/**
+ * The labels of the bottom bar grow with the system font only up to this much: the bar has a fixed width for each
+ * destination, and at 200% a label such as "Actividades" broke in the middle of the word. Each item still reads out
+ * its full name.
+ */
+private const val NAV_LABEL_MAX_FONT_SCALE = 1.2f

@@ -17,6 +17,8 @@ data class HealthEvent(
     val prescription: String,
     val followUp: String,
     val nextDueDate: String?,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
     /** Open events carry a next due date; the dashboard counts them as pending follow-ups. */
     
@@ -38,6 +40,8 @@ data class HealthEventDraft(
     val prescription: String,
     val followUp: String,
     val nextDueDate: String?,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /** Kinds of record the web offers; the API stores them as free text. */
@@ -51,6 +55,20 @@ object HealthTypes {
     val all = listOf(INCIDENT, VACCINE, TREATMENT, DIAGNOSIS, CHECKUP)
 }
 
+
+/** Rules of the check that follows a health record (US-019). */
+object FollowUpRules {
+    /**
+     * The next check is optional. When it is given it must be a real day after the day of the record, so a
+     * follow-up is never scheduled for the day of the visit itself or before it (US-019 scenario 2).
+     */
+    fun isValidNextCheck(recordDate: String, nextCheck: String): Boolean {
+        if (nextCheck.isBlank()) return true
+        val next = runCatching { java.time.LocalDate.parse(nextCheck) }.getOrNull() ?: return false
+        val record = runCatching { java.time.LocalDate.parse(recordDate) }.getOrNull() ?: return true
+        return next.isAfter(record)
+    }
+}
 
 /** Client-side visibility rule for health records. */
 object SanitaryScope {

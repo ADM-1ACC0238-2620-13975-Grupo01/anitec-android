@@ -1,5 +1,14 @@
 package com.anitec.platform.activities.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
+import com.anitec.platform.core.designsystem.component.DatePickerPopup
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material.icons.filled.MoreVert
+import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +18,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -40,6 +49,7 @@ import com.anitec.platform.activities.interfaces.viewmodel.ActivityFormViewModel
 import com.anitec.platform.activities.interfaces.viewmodel.ActivityListViewModel
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.outbox.isPendingSync
+import com.anitec.platform.reminders.interfaces.ui.NotificationsOffBanner
 import com.anitec.platform.core.designsystem.component.AniTecTextField
 import com.anitec.platform.core.designsystem.component.ConfirmDialog
 import com.anitec.platform.core.designsystem.component.DangerTextButton
@@ -93,6 +103,7 @@ fun activityStatusRes(status: String): Int? = when (status) {
     ActivityStatuses.PENDING -> R.string.activity_status_pending
     ActivityStatuses.SCHEDULED -> R.string.activity_status_scheduled
     ActivityStatuses.COMPLETED -> R.string.activity_status_completed
+    ActivityStatuses.CANCELLED -> R.string.activity_status_cancelled
     else -> null
 }
 /**
@@ -124,9 +135,9 @@ fun ActivityCard(
     activity: Activity,
     today: LocalDate,
     modifier: Modifier = Modifier,
-    footer: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
+    footer: (@Composable androidx.compose.foundation.layout.FlowRowScope.() -> Unit)? = null,
 ) {
-    val overdue = activity.isUpcoming(today).not() && !activity.status.equals(ActivityStatuses.COMPLETED, ignoreCase = true)
+    val overdue = activity.isUpcoming(today).not() && activity.isOpen
     RecordCard(
         title = activity.title,
         kicker = if (overdue) "${activity.date} · ${stringResource(R.string.activity_overdue)}" else activity.date,
@@ -140,6 +151,22 @@ fun ActivityCard(
         modifier = modifier,
     )
 }
+/** The less common actions of an open activity, behind one button so the card keeps its two main ones in view. */
+@Composable
+private fun ActivityMenu(onEdit: () -> Unit, onCancel: () -> Unit, onDelete: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }) {
+            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.activity_more_actions))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(text = { Text(stringResource(R.string.common_edit)) }, onClick = { open = false; onEdit() })
+            DropdownMenuItem(text = { Text(stringResource(R.string.activity_cancel_action)) }, onClick = { open = false; onCancel() })
+            DropdownMenuItem(text = { Text(stringResource(R.string.common_delete)) }, onClick = { open = false; onDelete() })
+        }
+    }
+}
+
 /**
  * Composable screen that displays the list of farm activities with navigation actions.
  */
@@ -153,6 +180,10 @@ fun ActivityListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
+    // The list keeps the item that was first on screen in place, so an activity that arrives above it would be
+    // left out of sight; when the first item changes, go back to the top to show it.
+    val listState = rememberLazyListState()
+    LaunchedEffect(state.items.firstOrNull()?.id) { listState.animateScrollToItem(0) }
 // Botón flotante extendido para crear una nueva actividad y contenedor de notificaciones Snackbar.
     Box(modifier = modifier.fillMaxSize()) {
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.fillMaxSize()) {
@@ -160,41 +191,67 @@ fun ActivityListScreen(
                 state.loading -> LoadingState()
                 state.items.isEmpty() -> EmptyState(stringResource(R.string.activities_empty))
                 else -> LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    if (state.items.any { it.isUpcoming(state.today) }) {
+                        item(key = "notifications-off") { NotificationsOffBanner() }
+                    }
                     items(state.items, key = { it.id }) { activity ->
                         ActivityCard(
                             activity = activity,
                             today = state.today,
                             footer = {
-                                SecondaryButton(
-                                    text = stringResource(R.string.common_edit),
-                                    onClick = { onEdit(activity.id) },
-                                    icon = Icons.Filled.Edit,
-                                )
-                                DangerTextButton(
-                                    text = stringResource(R.string.common_delete),
-                                    onClick = { viewModel.requestDelete(activity) },
-                                    icon = Icons.Filled.Delete,
-                                )
+                                if (activity.isOpen) {
+                                    SecondaryButton(
+                                        text = stringResource(R.string.activity_attended),
+                                        onClick = { viewModel.markAttended(activity) },
+                                    )
+                                    SecondaryButton(
+                                        text = stringResource(R.string.activity_reschedule),
+                                        onClick = { viewModel.requestReschedule(activity) },
+                                    )
+                                    ActivityMenu(
+                                        onEdit = { onEdit(activity.id) },
+                                        onCancel = { viewModel.requestCancel(activity) },
+                                        onDelete = { viewModel.requestDelete(activity) },
+                                    )
+                                } else {
+                                    SecondaryButton(
+                                        text = stringResource(R.string.common_edit),
+                                        onClick = { onEdit(activity.id) },
+                                        icon = Icons.Filled.Edit,
+                                    )
+                                    DangerTextButton(
+                                        text = stringResource(R.string.common_delete),
+                                        onClick = { viewModel.requestDelete(activity) },
+                                        icon = Icons.Filled.Delete,
+                                    )
+                                }
                             },
                         )
                     }
                 }
             }
         }
-        ExtendedFloatingActionButton(
-            onClick = onNew,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.activities_new)) },
-        )
+        AniTecExtendedFab(text = stringResource(R.string.activities_new), icon = Icons.Filled.Add, onClick = onNew, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
+    state.pendingCancel?.let { activity ->
+        ConfirmDialog(
+            title = stringResource(R.string.activity_cancel_action),
+            message = stringResource(R.string.activity_cancel_confirm, activity.title),
+            confirmLabel = stringResource(R.string.activity_cancel_action),
+            dismissLabel = stringResource(R.string.activity_keep),
+            onConfirm = viewModel::confirmCancel,
+            onDismiss = viewModel::dismissCancel,
+        )
+    }
+    state.pendingReschedule?.let { activity ->
+        DatePickerPopup(value = activity.date, onPicked = viewModel::reschedule, onDismiss = viewModel::dismissReschedule)
+    }
     state.pendingDelete?.let { activity ->
         ConfirmDialog(
             title = stringResource(R.string.common_confirm_delete_title),
@@ -216,6 +273,7 @@ fun ActivityFormScreen(
     viewModel: ActivityFormViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    state.conflict?.let { SaveConflictDialog(it, viewModel::keepMine, viewModel::keepServer, viewModel::dismissConflict) }
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
     LaunchedEffect(state.done) { if (state.done) onBack() }
@@ -253,7 +311,11 @@ fun ActivityFormScreen(
         )
         DateField(
             value = state.date, onChange = viewModel::onDateChange, label = stringResource(R.string.activity_date),
-            error = if (state.dateMissing) required else null,
+            error = when {
+                state.dateMissing -> required
+                state.dateInPast -> stringResource(R.string.activity_date_past)
+                else -> null
+            },
         )
         DropdownField(
             label = stringResource(R.string.activity_priority),

@@ -24,13 +24,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    /** Shared kotlinx.serialization config: ignore unknown keys and coerce defaults. */
+    /**
+     * Shared kotlinx.serialization config: ignore unknown keys and coerce defaults.
+     *
+     * [encodeDefaults] makes a field that still has its default value (an empty description, for instance) travel in the
+     * request. Without it the field is left out, the server reads it as missing and refuses the request ("The FollowUp
+     * field is required") even though the form treats it as optional.
+     */
     @Provides
     @Singleton
     fun provideJson(): Json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
         coerceInputValues = true
+        encodeDefaults = true
     }
 
     /**

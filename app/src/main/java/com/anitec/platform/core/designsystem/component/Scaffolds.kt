@@ -1,5 +1,6 @@
 package com.anitec.platform.core.designsystem.component
 
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -101,7 +102,7 @@ fun RecordCard(
     kicker: String? = null,
     trailing: (@Composable () -> Unit)? = null,
     details: List<Pair<String, String>> = emptyList(),
-    footer: (@Composable RowScope.() -> Unit)? = null,
+    footer: (@Composable FlowRowScope.() -> Unit)? = null,
     pendingSync: Boolean = false,
 ) {
     AniTecPanel(modifier = modifier.fillMaxWidth()) {
@@ -133,7 +134,7 @@ fun RecordCard(
                 }
             }
             if (footer != null) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), content = footer)
+                ButtonRow(content = footer)
             }
         }
     }

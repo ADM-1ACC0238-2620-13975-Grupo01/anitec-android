@@ -1,5 +1,6 @@
 package com.anitec.platform.veterinary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anitec.platform.R
+import com.anitec.platform.consent.domain.LinkStatus
+import com.anitec.platform.consent.interfaces.ui.severity
+import com.anitec.platform.consent.interfaces.ui.tagText
 import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.component.AniTecPanel
 import com.anitec.platform.core.designsystem.component.AniTecTextField
@@ -77,19 +80,31 @@ fun ClientCard(
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(summary.client.rancherName, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "${pluralCount(R.plurals.count_farms, summary.client.herds)} · ${pluralCount(R.plurals.count_animals, summary.client.animals)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // The rancher's totals are shown only once they accepted; before that there is nothing to count.
+                    if (summary.client.isActive) {
+                        Text(
+                            "${pluralCount(R.plurals.count_farms, summary.client.herds)} · ${pluralCount(R.plurals.count_animals, summary.client.animals)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
-                if (summary.attentionCount > 0) {
+                if (!summary.client.isActive) {
+                    StatusTag(LinkStatus.parse(summary.client.status).tagText(), LinkStatus.parse(summary.client.status).severity())
+                } else if (summary.attentionCount > 0) {
                     StatusTag(pluralCount(R.plurals.count_alerts, summary.attentionCount), Severity.Warn)
                 } else {
                     StatusTag(stringResource(R.string.vet_no_alerts), Severity.Success)
                 }
             }
-            if (summary.farmNames.isEmpty()) {
+            if (!summary.client.isActive) {
+                // No access yet (or any more): there are no farms, animals or records to show.
+                Text(
+                    stringResource(if (summary.client.isPending) R.string.vet_waiting_acceptance else R.string.vet_request_closed),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else if (summary.farmNames.isEmpty()) {
                 Text(stringResource(R.string.vet_no_farms), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -105,7 +120,7 @@ fun ClientCard(
                     }
                 }
             }
-            Text(
+            if (summary.client.isActive) Text(
                 listOf(
                     pluralCount(R.plurals.count_species, summary.speciesCount),
                     pluralCount(R.plurals.count_records, summary.recordCount),
@@ -115,13 +130,19 @@ fun ClientCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton(
-                    text = stringResource(R.string.vet_view_patients),
-                    onClick = onViewPatients,
-                    icon = Icons.Filled.Badge,
-                )
+                if (summary.client.isActive) {
+                    SecondaryButton(
+                        text = stringResource(R.string.vet_view_patients),
+                        onClick = onViewPatients,
+                        icon = Icons.Filled.Badge,
+                    )
+                }
                 if (onRemove != null) {
-                    DangerTextButton(text = stringResource(R.string.vet_remove_client), onClick = onRemove, icon = Icons.Filled.PersonRemove)
+                    DangerTextButton(
+                        text = stringResource(if (summary.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
+                        onClick = onRemove,
+                        icon = Icons.Filled.PersonRemove,
+                    )
                 }
             }
         }
@@ -157,13 +178,7 @@ fun ClientListScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddClient,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Filled.PersonAdd, contentDescription = null) },
-                text = { Text(stringResource(R.string.vet_add_client)) },
-            )
+            AniTecExtendedFab(text = stringResource(R.string.vet_add_client), icon = Icons.Filled.PersonAdd, onClick = onAddClient)
         },
     ) { padding ->
         PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = viewModel::refresh, modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -195,9 +210,9 @@ fun ClientListScreen(
 
     state.pendingRemove?.let { item ->
         ConfirmDialog(
-            title = stringResource(R.string.vet_remove_client),
-            message = stringResource(R.string.vet_confirm_remove, item.client.rancherName),
-            confirmLabel = stringResource(R.string.vet_remove_client),
+            title = stringResource(if (item.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
+            message = stringResource(if (item.client.isPending) R.string.vet_confirm_withdraw else R.string.vet_confirm_remove, item.client.rancherName),
+            confirmLabel = stringResource(if (item.client.isPending) R.string.vet_withdraw_request else R.string.vet_remove_client),
             dismissLabel = stringResource(R.string.common_cancel),
             onConfirm = viewModel::confirmRemove,
             onDismiss = viewModel::dismissRemove,

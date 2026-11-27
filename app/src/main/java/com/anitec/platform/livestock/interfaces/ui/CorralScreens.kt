@@ -1,5 +1,6 @@
 package com.anitec.platform.livestock.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +15,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -82,13 +82,7 @@ fun CorralListScreen(
         },
         floatingActionButton = {
             if (state.canEdit) {
-                ExtendedFloatingActionButton(
-                    onClick = onNew,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    text = { Text(stringResource(R.string.corrals_new)) },
-                )
+                AniTecExtendedFab(text = stringResource(R.string.corrals_new), icon = Icons.Filled.Add, onClick = onNew)
             }
         },
     ) { padding ->

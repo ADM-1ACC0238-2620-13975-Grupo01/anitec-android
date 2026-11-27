@@ -41,7 +41,7 @@ android {
         versionCode = 3
         versionName = "0.2.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.anitec.platform.HiltTestRunner"
     }
 
     signingConfigs {
@@ -92,6 +92,10 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+    sourceSets {
+        // The exported schemas let the migration tests open the database as it was in an older version.
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
     }
 }
 
@@ -166,6 +170,9 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.okhttp.mockwebserver)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

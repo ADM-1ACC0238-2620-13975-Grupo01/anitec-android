@@ -1,5 +1,7 @@
 package com.anitec.platform.livestock.interfaces.viewmodel
 
+import com.anitec.platform.core.common.asConflict
+import com.anitec.platform.core.common.SaveConflict
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -61,6 +63,8 @@ data class AnimalFormUiState(
     val done: Boolean = false,
     @StringRes val messageRes: Int? = null,
     val serverMessages: List<String> = emptyList(),
+    /** Set when the server refused the save because the record changed after the form was opened. */
+    val conflict: SaveConflict? = null,
 ) {
     val corralsOfHerd: List<Corral> get() = allCorrals.filter { it.herdId == herdId }
     val bulk: Boolean get() = !isEdit && mode == RegistrationMode.Bulk
@@ -104,6 +108,9 @@ class AnimalFormViewModel @Inject constructor(
 
     private val animalId: Int? = savedStateHandle.toRoute<AnimalFormRoute>().animalId
 
+    // Version of the record when the form opened; an edit is sent against it.
+    private var baseVersion: Int? = null
+
     private val _state = MutableStateFlow(AnimalFormUiState(isEdit = animalId != null))
     val state: StateFlow<AnimalFormUiState> = _state.asStateFlow()
 
@@ -127,6 +134,7 @@ class AnimalFormViewModel @Inject constructor(
                 _state.update { it.copy(done = true) }
                 return@launch
             }
+            baseVersion = animal.version
             _state.update {
                 it.copy(
                     tag = animal.tag, name = animal.name, species = animal.species, breed = animal.breed,
@@ -153,6 +161,20 @@ class AnimalFormViewModel @Inject constructor(
     fun onAgeRangeChange(value: String?) = _state.update { it.copy(ageRange = value) }
     fun onQuantityChange(value: String) = _state.update { it.copy(quantity = value) }
     fun onMessageShown() = _state.update { it.copy(messageRes = null) }
+
+    /** The user keeps their change over the version that appeared meanwhile: it is sent again against that version. */
+    fun keepMine() {
+        val conflict = _state.value.conflict ?: return
+        baseVersion = conflict.serverVersion
+        _state.update { it.copy(conflict = null) }
+        save()
+    }
+
+    /** The user takes the version on the server: the cache already holds it, so the form just closes. */
+    fun keepServer() = _state.update { it.copy(conflict = null, done = true) }
+
+    /** The user goes back to the form with their change and the conflict forgotten. */
+    fun dismissConflict() = _state.update { it.copy(conflict = null) }
 
     /** Changing the farm resets the corral to the first one of that farm, as the web does. */
     fun onHerdChange(herdId: Int) = _state.update { current ->
@@ -197,7 +219,8 @@ class AnimalFormViewModel @Inject constructor(
                     is AppResult.Success<*> -> it.copy(saving = false, done = true)
                     is AppResult.Failure -> it.copy(
                         saving = false,
-                        messageRes = result.error.livestockMessageRes(),
+                        conflict = result.error.asConflict(),
+                        messageRes = if (result.error is AppError.OutOfDate) null else result.error.livestockMessageRes(),
                         serverMessages = (result.error as? AppError.Validation)?.messages
                             ?.filterNot { message -> message.startsWith("livestock.") }.orEmpty(),
                     )
@@ -210,6 +233,7 @@ class AnimalFormViewModel @Inject constructor(
         tag = tag.trim(), name = name.trim(), species = species, breed = breed.trim(), gender = gender,
         birthDate = birthDate.ifBlank { null }, weight = weightValue ?: 0.0, status = status,
         herdId = herdId!!, corralId = corralId, source = source, ageRange = ageRange, imageUrl = imageUrl,
+        baseVersion = baseVersion,
     )
 
     private fun AnimalFormUiState.toBatchDraft() = AnimalBatchDraft(

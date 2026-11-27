@@ -131,6 +131,22 @@ class SafeApiCallTest {
         assertEquals(emptyList<String>(), parseErrorMessages(null))
         assertEquals(emptyList<String>(), parseErrorMessages("[]"))
     }
+
+    @Test
+    fun `412 keeps the version and the copy the server holds`() = runTest {
+        respond(412, """{"message":"The record was changed after the version you based your change on.","currentVersion":3,"current":{"id":7,"title":"T"}}""")
+
+        val error = errorOf()
+
+        assertEquals(AppError.OutOfDate(3, """{"id":7,"title":"T"}"""), error)
+    }
+
+    @Test
+    fun `412 without a body is still reported as out of date`() = runTest {
+        respond(412)
+
+        assertEquals(AppError.OutOfDate(0, null), errorOf())
+    }
 }
 
 

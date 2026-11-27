@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Place
@@ -44,17 +45,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
 import com.anitec.platform.core.designsystem.component.AniTecPanel
+import com.anitec.platform.core.designsystem.Severity
 import com.anitec.platform.core.designsystem.component.DangerTextButton
+import com.anitec.platform.core.designsystem.component.StatusTag
 import com.anitec.platform.core.designsystem.component.sectionHeading
 import com.anitec.platform.core.i18n.LanguageSwitcher
 import com.anitec.platform.core.session.UserRole
 import com.anitec.platform.core.session.UserSession
 import com.anitec.platform.iam.interfaces.ui.labelRes
+import com.anitec.platform.reminders.interfaces.ui.ReminderSettingsCard
 
 private data class MoreItem(@StringRes val label: Int, val icon: ImageVector, val route: Any)
 
 private fun moreItems(role: UserRole): List<MoreItem> = when (role) {
     UserRole.Rancher -> listOf(
+        MoreItem(R.string.nav_veterinarians, Icons.Filled.MedicalServices, VeterinariansRoute),
         MoreItem(R.string.nav_herds, Icons.Filled.Place, HerdsRoute),
         MoreItem(R.string.nav_corrals, Icons.Filled.GridView, CorralsRoute),
         MoreItem(R.string.nav_finance, Icons.Filled.AccountBalanceWallet, FinancialRoute),
@@ -82,6 +87,8 @@ fun MoreScreen(
     modifier: Modifier = Modifier,
     /** Changes made offline and not sent yet; signing out would lose them. */
     unsyncedCount: Int = 0,
+    /** Requests from veterinarians waiting for the rancher's answer; shown next to the Veterinarians entry. */
+    pendingRequests: Int = 0,
 ) {
     val items = moreItems(session.role)
     var confirmSignOut by remember { mutableStateOf(false) }
@@ -109,11 +116,13 @@ fun MoreScreen(
         AniTecPanel(modifier = Modifier.fillMaxWidth()) {
             Column {
                 items.forEachIndexed { index, item ->
-                    MoreRow(item.label, item.icon) { onOpen(item.route) }
+                    MoreRow(item.label, item.icon, badge = if (item.route == VeterinariansRoute) pendingRequests else 0) { onOpen(item.route) }
                     if (index < items.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }
+        ReminderSettingsCard()
+
         /**
          * Renders a settings row with a language icon, label, and language switcher.
          */
@@ -159,7 +168,7 @@ fun MoreScreen(
  * Renders a clickable navigation row item for the menu.
  */
 @Composable
-private fun MoreRow(@StringRes label: Int, icon: ImageVector, onClick: () -> Unit) {
+private fun MoreRow(@StringRes label: Int, icon: ImageVector, badge: Int = 0, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,6 +180,10 @@ private fun MoreRow(@StringRes label: Int, icon: ImageVector, onClick: () -> Uni
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.width(12.dp))
         Text(stringResource(label), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        if (badge > 0) {
+            StatusTag(pluralStringResource(R.plurals.consent_pending_count, badge, badge), Severity.Warn)
+            Spacer(Modifier.width(8.dp))
+        }
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

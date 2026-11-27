@@ -71,8 +71,11 @@ private class FakeOutbox {
         if (index >= 0) rows[index] = change(rows[index])
     }
 
-    fun add(kind: String, localId: Int, payload: String, attempts: Int = 0) {
-        rows += PendingOperationEntity(seq = rows.size + 1L, kind = kind, localId = localId, payload = payload, createdAt = 0, attempts = attempts)
+    fun add(kind: String, localId: Int, payload: String, attempts: Int = 0, idempotencyKey: String = "") {
+        rows += PendingOperationEntity(
+            seq = rows.size + 1L, kind = kind, localId = localId, payload = payload, createdAt = 0, attempts = attempts,
+            idempotencyKey = idempotencyKey,
+        )
     }
 }
 
@@ -99,7 +102,7 @@ class OutboxProcessorTest {
     @Test
     fun `a sent animal replaces its local copy and leaves the queue`() = runTest {
         queueAnimal(localId = -1)
-        coEvery { livestockApi.createAnimal(any()) } returns animalDto(id = 50)
+        coEvery { livestockApi.createAnimal(any(), any()) } returns animalDto(id = 50)
 
         assertEquals(SyncOutcome.Done, processor.run())
 
@@ -112,9 +115,9 @@ class OutboxProcessorTest {
     fun `records queued for an offline animal follow it to the id the server gave`() = runTest {
         queueAnimal(localId = -1)
         queueHealth(localId = -2, animalId = -1)
-        coEvery { livestockApi.createAnimal(any()) } returns animalDto(id = 50)
+        coEvery { livestockApi.createAnimal(any(), any()) } returns animalDto(id = 50)
         val sent = slot<HealthEventDto>()
-        coEvery { sanitaryApi.createEvent(capture(sent)) } returns healthDto(animalId = 50, id = 700)
+        coEvery { sanitaryApi.createEvent(capture(sent), any()) } returns healthDto(animalId = 50, id = 700)
 
         assertEquals(SyncOutcome.Done, processor.run())
 
@@ -128,7 +131,7 @@ class OutboxProcessorTest {
     @Test
     fun `no connection keeps the change and asks for a retry`() = runTest {
         queueAnimal(localId = -1)
-        coEvery { livestockApi.createAnimal(any()) } throws IOException("offline")
+        coEvery { livestockApi.createAnimal(any(), any()) } throws IOException("offline")
 
         assertEquals(SyncOutcome.Retry, processor.run())
 
@@ -144,7 +147,7 @@ class OutboxProcessorTest {
 
         assertEquals(SyncOutcome.Done, processor.run())
 
-        coVerify(exactly = 0) { livestockApi.createAnimal(any()) }
+        coVerify(exactly = 0) { livestockApi.createAnimal(any(), any()) }
         coVerify { livestockDao.upsertAnimal(match { it.id == 77 }) }
     }
 
@@ -154,7 +157,7 @@ class OutboxProcessorTest {
             OutboxKinds.CREATE_FINANCIAL_RECORD, -1,
             json.encodeToString(FinancialRecordDto.serializer(), FinancialRecordDto(ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")),
         )
-        coEvery { financialApi.create(any()) } returns FinancialRecordDto(id = 77, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
+        coEvery { financialApi.create(any(), any()) } returns FinancialRecordDto(id = 77, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
 
         assertEquals(SyncOutcome.Done, processor.run())
 
@@ -169,7 +172,7 @@ class OutboxProcessorTest {
             OutboxKinds.CREATE_FINANCIAL_RECORD, -3,
             json.encodeToString(FinancialRecordDto.serializer(), FinancialRecordDto(ownerId = 10, type = "Egreso", amount = 1.0, date = "2026-10-01")),
         )
-        coEvery { financialApi.create(any()) } throws httpError(400)
+        coEvery { financialApi.create(any(), any()) } throws httpError(400)
 
         assertEquals(SyncOutcome.Done, processor.run())
         assertTrue(fake.rows.single().failed)
@@ -184,8 +187,8 @@ class OutboxProcessorTest {
     fun `a refused change is marked failed and the next one is still sent`() = runTest {
         fake.add(OutboxKinds.CREATE_ACTIVITY, -1, json.encodeToString(FarmActivityDto.serializer(), FarmActivityDto(title = "A", date = "2026-10-05")))
         fake.add(OutboxKinds.CREATE_ACTIVITY, -2, json.encodeToString(FarmActivityDto.serializer(), FarmActivityDto(title = "B", date = "2026-10-06")))
-        coEvery { activitiesApi.create(match { it.title == "A" }) } throws httpError(400)
-        coEvery { activitiesApi.create(match { it.title == "B" }) } returns FarmActivityDto(id = 9, title = "B", date = "2026-10-06")
+        coEvery { activitiesApi.create(match { it.title == "A" }, any()) } throws httpError(400)
+        coEvery { activitiesApi.create(match { it.title == "B" }, any()) } returns FarmActivityDto(id = 9, title = "B", date = "2026-10-06")
 
         assertEquals(SyncOutcome.Done, processor.run())
 
@@ -201,14 +204,14 @@ class OutboxProcessorTest {
 
         assertEquals(SyncOutcome.Done, processor.run())
 
-        coVerify(exactly = 0) { sanitaryApi.createEvent(any()) }
+        coVerify(exactly = 0) { sanitaryApi.createEvent(any(), any()) }
         assertEquals(OutboxFailures.DEPENDENCY, fake.rows.single().lastError)
     }
 
     @Test
     fun `an expired session stops the run without touching the queue`() = runTest {
         queueAnimal(localId = -1)
-        coEvery { livestockApi.createAnimal(any()) } throws httpError(401)
+        coEvery { livestockApi.createAnimal(any(), any()) } throws httpError(401)
 
         assertEquals(SyncOutcome.Stopped, processor.run())
 
@@ -230,6 +233,55 @@ class OutboxProcessorTest {
         coVerify { livestockDao.deleteAnimal(-1) }
     }
 
+    private fun queueFinancial(idempotencyKey: String) = fake.add(
+        OutboxKinds.CREATE_FINANCIAL_RECORD, -1,
+        json.encodeToString(FinancialRecordDto.serializer(), FinancialRecordDto(ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")),
+        idempotencyKey = idempotencyKey,
+    )
+
+    @Test
+    fun `every try of a change sends the same idempotency key`() = runTest {
+        queueFinancial("key-1")
+        val keys = mutableListOf<String?>()
+        coEvery { financialApi.create(any(), captureNullable(keys)) } throws IOException("offline") andThen
+            FinancialRecordDto(id = 77, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
+
+        assertEquals(SyncOutcome.Retry, processor.run())
+        assertEquals(SyncOutcome.Done, processor.run())
+
+        assertEquals(listOf<String?>("key-1", "key-1"), keys)
+    }
+
+    @Test
+    fun `a change queued before keys existed still gets a stable key`() = runTest {
+        queueFinancial("")
+        val keys = mutableListOf<String?>()
+        coEvery { financialApi.create(any(), captureNullable(keys)) } throws IOException("offline") andThen
+            FinancialRecordDto(id = 77, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
+
+        processor.run()
+        processor.run()
+
+        assertEquals(2, keys.size)
+        assertEquals(keys[0], keys[1])
+        assertTrue(keys[0]!!.isNotBlank())
+    }
+
+    @Test
+    fun `retrying a refused change keeps its key`() = runTest {
+        queueFinancial("key-2")
+        val keys = mutableListOf<String?>()
+        coEvery { financialApi.create(any(), captureNullable(keys)) } throws httpError(400) andThen
+            FinancialRecordDto(id = 78, ownerId = 10, type = "Ingreso", amount = 5.0, date = "2026-10-01")
+
+        processor.run()
+        assertTrue(fake.rows.single().failed)
+        processor.retryFailed()
+        assertEquals(SyncOutcome.Done, processor.run())
+
+        assertEquals(listOf<String?>("key-2", "key-2"), keys)
+    }
+
     private fun httpError(code: Int) = retrofit2.HttpException(
         retrofit2.Response.error<Any>(code, okhttp3.ResponseBody.create(null, "")),
     )
@@ -249,8 +301,8 @@ class OfflineCreationTest {
 
     @Test
     fun `creating without a connection queues the activity and keeps it locally under a negative id`() = runTest {
-        coEvery { api.create(any()) } throws IOException("offline")
-        coEvery { queue.enqueue(OutboxKinds.CREATE_ACTIVITY, any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any()) } returns -4
+        coEvery { api.create(any(), any()) } throws IOException("offline")
+        coEvery { queue.enqueue(OutboxKinds.CREATE_ACTIVITY, any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any(), any()) } returns -4
 
         val result = repository().create(draft)
 
@@ -262,26 +314,70 @@ class OfflineCreationTest {
     }
 
     @Test
+    fun `the key of the online try is the one the queued change is sent with`() = runTest {
+        val sentKeys = mutableListOf<String?>()
+        val queuedKey = slot<String>()
+        coEvery { api.create(any(), captureNullable(sentKeys)) } throws IOException("offline")
+        coEvery { queue.enqueue(OutboxKinds.CREATE_ACTIVITY, any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any(), capture(queuedKey)) } returns -4
+
+        repository().create(draft)
+
+        // If that first try reached the server and only the answer was lost, the server recognises the retry.
+        assertEquals(1, sentKeys.size)
+        assertTrue(sentKeys.single()!!.isNotBlank())
+        assertEquals(sentKeys.single(), queuedKey.captured)
+    }
+
+    @Test
+    fun `two different operations never share a key`() = runTest {
+        val sentKeys = mutableListOf<String?>()
+        coEvery { api.create(any(), captureNullable(sentKeys)) } throws IOException("offline")
+        coEvery { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any(), any()) } returns -4
+
+        repository().create(draft)
+        repository().create(draft)
+
+        assertEquals(2, sentKeys.distinct().size)
+    }
+
+    @Test
     fun `a refusal from the server is reported and nothing is queued`() = runTest {
-        coEvery { api.create(any()) } throws retrofit2.HttpException(retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, "")))
+        coEvery { api.create(any(), any()) } throws retrofit2.HttpException(retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, "")))
 
         val result = repository().create(draft)
 
         assertTrue(result is AppResult.Failure)
-        coVerify(exactly = 0) { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any()) }
+        coVerify(exactly = 0) { queue.enqueue(any(), any<kotlinx.serialization.KSerializer<FarmActivityDto>>(), any(), any()) }
     }
 
     @Test
     fun `queueing stores the change and schedules the send`() = runTest {
         val dao = mockk<OutboxDao>()
         val scheduler = mockk<OutboxScheduler>(relaxed = true)
-        coEvery { dao.enqueue(OutboxKinds.CREATE_ACTIVITY, any(), any()) } returns -1
+        coEvery { dao.enqueue(OutboxKinds.CREATE_ACTIVITY, any(), any(), any()) } returns -1
 
         val localId = OutboxQueue(dao, json, scheduler)
             .enqueue(OutboxKinds.CREATE_ACTIVITY, FarmActivityDto.serializer(), FarmActivityDto(title = "T", date = "2026-10-05"))
 
         assertEquals(-1, localId)
         verify { scheduler.schedule() }
+    }
+
+    @Test
+    fun `queueing stores the key it is given, or makes one`() = runTest {
+        val dao = mockk<OutboxDao>()
+        val scheduler = mockk<OutboxScheduler>(relaxed = true)
+        val keys = mutableListOf<String>()
+        coEvery { dao.enqueue(any(), any(), any(), capture(keys)) } returns -1
+        val queue = OutboxQueue(dao, json, scheduler)
+        val body = FarmActivityDto(title = "T", date = "2026-10-05")
+
+        queue.enqueue(OutboxKinds.CREATE_ACTIVITY, FarmActivityDto.serializer(), body, "given-key")
+        queue.enqueue(OutboxKinds.CREATE_ACTIVITY, FarmActivityDto.serializer(), body)
+
+        assertEquals("given-key", keys[0])
+        assertTrue(keys[1].isNotBlank())
+        assertTrue(keys[1] != keys[0])
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.anitec.platform.livestock.infrastructure.local.HerdEntity
 import com.anitec.platform.livestock.infrastructure.local.LivestockDao
 import com.anitec.platform.sanitary.infrastructure.local.HealthEventEntity
 import com.anitec.platform.sanitary.infrastructure.local.SanitaryDao
+import com.anitec.platform.veterinary.infrastructure.local.ClientEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -126,5 +127,19 @@ class RoomDaoTest {
         assertTrue(livestock.observeAnimals().first().isEmpty())
         assertTrue(sanitary.observeEvents().first().isEmpty())
     }
-}
 
+    @Test
+    fun rancherIds_onlyListsTheRanchersWhoAccepted() = runTest {
+        database.veterinaryDao().upsertAll(
+            listOf(
+                ClientEntity(10, "Carlos", "Accepted", 1, 1),
+                ClientEntity(11, "Maria", "Pending", 0, 0),
+                ClientEntity(12, "Rosa", "Rejected", 0, 0),
+                ClientEntity(13, "Pablo", "Revoked", 0, 0),
+                ClientEntity(14, "Ana", "accepted", 0, 0),
+            ),
+        )
+
+        assertEquals(setOf(10, 14), database.veterinaryDao().rancherIds().toSet())
+    }
+}

@@ -57,18 +57,25 @@ fun DateField(
         },
     )
     if (open) {
-        val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = runCatching { LocalDate.parse(value).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() }.getOrNull(),
-        )
-        DatePickerDialog(
-            onDismissRequest = { open = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    pickerState.selectedDateMillis?.let { onChange(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString()) }
-                    open = false
-                }) { Text(stringResource(R.string.common_save)) }
-            },
-            dismissButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.common_cancel)) } },
-        ) { DatePicker(state = pickerState) }
+        DatePickerPopup(value = value, onPicked = onChange, onDismiss = { open = false })
     }
+}
+
+/** Calendar dialog that starts on [value] (ISO yyyy-MM-dd, or empty) and answers the picked day as ISO text. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerPopup(value: String, onPicked: (String) -> Unit, onDismiss: () -> Unit) {
+    val pickerState = rememberDatePickerState(
+        initialSelectedDateMillis = runCatching { LocalDate.parse(value).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() }.getOrNull(),
+    )
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                pickerState.selectedDateMillis?.let { onPicked(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString()) }
+                onDismiss()
+            }) { Text(stringResource(R.string.common_save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } },
+    ) { DatePicker(state = pickerState) }
 }

@@ -1,5 +1,7 @@
 package com.anitec.platform.sanitary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.AniTecExtendedFab
+import com.anitec.platform.core.designsystem.component.SaveConflictDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +16,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -75,7 +76,7 @@ fun FollowUpTag(hasFollowUp: Boolean) {
 
 /** Card of one health record, shared by the list and the dashboard. */
 @Composable
-fun HealthRecordCard(item: HealthItem, modifier: Modifier = Modifier, footer: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null) {
+fun HealthRecordCard(item: HealthItem, modifier: Modifier = Modifier, footer: (@Composable androidx.compose.foundation.layout.FlowRowScope.() -> Unit)? = null) {
     val event = item.event
     val details = buildList {
         add(stringResource(R.string.health_type) to healthTypeLabel(event.type))
@@ -138,14 +139,7 @@ fun HealthListScreen(
                 }
             }
         }
-        ExtendedFloatingActionButton(
-            onClick = onNew,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.health_new)) },
-        )
+        AniTecExtendedFab(text = stringResource(R.string.health_new), icon = Icons.Filled.Add, onClick = onNew, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
         SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
@@ -168,6 +162,7 @@ fun HealthFormScreen(
     viewModel: HealthFormViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    state.conflict?.let { SaveConflictDialog(it, viewModel::keepMine, viewModel::keepServer, viewModel::dismissConflict) }
     val snackbarHostState = remember { SnackbarHostState() }
     MessageEffect(state.messageRes, snackbarHostState, viewModel::onMessageShown)
     LaunchedEffect(state.done) { if (state.done) onBack() }
@@ -211,6 +206,7 @@ fun HealthFormScreen(
             onChange = viewModel::onNextDueDateChange,
             label = stringResource(R.string.health_next_due),
             clearable = true,
+            error = if (state.nextDueInvalid) stringResource(R.string.health_next_due_invalid) else null,
         )
         AniTecTextField(
             value = state.veterinarian, onValueChange = viewModel::onVeterinarianChange, label = stringResource(R.string.health_veterinarian),

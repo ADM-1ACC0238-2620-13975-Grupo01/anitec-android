@@ -102,7 +102,7 @@ class OutboxProcessor @Inject constructor(
             } else {
                 null
             }
-            existing ?: livestockApi.createAnimal(body)
+            existing ?: livestockApi.createAnimal(body, operation.sendKey)
         }
         return when (result) {
             is AppResult.Success -> {
@@ -122,7 +122,7 @@ class OutboxProcessor @Inject constructor(
         val body = json.decodeFromString(HealthEventDto.serializer(), operation.payload)
         // Its animal was created offline too and has not reached the server (or was refused).
         if (body.animalId < 0) return fail(operation, OutboxFailures.DEPENDENCY)
-        return when (val result = safeApiCall { sanitaryApi.createEvent(body) }) {
+        return when (val result = safeApiCall { sanitaryApi.createEvent(body, operation.sendKey) }) {
             is AppResult.Success -> {
                 sanitaryDao.delete(operation.localId)
                 sanitaryDao.upsert(result.value.toDomain().toEntity())
@@ -135,7 +135,7 @@ class OutboxProcessor @Inject constructor(
 
     private suspend fun sendActivity(operation: PendingOperationEntity): Step {
         val body = json.decodeFromString(FarmActivityDto.serializer(), operation.payload)
-        return when (val result = safeApiCall { activitiesApi.create(body) }) {
+        return when (val result = safeApiCall { activitiesApi.create(body, operation.sendKey) }) {
             is AppResult.Success -> {
                 activitiesDao.delete(operation.localId)
                 activitiesDao.upsert(result.value.toDomain().toEntity())
@@ -148,7 +148,7 @@ class OutboxProcessor @Inject constructor(
 
     private suspend fun sendFinancialRecord(operation: PendingOperationEntity): Step {
         val body = json.decodeFromString(FinancialRecordDto.serializer(), operation.payload)
-        return when (val result = safeApiCall { financialApi.create(body) }) {
+        return when (val result = safeApiCall { financialApi.create(body, operation.sendKey) }) {
             is AppResult.Success -> {
                 financialDao.delete(operation.localId)
                 financialDao.upsert(result.value.toDomain().toEntity())
@@ -184,7 +184,7 @@ class OutboxProcessor @Inject constructor(
                 Step.Retry
             }
         }
-        is AppError.Conflict -> fail(operation, OutboxFailures.CONFLICT)
+        is AppError.Conflict, is AppError.OutOfDate -> fail(operation, OutboxFailures.CONFLICT)
         AppError.Forbidden -> fail(operation, OutboxFailures.FORBIDDEN)
         AppError.NotFound -> fail(operation, OutboxFailures.NOT_FOUND)
         is AppError.Validation -> fail(operation, OutboxFailures.REJECTED)

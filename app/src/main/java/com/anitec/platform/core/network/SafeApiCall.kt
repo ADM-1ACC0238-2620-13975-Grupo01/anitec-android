@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -42,16 +43,29 @@ suspend fun <T> safeApiCall(block: suspend () -> T): AppResult<T> = try {
  * Optional body text from [parseErrorMessages] is attached only for validation and conflict.
  */
 internal fun HttpException.toAppError(): AppError {
-    val messages = parseErrorMessages(response()?.errorBody()?.string())
+    // An error body can be read only once, so it is read here and handed to every parser that needs it.
+    val body = response()?.errorBody()?.string()
+    val messages = parseErrorMessages(body)
     return when (code()) {
         400 -> AppError.Validation(messages)
         401 -> AppError.Unauthorized
         403 -> AppError.Forbidden
         404 -> AppError.NotFound
         409 -> AppError.Conflict(messages)
+        412 -> parseOutOfDate(body)
         in 500..599 -> AppError.Server(code())
         else -> AppError.Unknown(messages.firstOrNull())
     }
+}
+
+/**
+ * Reads the 412 body the API sends when an edit is based on an old version: `currentVersion` and `current`,
+ * the server's copy of the record. Missing parts leave the defaults (version 0, no copy).
+ */
+internal fun parseOutOfDate(body: String?): AppError.OutOfDate {
+    val root = body?.takeIf { it.isNotBlank() }?.let { runCatching { errorJson.parseToJsonElement(it) }.getOrNull() } as? JsonObject
+    val version = (root?.get("currentVersion") as? JsonPrimitive)?.intOrNull ?: 0
+    return AppError.OutOfDate(version, root?.get("current")?.toString())
 }
 
 /**

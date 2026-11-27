@@ -125,7 +125,7 @@ class ActivitiesRepositoryTest {
     @Test
     fun `creating an activity sends the owner and creator and caches the answer`() = runTest {
         val sent = slot<FarmActivityDto>()
-        coEvery { api.create(capture(sent)) } returns dto(7, 11, 50)
+        coEvery { api.create(capture(sent), any()) } returns dto(7, 11, 50)
 
         val result = repository(UserRole.Veterinarian, 50)
             .create(ActivityDraft(11, 50, "Visit", "Visita veterinaria", "2026-10-09", "Alta", "Programado"))

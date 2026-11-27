@@ -19,6 +19,7 @@ data class ActivityEntity(
     val date: String,
     val priority: String,
     val status: String,
+    val version: Int = 1,
 )
 
 /**
@@ -43,6 +44,7 @@ interface ActivitiesDao {
      */
     @Upsert suspend fun upsert(activity: ActivityEntity)
     @Upsert suspend fun upsertAll(activities: List<ActivityEntity>)
+    @Query("SELECT * FROM activities WHERE id = :id") suspend fun byId(id: Int): ActivityEntity?
     @Query("DELETE FROM activities WHERE id = :id") suspend fun delete(id: Int)
     // Activities created offline have negative ids and must survive a refresh until they are sent.
     @Query("DELETE FROM activities WHERE id >= 0") suspend fun clear()

@@ -39,6 +39,8 @@ data class Animal(
     val ageRange: String?,
     /** Path relative to the server root, as returned by the upload endpoint. */
     val imageUrl: String?,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
     val healthStatus: AnimalStatus get() = AnimalStatus.fromApi(status)
 
@@ -72,6 +74,8 @@ data class AnimalDraft(
     val source: String?,
     val ageRange: String?,
     val imageUrl: String?,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /**

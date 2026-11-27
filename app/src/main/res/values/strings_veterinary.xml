@@ -1,11 +1,11 @@
 <resources>
     <!-- Clients -->
     <string name="vet_clients_subtitle">Ranchers whose animals you look after.</string>
-    <string name="vet_clients_empty">You have no clients yet. Add a rancher to start.</string>
-    <string name="vet_add_client">Add client</string>
-    <string name="vet_add_client_subtitle">Link a rancher to see their farms and animals.</string>
+    <string name="vet_clients_empty">You have no clients yet. Ask a rancher for access to start.</string>
+    <string name="vet_add_client">Request access</string>
+    <string name="vet_add_client_subtitle">Ask a rancher for access to see their farms and animals. They decide whether to accept.</string>
     <string name="vet_search_ranchers">Search by name or username</string>
-    <string name="vet_no_ranchers">No ranchers available to add.</string>
+    <string name="vet_no_ranchers">No ranchers available to ask.</string>
     <string name="vet_client_added">Client added</string>
     <string name="vet_view_patients">View patients</string>
     <string name="vet_remove_client">Remove client</string>

@@ -1,0 +1,34 @@
+<resources>
+    <!-- Rancher: veterinarian requests -->
+    <string name="nav_veterinarians">Veterinarians</string>
+    <string name="consent_title">Veterinarian access</string>
+    <string name="consent_subtitle">Decide which veterinarians can see and record data about your animals.</string>
+    <string name="consent_empty">No veterinarian has asked for access yet.</string>
+    <string name="consent_section_pending">Requests</string>
+    <string name="consent_section_active">With access</string>
+    <string name="consent_section_closed">Closed</string>
+    <string name="consent_requested_on">Requested on %1$s</string>
+    <string name="consent_accept">Accept</string>
+    <string name="consent_reject">Reject</string>
+    <string name="consent_revoke">Revoke access</string>
+    <string name="consent_revoke_confirm">Revoke the access of %1$s? They will stop seeing and recording data about your animals. What they recorded before stays.</string>
+    <string name="consent_accepted_message">Request accepted</string>
+    <string name="consent_rejected_message">Request rejected</string>
+    <string name="consent_revoked_message">Access revoked</string>
+    <string name="consent_status_pending">Pending</string>
+    <string name="consent_status_accepted">Has access</string>
+    <string name="consent_status_rejected">Rejected</string>
+    <string name="consent_status_revoked">Revoked</string>
+    <string name="consent_status_closed">Closed</string>
+    <plurals name="consent_pending_count">
+        <item quantity="one">%d pending request</item>
+        <item quantity="other">%d pending requests</item>
+    </plurals>
+
+    <!-- Veterinarian: asking for access -->
+    <string name="vet_request_sent">Request sent. You will see their data once they accept.</string>
+    <string name="vet_waiting_acceptance">Waiting for the rancher to accept.</string>
+    <string name="vet_request_closed">The rancher did not grant access.</string>
+    <string name="vet_withdraw_request">Withdraw request</string>
+    <string name="vet_confirm_withdraw">Withdraw your request to %1$s?</string>
+</resources>

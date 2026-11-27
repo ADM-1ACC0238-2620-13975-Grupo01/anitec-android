@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 // The web app has no dark mode, so the app ships a single light scheme.
-private val AniTecColorScheme = lightColorScheme(
+internal val AniTecColorScheme = lightColorScheme(
     primary = AniTecGreenDark,
     onPrimary = Color.White,
     primaryContainer = Color(0xFFE4F2DE),

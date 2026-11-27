@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -22,12 +23,13 @@ data class HealthEventDto(
     val prescription: String = "",
     val followUp: String = "",
     val nextDueDate: String? = null,
+    val version: Int = 1,
 )
 
 /** Retrofit contract of the health events REST endpoints. */
 interface SanitaryApi {
     @GET("health-events") suspend fun getEvents(): List<HealthEventDto>
-    @POST("health-events") suspend fun createEvent(@Body body: HealthEventDto): HealthEventDto
-    @PUT("health-events/{id}") suspend fun updateEvent(@Path("id") id: Int, @Body body: HealthEventDto): HealthEventDto
+    @POST("health-events") suspend fun createEvent(@Body body: HealthEventDto, @Header("Idempotency-Key") idempotencyKey: String? = null): HealthEventDto
+    @PUT("health-events/{id}") suspend fun updateEvent(@Path("id") id: Int, @Body body: HealthEventDto, @Header("If-Match") ifMatch: String? = null): HealthEventDto
     @DELETE("health-events/{id}") suspend fun deleteEvent(@Path("id") id: Int)
 }

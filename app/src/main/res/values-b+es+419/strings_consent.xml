@@ -1,0 +1,34 @@
+<resources>
+    <!-- Ganadero: solicitudes de veterinarios -->
+    <string name="nav_veterinarians">Veterinarios</string>
+    <string name="consent_title">Acceso de veterinarios</string>
+    <string name="consent_subtitle">Decide qué veterinarios pueden ver y registrar datos de tus animales.</string>
+    <string name="consent_empty">Ningún veterinario ha pedido acceso todavía.</string>
+    <string name="consent_section_pending">Solicitudes</string>
+    <string name="consent_section_active">Con acceso</string>
+    <string name="consent_section_closed">Cerradas</string>
+    <string name="consent_requested_on">Solicitado el %1$s</string>
+    <string name="consent_accept">Aceptar</string>
+    <string name="consent_reject">Rechazar</string>
+    <string name="consent_revoke">Revocar acceso</string>
+    <string name="consent_revoke_confirm">¿Revocar el acceso de %1$s? Dejará de ver y registrar datos de tus animales. Lo que registró antes se conserva.</string>
+    <string name="consent_accepted_message">Solicitud aceptada</string>
+    <string name="consent_rejected_message">Solicitud rechazada</string>
+    <string name="consent_revoked_message">Acceso revocado</string>
+    <string name="consent_status_pending">Pendiente</string>
+    <string name="consent_status_accepted">Con acceso</string>
+    <string name="consent_status_rejected">Rechazada</string>
+    <string name="consent_status_revoked">Revocado</string>
+    <string name="consent_status_closed">Cerrada</string>
+    <plurals name="consent_pending_count">
+        <item quantity="one">%d solicitud pendiente</item>
+        <item quantity="other">%d solicitudes pendientes</item>
+    </plurals>
+
+    <!-- Veterinario: pedir acceso -->
+    <string name="vet_request_sent">Solicitud enviada. Verás sus datos cuando la acepte.</string>
+    <string name="vet_waiting_acceptance">Esperando que el ganadero acepte.</string>
+    <string name="vet_request_closed">El ganadero no concedió el acceso.</string>
+    <string name="vet_withdraw_request">Retirar solicitud</string>
+    <string name="vet_confirm_withdraw">¿Retirar tu solicitud a %1$s?</string>
+</resources>

@@ -18,10 +18,26 @@ data class Activity(
     val date: String,
     val priority: String,
     val status: String,
+    /** Version the server holds; an edit sends it back so a change made elsewhere is not overwritten. */
+    val version: Int = 1,
 ) {
-    /** Still to be done: not completed and not in the past. */
+    /**
+     * The values of this activity as a draft, to save a change of [status] or [date] against the version the user
+     * is looking at: an edit made elsewhere in the meantime is reported as a conflict instead of overwritten.
+     */
+    fun toDraft(status: String = this.status, date: String = this.date) = ActivityDraft(
+        ownerId = ownerId, veterinarianId = veterinarianId, title = title, type = type, date = date,
+        priority = priority, status = status, baseVersion = version,
+    )
+
+    /** Still to be attended: neither completed nor cancelled. */
+    val isOpen: Boolean
+        get() = !status.equals(ActivityStatuses.COMPLETED, ignoreCase = true) &&
+            !status.equals(ActivityStatuses.CANCELLED, ignoreCase = true)
+
+    /** Still to be done: open and not in the past. */
     fun isUpcoming(today: LocalDate): Boolean {
-        if (status.equals(ActivityStatuses.COMPLETED, ignoreCase = true)) return false
+        if (!isOpen) return false
         val day = runCatching { LocalDate.parse(date) }.getOrNull() ?: return false
         return !day.isBefore(today)
     }
@@ -36,6 +52,8 @@ data class ActivityDraft(
     val date: String,
     val priority: String,
     val status: String,
+    /** Version of the record this edit started from; null for a new record. */
+    val baseVersion: Int? = null,
 )
 
 /** Activity types, in the Spanish text the API stores. */
@@ -56,12 +74,19 @@ object ActivityPriorities {
     val all = listOf(HIGH, MEDIUM, LOW)
 }
 
-/** Statuses; a [COMPLETED] activity is never shown as upcoming. */
+/** Statuses; a [COMPLETED] or [CANCELLED] activity is never shown as upcoming and gets no reminder. */
 object ActivityStatuses {
     const val PENDING = "Pendiente"
     const val SCHEDULED = "Programado"
     const val COMPLETED = "Completado"
-    val all = listOf(PENDING, SCHEDULED, COMPLETED)
+    const val CANCELLED = "Cancelado"
+    val all = listOf(PENDING, SCHEDULED, COMPLETED, CANCELLED)
+}
+
+object ActivityRules {
+    /** A pending activity can only be moved to today or a later day (US-028 scenario 2). */
+    fun canScheduleOn(date: String, today: LocalDate): Boolean =
+        runCatching { !LocalDate.parse(date).isBefore(today) }.getOrDefault(false)
 }
 
 object ActivityScope {

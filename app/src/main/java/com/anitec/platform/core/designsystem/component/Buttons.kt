@@ -1,5 +1,12 @@
 package com.anitec.platform.core.designsystem.component
 
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.layout.FlowRowScope
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,11 +35,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.anitec.platform.R
-import com.anitec.platform.core.designsystem.AniTecGreen
+import com.anitec.platform.core.designsystem.AniTecGreenButtonEnd
 import com.anitec.platform.core.designsystem.AniTecGreenDark
 
 /** Main call to action: 48 dp tall with the web's green gradient. */
@@ -47,7 +56,7 @@ fun PrimaryButton(
     val active = enabled && !loading
     val loadingDescription = stringResource(R.string.common_loading)
     val background = if (active) {
-        Brush.linearGradient(listOf(AniTecGreenDark, AniTecGreen))
+        Brush.linearGradient(listOf(AniTecGreenDark, AniTecGreenButtonEnd))
     } else {
         SolidColor(MaterialTheme.colorScheme.outlineVariant)
     }
@@ -134,4 +143,55 @@ fun DangerTextButton(
         }
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
+}
+
+/**
+ * The floating button that creates something, with its label.
+ *
+ * Checked on a device with the semantics tree: the merged node of an [ExtendedFloatingActionButton] had the button role
+ * and no text, so TalkBack could not say what it does. The label is set as the content description of the node, and
+ * the icon stays decorative.
+ */
+@Composable
+fun AniTecExtendedFab(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ExtendedFloatingActionButton(
+        onClick = onClick,
+        modifier = modifier.semantics { contentDescription = text },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        icon = { Icon(icon, contentDescription = null) },
+        text = { Text(text) },
+    )
+}
+
+/**
+ * Buttons side by side that move to the next line when they no longer fit, which is what happens when the user makes the
+ * text larger. A plain [Row] squeezes each button until its label breaks in the middle of a word ("Atendid-a").
+ * The buttons can still use `Modifier.weight(1f)` to share the width of a line.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ButtonRow(modifier: Modifier = Modifier, content: @Composable FlowRowScope.() -> Unit) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
+        content = content,
+    )
+}
+
+/**
+ * Limits how much the system font size grows [content], for text in a bar of fixed size such as the bottom navigation,
+ * where larger text cannot wrap or push the rest of the screen away. The full name stays available to screen readers.
+ */
+@Composable
+fun CappedFontScale(maxScale: Float, content: @Composable () -> Unit) {
+    val density = LocalDensity.current
+    CompositionLocalProvider(LocalDensity provides Density(density.density, minOf(density.fontScale, maxScale))) { content() }
 }

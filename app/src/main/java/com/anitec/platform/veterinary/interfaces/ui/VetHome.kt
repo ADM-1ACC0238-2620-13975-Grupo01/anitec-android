@@ -1,5 +1,6 @@
 package com.anitec.platform.veterinary.interfaces.ui
 
+import com.anitec.platform.core.designsystem.component.ButtonRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,7 +80,7 @@ fun VetHome(
                     }
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                ButtonRow {
                     PrimaryButton(
                         text = stringResource(R.string.vet_add_client),
                         onClick = onAddClient,

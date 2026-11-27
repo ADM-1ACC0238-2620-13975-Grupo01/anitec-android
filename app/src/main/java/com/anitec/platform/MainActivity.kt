@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.anitec.platform.app.AniTecApp
 import com.anitec.platform.core.devtools.LocalNetworkAccess
 import com.anitec.platform.core.designsystem.AniTecTheme
+import com.anitec.platform.reminders.application.ReminderTaps
+import com.anitec.platform.reminders.infrastructure.ReminderIntents
 import com.anitec.platform.subscriptions.application.CheckoutReturns
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -23,11 +25,13 @@ import javax.inject.Inject
  *
  * The activity is single-top: when the Stripe payment page opens `anitec://subscriptions/...` to bring
  * the user back, that link reaches [onNewIntent] of the running instance (or [onCreate] if the app
- * had to start) and is handed to [CheckoutReturns].
+ * had to start) and is handed to [CheckoutReturns]. A tap on an activity reminder arrives the same way, with the
+ * id of the activity, and is handed to [ReminderTaps].
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var checkoutReturns: CheckoutReturns
+    @Inject lateinit var reminderTaps: ReminderTaps
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +39,10 @@ class MainActivity : AppCompatActivity() {
         // Debug builds ask to reach the backend on this computer; release builds do nothing here.
         LocalNetworkAccess.requestIfNeeded(this)
         // After a rotation the same intent is delivered again; the link was already handled the first time.
-        if (savedInstanceState == null) checkoutReturns.onLink(intent?.dataString)
+        if (savedInstanceState == null) {
+            checkoutReturns.onLink(intent?.dataString)
+            ReminderIntents.activityIdOf(intent)?.let(reminderTaps::onActivityOpened)
+        }
         setContent {
             AniTecTheme {
                 AniTecApp()
@@ -47,5 +54,6 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         checkoutReturns.onLink(intent.dataString)
+        ReminderIntents.activityIdOf(intent)?.let(reminderTaps::onActivityOpened)
     }
 }
